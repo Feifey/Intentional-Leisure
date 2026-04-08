@@ -4,180 +4,115 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Intentional Leisure — Coming Soon</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --cream:     #F6EFE4;
-      --sand:      #E2D0B8;
-      --terracotta:#C97B55;
-      --clay:      #A85C3A;
-      --sage:      #7BA899;
-      --moss:      #4E7B6F;
-      --slate:     #3D5A6C;
-    }
-
     body {
       min-height: 100vh;
-      background-color: var(--cream);
+      background: #ffffff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       font-family: 'Inter', sans-serif;
-      color: var(--slate);
-      overflow: hidden;
-      position: relative;
+      color: #111111;
     }
 
-    /* ── dot grid background ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: radial-gradient(circle, #C97B5533 1px, transparent 1px);
-      background-size: 28px 28px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── soft horizon arc ── */
-    .arc {
-      position: fixed;
-      bottom: -180px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 140vw;
-      height: 380px;
-      border-radius: 50% 50% 0 0;
-      background: var(--sand);
-      opacity: 0.55;
-      z-index: 0;
-    }
-
-    /* ── content card ── */
-    .card {
-      position: relative;
-      z-index: 1;
+    .container {
       text-align: center;
-      max-width: 560px;
       padding: 0 24px;
-      animation: fadeUp 1s ease both;
+      max-width: 520px;
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
+      from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .eyebrow {
-      font-family: 'Inter', sans-serif;
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
       font-weight: 500;
-      font-size: 0.72rem;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: var(--terracotta);
-      margin-bottom: 20px;
+      color: #999;
+      margin-bottom: 32px;
     }
 
     h1 {
-      font-family: 'Lora', serif;
-      font-size: clamp(2rem, 6vw, 3rem);
+      font-size: clamp(2rem, 5.5vw, 2.75rem);
       font-weight: 600;
-      line-height: 1.2;
-      color: var(--slate);
-      margin-bottom: 10px;
-    }
-
-    h1 em {
-      font-style: italic;
-      color: var(--terracotta);
-    }
-
-    .divider {
-      width: 48px;
-      height: 2px;
-      background: var(--sage);
-      margin: 22px auto;
-      border-radius: 2px;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      color: #111;
+      margin-bottom: 20px;
     }
 
     p {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 300;
-      line-height: 1.75;
-      color: var(--slate);
-      opacity: 0.85;
-      margin-bottom: 36px;
+      line-height: 1.8;
+      color: #666;
+      margin-bottom: 48px;
     }
 
-    .badge {
+    .status {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: var(--sand);
-      border: 1px solid var(--terracotta);
-      color: var(--clay);
-      font-size: 0.82rem;
-      font-weight: 500;
-      letter-spacing: 0.05em;
-      padding: 10px 22px;
+      gap: 10px;
+      border: 1px solid #e5e5e5;
       border-radius: 100px;
+      padding: 10px 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #444;
     }
 
-    .dot-pulse {
-      width: 8px;
-      height: 8px;
+    .dot {
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: var(--terracotta);
-      animation: pulse 1.8s ease-in-out infinite;
+      background: #22c55e;
+      animation: blink 2s ease-in-out infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1;   transform: scale(1); }
-      50%       { opacity: 0.3; transform: scale(0.6); }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.15; }
     }
 
     footer {
       position: fixed;
-      bottom: 20px;
-      left: 0;
-      right: 0;
+      bottom: 24px;
+      width: 100%;
       text-align: center;
-      font-size: 0.72rem;
-      font-weight: 400;
+      font-size: 0.7rem;
+      color: #bbb;
       letter-spacing: 0.06em;
-      color: var(--slate);
-      opacity: 0.4;
-      z-index: 1;
     }
   </style>
 </head>
 <body>
 
-  <div class="arc"></div>
+  <div class="container">
+    <span class="tag">Intentional Leisure</span>
 
-  <div class="card">
-    <p class="eyebrow">Intentional Leisure &nbsp;·&nbsp; UX Research Project</p>
-
-    <h1>Something <em>thoughtful</em><br>is on its way.</h1>
-
-    <div class="divider"></div>
+    <h1>We're working<br>on something.</h1>
 
     <p>
-      We're building a space to explore how people spend<br>
-      their free time — and how they wish they could.<br>
-      Check back soon.
+      A project about how people spend their free time —<br>
+      and how they wish they could. Coming soon.
     </p>
 
-    <div class="badge">
-      <span class="dot-pulse"></span>
-      Currently in progress
+    <div class="status">
+      <span class="dot"></span>
+      In progress
     </div>
   </div>
 
-  <footer>Feifey &amp; Yuxuan &nbsp;·&nbsp; SVA &nbsp;·&nbsp; 2026</footer>
+  <footer>Feifey &amp; Yuxuan &nbsp;·&nbsp; SVA 2026</footer>
 
 </body>
 </html>
