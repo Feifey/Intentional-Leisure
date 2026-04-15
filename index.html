@@ -4,16 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Intentional Leisure</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #ffffff;
-      --fg: #111111;
-      --muted: #666666;
-      --border: #e8e8e8;
-      --ai-bg: #f4f4f4;
+      --bg:           #FDF8F2;
+      --fg:           #2D1E0F;
+      --muted:        #8B6B4A;
+      --border:       #E8D8C4;
+      --ai-bg:        #FFF4E8;
+      --accent:       #B5714A;
+      --chip-bg:      #FFF0E0;
+      --chip-border:  #D4A882;
     }
 
     body {
@@ -23,7 +26,16 @@
       min-height: 100vh;
     }
 
-    /* ── SETUP SCREEN ────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ── SETUP ────────────────────────────────────── */
     #setup {
       min-height: 100vh;
       display: flex;
@@ -31,98 +43,72 @@
       align-items: center;
       justify-content: center;
       padding: 32px 24px;
-      animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) both;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .setup-inner {
-      max-width: 420px;
-      width: 100%;
-      text-align: center;
-    }
+    .setup-inner { max-width: 420px; width: 100%; text-align: center; }
 
     .tag {
       display: inline-block;
-      font-size: 0.68rem;
+      font-size: 0.67rem;
       font-weight: 500;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: #aaa;
-      margin-bottom: 28px;
+      color: var(--muted);
+      opacity: 0.7;
+      margin-bottom: 18px;
     }
 
     .setup-inner h1 {
-      font-size: clamp(1.8rem, 5vw, 2.4rem);
+      font-size: clamp(1.75rem, 5vw, 2.2rem);
       font-weight: 600;
       letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 16px;
-    }
-
-    .setup-inner .desc {
-      font-size: 0.93rem;
-      font-weight: 300;
-      line-height: 1.8;
-      color: var(--muted);
-      margin-bottom: 44px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      text-align: left;
+      line-height: 1.2;
       margin-bottom: 12px;
     }
 
+    .setup-inner .desc {
+      font-size: 0.91rem;
+      font-weight: 300;
+      line-height: 1.8;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 7px; text-align: left; margin-bottom: 10px; }
+
     .field label {
-      font-size: 0.72rem;
+      font-size: 0.71rem;
       font-weight: 500;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #999;
+      color: var(--muted);
     }
 
     .field input {
       width: 100%;
-      padding: 12px 14px;
+      padding: 11px 14px;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       font-family: 'Inter', sans-serif;
       font-size: 0.9rem;
       color: var(--fg);
-      background: #fafafa;
+      background: #fff;
       outline: none;
       transition: border-color 0.18s;
-      letter-spacing: 0.04em;
     }
+    .field input:focus { border-color: var(--accent); }
 
-    .field input:focus {
-      border-color: #bbb;
-      background: #fff;
-    }
-
-    .key-note {
-      font-size: 0.71rem;
-      color: #bbb;
-      line-height: 1.65;
-      text-align: left;
-      margin-bottom: 28px;
-    }
-
-    .key-note a { color: #999; }
+    .key-note { font-size: 0.71rem; color: #bbb; line-height: 1.6; text-align: left; margin-bottom: 22px; }
+    .key-note a { color: var(--muted); }
 
     .btn-primary {
       width: 100%;
       padding: 13px;
-      background: #111;
+      background: var(--fg);
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-family: 'Inter', sans-serif;
       font-size: 0.88rem;
       font-weight: 500;
@@ -130,68 +116,156 @@
       transition: opacity 0.18s;
       letter-spacing: 0.01em;
     }
-
-    .btn-primary:hover   { opacity: 0.78; }
+    .btn-primary:hover { opacity: 0.78; }
     .btn-primary:disabled { opacity: 0.25; cursor: default; }
 
-    /* ── CHAT SCREEN ─────────────────────────── */
-    #chat {
-      display: none;
-      flex-direction: column;
-      height: 100vh;
+    /* ── SAVED MENU PREVIEW (setup) ─────────────── */
+    .saved-preview-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 22px 18px;
+      text-align: left;
+      margin-bottom: 18px;
+      animation: fadeIn 0.45s ease both;
     }
 
+    .spc-label {
+      font-size: 0.63rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0.65;
+      margin-bottom: 14px;
+    }
+
+    .spc-tier { margin-bottom: 11px; }
+
+    .spc-tier-label {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .spc-tier-items {
+      font-size: 0.84rem;
+      color: var(--fg);
+      line-height: 1.55;
+      opacity: 0.8;
+    }
+
+    .btn-outline {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s;
+      margin-bottom: 10px;
+    }
+    .btn-outline:hover { border-color: var(--accent); background: var(--chip-bg); }
+
+    .link-btn {
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      opacity: 0.65;
+      padding: 4px 0;
+    }
+    .link-btn:hover { opacity: 1; }
+
+    #rebuild-form {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.35s ease both;
+    }
+
+    /* ── CHAT SCREEN ─────────────────────────────── */
+    #chat { display: none; flex-direction: column; height: 100vh; }
+
     .chat-header {
-      padding: 14px 24px;
+      padding: 11px 20px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 12px;
       flex-shrink: 0;
+      background: var(--bg);
     }
 
     .chat-brand {
-      font-size: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 0.14em;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #bbb;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    /* ── PROGRESS BAR ────────────────────────────── */
+    .progress-wrap {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    #progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--chip-border), var(--accent));
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.7s cubic-bezier(0.16,1,0.3,1);
     }
 
     .btn-ghost {
-      font-size: 0.73rem;
-      color: #ccc;
+      font-size: 0.72rem;
+      color: var(--muted);
       background: none;
       border: none;
       cursor: pointer;
       font-family: 'Inter', sans-serif;
       padding: 4px 8px;
-      border-radius: 4px;
-      transition: color 0.18s;
+      border-radius: 6px;
+      transition: opacity 0.18s;
+      flex-shrink: 0;
+      opacity: 0.55;
     }
+    .btn-ghost:hover { opacity: 1; }
 
-    .btn-ghost:hover { color: #888; }
-
+    /* ── MESSAGES ────────────────────────────────── */
     .messages {
       flex: 1;
       overflow-y: auto;
-      padding: 32px 24px 24px;
+      padding: 28px 20px 16px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      max-width: 640px;
+      gap: 10px;
+      max-width: 580px;
       width: 100%;
       margin: 0 auto;
     }
 
     .bubble {
-      max-width: 86%;
-      padding: 13px 17px;
-      border-radius: 16px;
+      max-width: 88%;
+      padding: 12px 16px;
+      border-radius: 18px;
       font-size: 0.91rem;
-      line-height: 1.72;
-      white-space: pre-wrap;
-      word-wrap: break-word;
+      line-height: 1.65;
+      animation: fadeUp 0.3s ease both;
     }
 
     .bubble.ai {
@@ -202,279 +276,308 @@
     }
 
     .bubble.user {
-      background: #111;
-      color: #fff;
+      background: var(--fg);
+      color: #FDF8F2;
       border-bottom-right-radius: 4px;
       align-self: flex-end;
     }
 
-    /* ── MENU OUTPUT ─────────────────────────── */
+    /* ── OPTION CHIPS ────────────────────────────── */
+    .chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      padding: 2px 0 6px;
+      align-self: flex-start;
+      max-width: 92%;
+      animation: fadeUp 0.35s 0.08s ease both;
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+
+    .chip {
+      padding: 8px 16px;
+      background: var(--chip-bg);
+      border: 1px solid var(--chip-border);
+      border-radius: 100px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      color: var(--fg);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.12s;
+      line-height: 1.3;
+      user-select: none;
+    }
+    .chip:hover  { background: #FFE5CC; border-color: var(--accent); transform: translateY(-1px); }
+    .chip:active { transform: translateY(0); }
+
+    /* ── TYPING INDICATOR ────────────────────────── */
+    .typing-bubble {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      padding: 13px 16px;
+      background: var(--ai-bg);
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+      animation: fadeUp 0.25s ease both;
+    }
+
+    .typing-bubble span {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 1.3s ease-in-out infinite;
+      opacity: 0.35;
+    }
+    .typing-bubble span:nth-child(2) { animation-delay: 0.22s; }
+    .typing-bubble span:nth-child(3) { animation-delay: 0.44s; }
+
+    @keyframes blink {
+      0%,80%,100% { transform: scale(1);   opacity: 0.35; }
+      40%         { transform: scale(1.35); opacity: 1; }
+    }
+
+    /* ── MENU CARD ───────────────────────────────── */
     .menu-card {
       align-self: stretch;
-      background: #fafafa;
+      background: #fff;
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px 28px 22px;
+      border-radius: 16px;
+      padding: 26px 26px 20px;
+      animation: fadeUp 0.4s ease both;
     }
 
-    .menu-card h2 {
-      font-size: 0.95rem;
+    .menu-title {
+      font-size: 1.05rem;
       font-weight: 600;
       letter-spacing: -0.01em;
-      margin-bottom: 24px;
-      color: #111;
-    }
-
-    .menu-tier {
+      color: var(--fg);
       margin-bottom: 20px;
     }
 
-    .menu-tier h3 {
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #bbb;
-      margin-bottom: 10px;
+    .menu-tier { margin-bottom: 18px; }
+
+    .menu-tier-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 9px;
     }
 
-    .menu-tier h3 span {
+    .tier-icon { font-size: 0.95rem; }
+
+    .tier-label {
+      font-size: 0.69rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .tier-sub {
+      font-size: 0.64rem;
+      color: #ccc;
       font-weight: 400;
-      color: #ddd;
       letter-spacing: 0;
       text-transform: none;
-      font-size: 0.65rem;
-      margin-left: 6px;
+      margin-left: 3px;
     }
 
-    .menu-tier ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
+    .menu-tier ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
 
     .menu-tier ul li {
       font-size: 0.88rem;
-      line-height: 1.55;
-      color: #333;
+      line-height: 1.5;
+      color: var(--fg);
       padding-left: 16px;
       position: relative;
     }
 
-    .menu-tier ul li::before {
-      content: '—';
-      position: absolute;
-      left: 0;
-      color: #ddd;
-    }
+    .menu-tier ul li::before { content: '–'; position: absolute; left: 0; color: var(--chip-border); }
 
-    .menu-footer-note {
-      font-size: 0.73rem;
-      color: #bbb;
-      margin-top: 20px;
-      line-height: 1.6;
-      border-top: 1px solid #eee;
-      padding-top: 16px;
-    }
+    .menu-divider { height: 1px; background: var(--border); margin: 16px 0; }
 
-    .menu-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 18px;
-    }
+    .menu-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-    .btn-print {
-      padding: 9px 18px;
-      background: #111;
+    .btn-save {
+      padding: 9px 20px;
+      background: var(--fg);
       color: #fff;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       font-family: 'Inter', sans-serif;
       font-size: 0.78rem;
       font-weight: 500;
       cursor: pointer;
       transition: opacity 0.18s;
     }
+    .btn-save:hover { opacity: 0.78; }
 
-    .btn-print:hover { opacity: 0.78; }
+    .btn-save-outline {
+      padding: 9px 20px;
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s;
+    }
+    .btn-save-outline:hover { border-color: var(--accent); background: var(--chip-bg); }
 
-    /* ── TYPING INDICATOR ────────────────────── */
-    .typing-bubble {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-      padding: 13px 17px;
-      background: var(--ai-bg);
-      border-radius: 16px;
-      border-bottom-left-radius: 4px;
-      align-self: flex-start;
-      width: fit-content;
+    .save-confirm {
+      font-size: 0.74rem;
+      color: var(--accent);
+      margin-top: 8px;
+      animation: fadeIn 0.3s ease both;
     }
 
-    .typing-bubble span {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #ccc;
-      animation: blink 1.2s ease-in-out infinite;
-    }
-
-    .typing-bubble span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-bubble span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes blink {
-      0%, 80%, 100% { transform: scale(1); opacity: 0.35; }
-      40%           { transform: scale(1.25); opacity: 1; }
-    }
-
-    /* ── INPUT AREA ──────────────────────────── */
+    /* ── INPUT AREA ──────────────────────────────── */
     .chat-footer {
       border-top: 1px solid var(--border);
-      padding: 14px 24px;
+      padding: 11px 20px;
       flex-shrink: 0;
+      background: var(--bg);
     }
 
     .chat-footer-inner {
-      max-width: 640px;
+      max-width: 580px;
       margin: 0 auto;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: flex-end;
     }
 
     #user-input {
       flex: 1;
-      padding: 11px 14px;
+      padding: 10px 14px;
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 10px;
       font-family: 'Inter', sans-serif;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       resize: none;
       outline: none;
       line-height: 1.5;
-      min-height: 42px;
-      max-height: 130px;
+      min-height: 40px;
+      max-height: 110px;
       transition: border-color 0.18s;
       color: var(--fg);
+      background: #fff;
     }
-
-    #user-input:focus { border-color: #bbb; }
+    #user-input:focus { border-color: var(--accent); }
+    #user-input::placeholder { color: #ccc; }
 
     .btn-send {
-      padding: 0 18px;
-      height: 42px;
-      background: #111;
+      padding: 0 16px;
+      height: 40px;
+      background: var(--fg);
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-family: 'Inter', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 500;
+      font-size: 1rem;
+      font-weight: 400;
       cursor: pointer;
       transition: opacity 0.18s;
       flex-shrink: 0;
     }
-
     .btn-send:hover    { opacity: 0.78; }
     .btn-send:disabled { opacity: 0.25; cursor: default; }
-
-    /* ── FOOTER ──────────────────────────────── */
-    .site-footer {
-      position: fixed;
-      bottom: 20px;
-      width: 100%;
-      text-align: center;
-      font-size: 0.66rem;
-      color: #ccc;
-      letter-spacing: 0.07em;
-      pointer-events: none;
-    }
-
-    #chat .site-footer { display: none; }
-
-    /* ── PRINT ───────────────────────────────── */
-    @media print {
-      #chat .chat-header,
-      #chat .chat-footer,
-      .bubble.user,
-      .bubble.ai,
-      .menu-actions { display: none !important; }
-
-      .messages { padding: 0; overflow: visible; }
-      .menu-card { border: none; background: none; padding: 0; }
-    }
   </style>
 </head>
 <body>
 
-<!-- ── SETUP SCREEN ────────────────────────────── -->
+<!-- ── SETUP SCREEN ─────────────────────────────────── -->
 <div id="setup">
   <div class="setup-inner">
     <span class="tag">Intentional Leisure</span>
-    <h1>Build your<br>leisure menu.</h1>
-    <p class="desc">
-      Answer a few questions when you have energy.<br>
-      When you're tired, just pick from the list.
-    </p>
 
-    <div class="field">
-      <label>Groq API Key</label>
-      <input type="password" id="api-key-input" placeholder="gsk_..." autocomplete="off" />
+    <!-- New user -->
+    <div id="new-user-view">
+      <h1>Build your<br>leisure menu.</h1>
+      <p class="desc">Answer a few quick questions.<br>When you're tired, just pick from the list.</p>
+      <div class="field">
+        <label>Groq API Key</label>
+        <input type="password" id="api-key-input" placeholder="gsk_…" autocomplete="off" />
+      </div>
+      <p class="key-note">
+        Free key at <a href="https://console.groq.com" target="_blank">console.groq.com</a> — stored only in this browser.
+      </p>
+      <button class="btn-primary" onclick="startChat()">Begin →</button>
     </div>
-    <p class="key-note">
-      Stored only in this browser session — never sent anywhere except Google's API.<br>
-      Get a free key at <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a>.
-    </p>
 
-    <button class="btn-primary" id="start-btn" onclick="startChat()">Begin</button>
+    <!-- Returning user -->
+    <div id="returning-user-view" style="display:none">
+      <h1>Welcome back.</h1>
+      <p class="desc" style="margin-bottom:20px">Here's your leisure menu.</p>
+      <div class="saved-preview-card" id="saved-preview-card"></div>
+      <button class="btn-primary" onclick="viewSavedMenu()">Use this menu →</button>
+      <div style="margin-top:11px; text-align:center">
+        <button class="link-btn" onclick="showRebuildForm()">Rebuild my menu</button>
+      </div>
+      <div id="rebuild-form" style="display:none">
+        <div class="field" style="margin-top:4px">
+          <label>Groq API Key</label>
+          <input type="password" id="api-key-rebuild" placeholder="gsk_…" autocomplete="off" />
+        </div>
+        <button class="btn-primary" onclick="startFreshChat()">Start fresh →</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ── CHAT SCREEN ────────────────────────────── -->
+<!-- ── CHAT SCREEN ──────────────────────────────────── -->
 <div id="chat">
   <div class="chat-header">
     <span class="chat-brand">Intentional Leisure</span>
-    <button class="btn-ghost" onclick="resetChat()">Start over</button>
+    <div class="progress-wrap"><div id="progress-fill"></div></div>
+    <button class="btn-ghost" onclick="resetChat()">↩ Start over</button>
   </div>
 
   <div class="messages" id="messages"></div>
 
-  <div class="chat-footer">
+  <div class="chat-footer" id="chat-footer">
     <div class="chat-footer-inner">
       <textarea
         id="user-input"
-        placeholder="Type your answer…"
+        placeholder="Or type your own answer…"
         rows="1"
         onkeydown="handleKey(event)"
         oninput="autoResize(this)"
       ></textarea>
-      <button class="btn-send" id="send-btn" onclick="sendMessage()">Send</button>
+      <button class="btn-send" id="send-btn" onclick="sendMessage()">↑</button>
     </div>
   </div>
 </div>
 
-<div class="site-footer">Feifey &amp; Yuxuan &nbsp;·&nbsp; SVA 2026</div>
-
 <script>
-// ── SYSTEM PROMPT ─────────────────────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are a personal leisure architect. Your only job is to help the user build a physical "Leisure Menu" -- a simple, handwritten or printed list they put on their fridge or desk. When they are tired and low on energy after work, they look at the menu and pick something instead of reaching for their phone.
+/* ─────────────────────────────────────────────────────────────────────────────
+   SYSTEM PROMPT
+───────────────────────────────────────────────────────────────────────────── */
+const SYSTEM_PROMPT = `You are a warm, gentle guide — part caring therapist, part intuitive chef — helping someone discover what truly rests them. Your job is to help them build a personal "Leisure Menu": a short list they can reach for when they're tired instead of their phone.
 
 The menu has three tiers:
-- Appetizers: activities that take 5 minutes or less, require zero setup, and can be done lying down or sitting still
-- Mains: activities that take 20 to 45 minutes, require only one simple object or one action to start, and leave you feeling replenished
-- Desserts: passive but finite -- one episode of something specific, one album, one short documentary. It must have a defined end.
+🌿 Appetizers: 5 minutes or less, zero setup, can be done lying down
+🍽️ Mains: 20–45 minutes, one simple thing to start, leaves you replenished
+🍮 Desserts: one episode, one album, one short thing — has a defined end
 
-Your job is to build this menu through a warm, conversational interview. Rules you must follow:
+Conversation rules:
+1. ONE question per message. Never two.
+2. SHORT messages — max 2 warm sentences before the question. No paragraphs.
+3. Reflect gently on what they said, using their own words, before moving on.
+4. Never suggest activities they haven't already mentioned interest in.
+5. 6–8 exchanges total — be warm but efficient.
+6. After EVERY question, on its own line at the end, write exactly:
+   OPTIONS: [option A] | [option B] | [option C] | Something else
+   Options must be specific and directly relevant to the question you just asked.
 
-1. Ask only one question at a time. Never ask two questions in the same message.
-2. Be curious and specific. Follow up on what the user says. Never move to a new topic until you have understood the current answer.
-3. Never suggest activities that the user has not already expressed interest in. Only ask questions to draw out what they already want.
-4. Reflect back what you hear before moving on. Use their exact words.
-5. Aim to gather 2 to 3 items per tier. Once all three tiers are filled, tell the user you have enough and ask if they are ready to see their menu.
-6. Keep the whole conversation to under 12 exchanges before generating the menu.
+When you have 2–3 ideas per tier, warmly let them know you have everything you need and ask if they're ready to see their menu.
 
-When the user is ready, output the menu using this exact format and nothing else:
+When ready, output ONLY this format and nothing else:
 
 MY LEISURE MENU
 ---
@@ -493,143 +596,278 @@ DESSERTS (one and done)
 - [item]
 - [item]
 
-Print this and put it somewhere you will see it when you are tired.
-
-Rules for the menu items:
-- Use the user's exact words and phrasing
+Menu rules:
+- Use the user's exact words
 - Each item is one short line, specific enough to start without thinking
-- Maximum 3 items per tier
 - Never frame any item as productive, self-improving, or something to be earned
-- Never include the word "meaningful"
+- Max 3 items per tier
 
-Begin with one short sentence introducing what you are building together, then ask your first question.`;
+Begin with one warm sentence, then ask your first question. End with OPTIONS.`;
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let apiKey = '';
-let conversation = [];
-let isLoading = false;
+/* ─────────────────────────────────────────────────────────────────────────────
+   STATE
+───────────────────────────────────────────────────────────────────────────── */
+let apiKey        = '';
+let conversation  = [];
+let isLoading     = false;
+let questionCount = 0;
+const MAX_Q       = 8;
+let savedMenuData   = null;
+let currentMenuData = null;
 
-// The hidden trigger that starts the conversation (never shown in UI)
-const TRIGGER = { role: 'user', content: 'ready' };
+/* ─────────────────────────────────────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────────────────────────────────────── */
+window.addEventListener('load', () => {
+  const savedKey = localStorage.getItem('il_key') || '';
+  if (savedKey) {
+    document.getElementById('api-key-input').value = savedKey;
+  }
 
-// ── SETUP ─────────────────────────────────────────────────────────────────────
-function startChat() {
-  const keyVal = document.getElementById('api-key-input').value.trim();
-  if (!keyVal) { alert('Please enter your Groq API key.'); return; }
-  apiKey = keyVal;
-  try { sessionStorage.setItem('il_key', apiKey); } catch (e) {}
+  try {
+    const json = localStorage.getItem('il_menu');
+    if (json) {
+      savedMenuData = JSON.parse(json);
+      showReturningView(savedMenuData);
+    }
+  } catch (e) { localStorage.removeItem('il_menu'); }
+});
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   RETURNING USER VIEW
+───────────────────────────────────────────────────────────────────────────── */
+function showReturningView(menuData) {
+  document.getElementById('new-user-view').style.display      = 'none';
+  document.getElementById('returning-user-view').style.display = 'block';
+
+  const icons = { appetizers: '🌿', mains: '🍽️', desserts: '🍮' };
+  let html = '<div class="spc-label">Your Leisure Menu</div>';
+  for (const tier of menuData.tiers) {
+    const key = tier.label.toLowerCase();
+    const preview = tier.items.slice(0, 2).join(' · ') + (tier.items.length > 2 ? ' …' : '');
+    html += `<div class="spc-tier">
+      <div class="spc-tier-label">${icons[key] || ''} ${tier.label}</div>
+      <div class="spc-tier-items">${preview}</div>
+    </div>`;
+  }
+  document.getElementById('saved-preview-card').innerHTML = html;
+}
+
+function showRebuildForm() {
+  const form = document.getElementById('rebuild-form');
+  form.style.display = 'block';
+  const savedKey = localStorage.getItem('il_key') || '';
+  document.getElementById('api-key-rebuild').value = savedKey;
+}
+
+function viewSavedMenu() {
+  currentMenuData = savedMenuData;
   document.getElementById('setup').style.display = 'none';
-  document.getElementById('chat').style.display = 'flex';
+  document.getElementById('chat').style.display  = 'flex';
+  document.getElementById('chat-footer').style.display = 'none';
+  document.getElementById('progress-fill').style.width = '100%';
 
-  // Start with hidden trigger so conversation begins naturally
-  conversation = [TRIGGER];
+  renderMenuCard(savedMenuData);
+
+  const msgs = document.getElementById('messages');
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'text-align:center; padding:6px 0 2px;';
+  wrap.innerHTML = '<button class="link-btn" onclick="resetChat()" style="font-size:0.79rem">Rebuild my menu</button>';
+  msgs.appendChild(wrap);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   START / RESET
+───────────────────────────────────────────────────────────────────────────── */
+function startChat() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) { alert('Please enter your Groq API key.'); return; }
+  beginChat(key);
+}
+
+function startFreshChat() {
+  const key = document.getElementById('api-key-rebuild').value.trim();
+  if (!key) { alert('Please enter your Groq API key.'); return; }
+  localStorage.removeItem('il_menu');
+  savedMenuData = null;
+  beginChat(key);
+}
+
+function beginChat(key) {
+  apiKey = key;
+  localStorage.setItem('il_key', key);
+
+  document.getElementById('setup').style.display          = 'none';
+  document.getElementById('chat').style.display           = 'flex';
+  document.getElementById('chat-footer').style.display    = '';
+  document.getElementById('messages').innerHTML           = '';
+  document.getElementById('progress-fill').style.width    = '0%';
+
+  questionCount   = 0;
+  currentMenuData = null;
+  conversation    = [{ role: 'user', content: 'ready' }];
   callAPI();
 }
 
 function resetChat() {
   if (isLoading) return;
-  if (!confirm('Start over? Your current conversation will be lost.')) return;
-  conversation = [];
-  document.getElementById('messages').innerHTML = '';
-  document.getElementById('setup').style.display = 'flex';
-  document.getElementById('chat').style.display = 'none';
+  conversation    = [];
+  questionCount   = 0;
+  currentMenuData = null;
+
+  document.getElementById('messages').innerHTML        = '';
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('chat').style.display        = 'none';
+  document.getElementById('chat-footer').style.display = '';
+  document.getElementById('setup').style.display       = 'flex';
+
+  // Re-check saved menu
+  try {
+    const json = localStorage.getItem('il_menu');
+    if (json) {
+      savedMenuData = JSON.parse(json);
+      showReturningView(savedMenuData);
+      document.getElementById('rebuild-form').style.display = 'none';
+    } else {
+      savedMenuData = null;
+      document.getElementById('new-user-view').style.display       = 'block';
+      document.getElementById('returning-user-view').style.display = 'none';
+    }
+  } catch (e) {}
 }
 
-// ── INPUT ─────────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────────────────
+   INPUT HANDLING
+───────────────────────────────────────────────────────────────────────────── */
 function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
 function autoResize(el) {
   el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
+  el.style.height = Math.min(el.scrollHeight, 110) + 'px';
 }
 
-async function sendMessage() {
+async function sendMessage(text) {
   if (isLoading) return;
-  const input = document.getElementById('user-input');
-  const text = input.value.trim();
-  if (!text) return;
+  if (!text) {
+    const inp = document.getElementById('user-input');
+    text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+    inp.style.height = 'auto';
+  }
 
-  input.value = '';
-  input.style.height = 'auto';
+  // Remove existing chips
+  document.querySelectorAll('.chips-wrap').forEach(c => c.remove());
 
   addBubble('user', text);
   conversation.push({ role: 'user', content: text });
-
   await callAPI();
 }
 
-// ── API CALL ──────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────────────────
+   PROGRESS BAR
+───────────────────────────────────────────────────────────────────────────── */
+function updateProgress() {
+  const pct = Math.min((questionCount / MAX_Q) * 100, 95);
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   API CALL
+───────────────────────────────────────────────────────────────────────────── */
 async function callAPI() {
   isLoading = true;
   document.getElementById('send-btn').disabled = true;
-
   const typingEl = addTyping();
 
   try {
-    const res = await fetch(
-      `https://api.groq.com/openai/v1/chat/completions`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            ...conversation
-          ],
-          temperature: 0.85,
-          max_tokens: 1200
-        })
-      }
-    );
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...conversation],
+        temperature: 0.85,
+        max_tokens: 380
+      })
+    });
 
     if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.error?.message || `HTTP ${res.status}`);
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
     }
 
-    const data = await res.json();
+    const data  = await res.json();
     const reply = data.choices?.[0]?.message?.content?.trim() || '';
 
     typingEl.remove();
     conversation.push({ role: 'assistant', content: reply });
 
-    if (isMenuResponse(reply)) {
-      renderMenu(reply);
+    if (isMenu(reply)) {
+      currentMenuData = parseMenu(reply);
+      renderMenuCard(currentMenuData);
+      document.getElementById('progress-fill').style.width = '100%';
     } else {
-      addBubble('ai', reply);
+      questionCount++;
+      updateProgress();
+      const opts      = parseOptions(reply);
+      const cleanText = stripOptions(reply);
+      addBubble('ai', cleanText);
+      if (opts.length) renderChips(opts);
     }
-
   } catch (err) {
     typingEl.remove();
-    addBubble('ai', `Something went wrong: ${err.message}\n\nPlease check your API key and try again.`);
+    addBubble('ai', `Something went wrong: ${err.message}`);
   }
 
   isLoading = false;
   document.getElementById('send-btn').disabled = false;
-  document.getElementById('user-input').focus();
 }
 
-// ── DETECT MENU OUTPUT ────────────────────────────────────────────────────────
-function isMenuResponse(text) {
+/* ─────────────────────────────────────────────────────────────────────────────
+   PARSING HELPERS
+───────────────────────────────────────────────────────────────────────────── */
+function parseOptions(text) {
+  const m = text.match(/OPTIONS:\s*(.+)/i);
+  if (!m) return [];
+  return m[1].split('|').map(o => o.trim()).filter(Boolean);
+}
+
+function stripOptions(text) {
+  return text.replace(/\n?OPTIONS:.*$/im, '').trim();
+}
+
+function isMenu(text) {
   return text.includes('MY LEISURE MENU') ||
     (text.includes('APPETIZERS') && text.includes('MAINS') && text.includes('DESSERTS'));
 }
 
-// ── RENDER CHAT BUBBLES ───────────────────────────────────────────────────────
+function parseMenu(text) {
+  const tiers = [
+    { key: 'APPETIZERS', label: 'Appetizers', sub: 'under 5 min', icon: '🌿', items: [] },
+    { key: 'MAINS',      label: 'Mains',      sub: '20–45 min',   icon: '🍽️',  items: [] },
+    { key: 'DESSERTS',   label: 'Desserts',   sub: 'one and done', icon: '🍮', items: [] },
+  ];
+  let cur = null;
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    if (!line || line === '---') continue;
+    const match = tiers.find(t => line.toUpperCase().startsWith(t.key));
+    if (match) { cur = match; continue; }
+    if (line.startsWith('-') && cur) cur.items.push(line.replace(/^-\s*/, ''));
+  }
+  return { tiers: tiers.filter(t => t.items.length), savedAt: Date.now() };
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RENDER HELPERS
+───────────────────────────────────────────────────────────────────────────── */
 function addBubble(role, text) {
   const msgs = document.getElementById('messages');
-  const el = document.createElement('div');
-  el.className = `bubble ${role}`;
+  const el   = document.createElement('div');
+  el.className   = `bubble ${role}`;
   el.textContent = text;
   msgs.appendChild(el);
   msgs.scrollTop = msgs.scrollHeight;
@@ -638,74 +876,158 @@ function addBubble(role, text) {
 
 function addTyping() {
   const msgs = document.getElementById('messages');
-  const el = document.createElement('div');
+  const el   = document.createElement('div');
   el.className = 'typing-bubble';
-  el.innerHTML = '<span></span><span></span><span></span>';
+  el.innerHTML  = '<span></span><span></span><span></span>';
   msgs.appendChild(el);
   msgs.scrollTop = msgs.scrollHeight;
   return el;
 }
 
-// ── RENDER MENU CARD ──────────────────────────────────────────────────────────
-function renderMenu(text) {
+function renderChips(options) {
+  const msgs = document.getElementById('messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'chips-wrap';
+  for (const opt of options) {
+    const chip  = document.createElement('button');
+    chip.className   = 'chip';
+    chip.textContent = opt;
+    chip.onclick = () => { wrap.remove(); sendMessage(opt); };
+    wrap.appendChild(chip);
+  }
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function renderMenuCard(menuData) {
   const msgs = document.getElementById('messages');
   const card = document.createElement('div');
   card.className = 'menu-card';
 
-  const tiers = [
-    { key: 'APPETIZERS', label: 'Appetizers', sub: 'under 5 min', items: [] },
-    { key: 'MAINS',      label: 'Mains',      sub: '20 – 45 min', items: [] },
-    { key: 'DESSERTS',   label: 'Desserts',   sub: 'one and done', items: [] },
-  ];
-
-  let currentTier = null;
-  let footerLine = '';
-
-  for (const raw of text.split('\n')) {
-    const line = raw.trim();
-    if (!line || line === '---') continue;
-
-    const match = tiers.find(t => line.toUpperCase().startsWith(t.key));
-    if (match) { currentTier = match; continue; }
-
-    if (line.startsWith('-') && currentTier) {
-      currentTier.items.push(line.replace(/^-\s*/, ''));
-      continue;
-    }
-
-    if (line.toLowerCase().includes('print this') || line.toLowerCase().includes('put it somewhere')) {
-      footerLine = line;
-    }
-  }
-
-  let html = '<h2>My Leisure Menu</h2>';
-
-  for (const tier of tiers) {
-    if (!tier.items.length) continue;
+  let html = '<div class="menu-title">My Leisure Menu</div>';
+  for (const tier of menuData.tiers) {
     html += `<div class="menu-tier">
-      <h3>${tier.label}<span>${tier.sub}</span></h3>
+      <div class="menu-tier-header">
+        <span class="tier-icon">${tier.icon}</span>
+        <span class="tier-label">${tier.label}<span class="tier-sub"> · ${tier.sub}</span></span>
+      </div>
       <ul>${tier.items.map(i => `<li>${i}</li>`).join('')}</ul>
     </div>`;
   }
 
-  if (footerLine) {
-    html += `<p class="menu-footer-note">${footerLine}</p>`;
-  }
-
-  html += `<div class="menu-actions">
-    <button class="btn-print" onclick="window.print()">Print menu</button>
-  </div>`;
+  html += `<div class="menu-divider"></div>
+    <div class="menu-actions">
+      <button class="btn-save" onclick="saveAsDefault()">Save as my menu</button>
+      <button class="btn-save-outline" onclick="saveAsPhoto()">Save as photo</button>
+    </div>
+    <div id="save-confirm" class="save-confirm" style="display:none">✓ Saved! Next time you visit, it'll be right here.</div>`;
 
   card.innerHTML = html;
   msgs.appendChild(card);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-try {
-  const saved = sessionStorage.getItem('il_key');
-  if (saved) document.getElementById('api-key-input').value = saved;
-} catch (e) {}
+/* ─────────────────────────────────────────────────────────────────────────────
+   SAVE AS DEFAULT
+───────────────────────────────────────────────────────────────────────────── */
+function saveAsDefault() {
+  if (!currentMenuData) return;
+  localStorage.setItem('il_menu', JSON.stringify(currentMenuData));
+  savedMenuData = currentMenuData;
+  const el = document.getElementById('save-confirm');
+  if (el) { el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 3000); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SAVE AS PHOTO  (pure Canvas — no external library)
+───────────────────────────────────────────────────────────────────────────── */
+async function saveAsPhoto() {
+  if (!currentMenuData) return;
+  await document.fonts.ready;
+
+  const SCALE = 2;
+  const W     = 560 * SCALE;
+
+  // Dynamic height
+  let lh = 52 + 20 + 2 + 24 + 34 + 28; // top-pad + brand + divider + gap + title + gap
+  for (const tier of currentMenuData.tiers) {
+    lh += 16 + 14; // tier header + gap
+    lh += tier.items.length * 24;
+    lh += 18; // tier bottom gap
+  }
+  lh += 2 + 14 + 14 + 48; // bottom divider + gap + footer + bottom-pad
+  const H = Math.max(480, lh) * SCALE;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#FDF4EC');
+  grad.addColorStop(1, '#EDD8BF');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  const px = 52 * SCALE;
+  let y = 52 * SCALE;
+
+  // Brand
+  ctx.font      = `500 ${11 * SCALE}px Inter, -apple-system, sans-serif`;
+  ctx.fillStyle = '#C4895A';
+  ctx.fillText('INTENTIONAL LEISURE', px, y);
+  y += 20 * SCALE;
+
+  // Divider
+  ctx.strokeStyle = '#DFC0A0';
+  ctx.lineWidth   = SCALE;
+  ctx.beginPath(); ctx.moveTo(px, y); ctx.lineTo(W - px, y); ctx.stroke();
+  y += 24 * SCALE;
+
+  // Title
+  ctx.font      = `600 ${27 * SCALE}px Inter, -apple-system, sans-serif`;
+  ctx.fillStyle = '#2D1E0F';
+  ctx.fillText('My Leisure Menu', px, y);
+  y += 34 * SCALE;
+
+  // Tiers
+  for (const tier of currentMenuData.tiers) {
+    ctx.font      = `600 ${11 * SCALE}px Inter, -apple-system, sans-serif`;
+    ctx.fillStyle = '#B5714A';
+    ctx.fillText(`${tier.icon}  ${tier.label.toUpperCase()}  ·  ${tier.sub}`, px, y);
+    y += 16 * SCALE;
+
+    ctx.font      = `400 ${15 * SCALE}px Inter, -apple-system, sans-serif`;
+    ctx.fillStyle = '#2D1E0F';
+    for (const item of tier.items) {
+      ctx.fillText(`–   ${item}`, px + 6 * SCALE, y);
+      y += 24 * SCALE;
+    }
+    y += 14 * SCALE;
+  }
+
+  // Bottom divider
+  ctx.strokeStyle = '#DFC0A0';
+  ctx.lineWidth   = SCALE;
+  ctx.beginPath(); ctx.moveTo(px, y); ctx.lineTo(W - px, y); ctx.stroke();
+  y += 14 * SCALE;
+
+  // Footer text
+  ctx.font      = `300 ${9 * SCALE}px Inter, -apple-system, sans-serif`;
+  ctx.fillStyle = '#C8A882';
+  ctx.fillText('intentional-leisure.com', px, y);
+
+  // Download
+  canvas.toBlob(blob => {
+    const url  = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'my-leisure-menu.png';
+    link.href     = url;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, 'image/png');
+}
 </script>
 </body>
 </html>
