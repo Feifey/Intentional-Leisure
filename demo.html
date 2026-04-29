@@ -699,6 +699,21 @@
 
     <div class="so-divider"></div>
 
+    <!-- API Key -->
+    <div style="margin-bottom:14px">
+      <div class="so-q">Groq API key <span>(optional — makes suggestions real AI)</span></div>
+      <input type="password" id="so-api-key" placeholder="gsk_…"
+        style="width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+               border-radius:8px;font-family:'Inter',sans-serif;font-size:0.82rem;color:#fff;outline:none;
+               transition:border-color .15s;"
+        onfocus="this.style.borderColor='#5B8FD4'"
+        onblur="this.style.borderColor='rgba(255,255,255,.15)'"
+      />
+      <div style="font-size:0.64rem;color:rgba(255,255,255,.28);margin-top:5px">
+        Free at console.groq.com · stays only in this browser · without it the demo uses example suggestions
+      </div>
+    </div>
+
     <button class="so-btn" onclick="startDemo()">Start demo →</button>
   </div>
 </div>
@@ -1110,6 +1125,8 @@ let teaInt       = null;
 let playerInt    = null;
 let gentleTimer  = null;
 let currentSugs  = [];
+let demoApiKey   = '';
+let lastSugsWereLive = false;
 
 /* ─── SETUP CHIPS ───────────────────────────────── */
 window.addEventListener('load', () => {
@@ -1117,6 +1134,10 @@ window.addEventListener('load', () => {
   buildSetupChips('so-regret',     REGRET_OPTS,     'regret');
   updateClock();
   setInterval(updateClock, 1000);
+
+  // Pre-fill saved API key
+  const saved = localStorage.getItem('il_key') || '';
+  if (saved) document.getElementById('so-api-key').value = saved;
 });
 
 function buildSetupChips(id, opts, key) {
@@ -1136,6 +1157,15 @@ function buildSetupChips(id, opts, key) {
 }
 
 function startDemo() {
+  // Save API key if entered
+  const keyInput = document.getElementById('so-api-key');
+  if (keyInput?.value?.trim()) {
+    demoApiKey = keyInput.value.trim();
+    localStorage.setItem('il_key', demoApiKey);
+  } else {
+    demoApiKey = localStorage.getItem('il_key') || '';
+  }
+
   const overlay = document.getElementById('setup-overlay');
   overlay.classList.add('hiding');
   setTimeout(() => overlay.classList.add('gone'), 500);
@@ -1229,16 +1259,100 @@ function nudgeComeBack() {
 }
 
 /* ─── OPEN TRANSITION ───────────────────────────── */
-function openTransition() {
+async function openTransition() {
   document.getElementById('desktop-notif').style.display = 'none';
   if (gentleTimer) clearTimeout(gentleTimer);
   setPhoneState('thinking');
 
-  currentSugs = buildSuggestions();
-  setTimeout(() => {
-    renderSuggestions(currentSugs);
-    setPhoneState('suggestions');
-  }, 3000);
+  // Run AI call + minimum breathing time simultaneously
+  const [sugs] = await Promise.all([
+    fetchLiveSuggestions(),
+    new Promise(r => setTimeout(r, 2800)) // breathing animation always shows
+  ]);
+
+  currentSugs = sugs;
+  renderSuggestions(sugs);
+  setPhoneState('suggestions');
+}
+
+/* ─── GROQ API CALL ─────────────────────────────── */
+async function fetchLiveSuggestions() {
+  if (!demoApiKey) {
+    lastSugsWereLive = false;
+    return buildSuggestions(); // fallback to pre-set
+  }
+
+  const profile = [
+    demoProfile.decompress.length ? `What helps them decompress: ${demoProfile.decompress.join(', ')}` : '',
+    demoProfile.regret.length     ? `What they tend to regret: ${demoProfile.regret.join(', ')}`       : '',
+  ].filter(Boolean).join('\n') || 'No profile provided — make 3 general suggestions.';
+
+  const VALID_TYPES = ['walk','music','podcast','drawing','journal','reading','stretch','tea','bath'];
+
+  const system = `You are a calm transition guide. Someone just finished work and wants to switch to rest mode.
+
+User profile:
+${profile}
+
+Generate exactly 3 personalized transition suggestions. Rules:
+- Each must be specific and immediately startable (under 10 seconds to begin)
+- Each "because" must quote something from their profile using their exact words
+- Never suggest anything from their regret list
+- Pick the most fitting type for each from this exact list: ${VALID_TYPES.join(', ')}
+
+Respond ONLY in valid JSON, no other text:
+{
+  "suggestions": [
+    {
+      "activity": "Short specific activity name, 6 words max",
+      "because": "One sentence quoting their exact profile words",
+      "start": "Single first physical action to take",
+      "type": "one of: ${VALID_TYPES.join('|')}"
+    }
+  ]
+}`;
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${demoApiKey}`
+      },
+      body: JSON.stringify({
+        model:       'llama-3.3-70b-versatile',
+        messages:    [
+          { role: 'system', content: system },
+          { role: 'user',   content: `It's ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}. I just finished work.` }
+        ],
+        temperature: 0.8,
+        max_tokens:  500
+      })
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const data  = await res.json();
+    const reply = data.choices?.[0]?.message?.content?.trim() || '';
+    const match = reply.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('No JSON in response');
+
+    const parsed = JSON.parse(match[0]);
+    const sugs   = (parsed.suggestions || []).map(s => ({
+      ...s,
+      type: VALID_TYPES.includes(s.type) ? s.type : 'tea' // safe fallback type
+    })).slice(0, 5);
+
+    if (!sugs.length) throw new Error('Empty suggestions');
+
+    lastSugsWereLive = true;
+    return sugs;
+
+  } catch (err) {
+    console.warn('Groq call failed, using pre-set suggestions:', err.message);
+    lastSugsWereLive = false;
+    return buildSuggestions();
+  }
 }
 
 /* ─── RENDER SUGGESTIONS ────────────────────────── */
@@ -1246,10 +1360,18 @@ function renderSuggestions(sugs) {
   const list = document.getElementById('sug-list');
   list.innerHTML = '';
 
-  // Personalise context line
+  // Context line
   const regret = demoProfile.regret[0] || 'scrolling';
   document.getElementById('p-ctx-text').textContent =
     `Before you open ${regret} — here's what you said helps.`;
+
+  // AI / demo mode badge
+  const badge = document.createElement('div');
+  badge.style.cssText = `display:flex;align-items:center;gap:5px;margin-bottom:10px;font-size:0.62rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;`;
+  badge.innerHTML = lastSugsWereLive
+    ? `<span style="width:6px;height:6px;border-radius:50%;background:#5A8A5A;flex-shrink:0"></span><span style="color:#5A8A5A">Generated by AI for you</span>`
+    : `<span style="width:6px;height:6px;border-radius:50%;background:#aaa;flex-shrink:0"></span><span style="color:#aaa">Example suggestions — add a Groq key for live AI</span>`;
+  list.appendChild(badge);
 
   sugs.forEach(s => {
     const card = document.createElement('div');

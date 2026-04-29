@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intentional Leisure</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #F8F3EA;
+      --fg:     #2A1A0E;
+      --muted:  #7A6048;
+      --border: #DDD0BC;
+      --ai-bg:  #FFF8F0;
+      --accent: #9E5C2A;
+    }
+
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--fg); min-height: 100vh; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ── SETUP ─────────────────────────────────── */
+    #setup {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px 24px;
+      animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) both;
+      background: var(--bg);
+    }
+
+    .setup-inner { max-width: 400px; width: 100%; text-align: center; }
+
+    .setup-tag {
+      display: inline-block;
+      font-size: 0.64rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); opacity: 0.75; margin-bottom: 16px;
+    }
+
+    .setup-inner h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2rem, 6vw, 2.7rem); font-weight: 700; font-style: italic;
+      letter-spacing: -0.01em; line-height: 1.15;
+      color: var(--fg); margin-bottom: 12px;
+    }
+
+    .setup-inner .desc {
+      font-size: 0.88rem; font-weight: 300; line-height: 1.8;
+      color: var(--muted); margin-bottom: 32px;
+    }
+
+    .ornament {
+      display: flex; align-items: center; gap: 10px;
+      margin: 20px 0 28px;
+    }
+    .ornament-line { flex: 1; height: 1px; background: var(--border); }
+    .ornament-dot  { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.4; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; text-align: left; margin-bottom: 10px; }
+    .field label {
+      font-size: 0.68rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    }
+    .field input {
+      width: 100%; padding: 11px 14px;
+      border: 1px solid var(--border); border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 0.88rem;
+      color: var(--fg); background: #fff; outline: none; transition: border-color 0.18s;
+    }
+    .field input:focus { border-color: var(--accent); }
+    .field input::placeholder { color: #ccc; }
+
+    .key-note { font-size: 0.69rem; color: #bbb; line-height: 1.6; text-align: left; margin-bottom: 20px; }
+    .key-note a { color: var(--muted); }
+
+    .btn-primary {
+      width: 100%; padding: 13px;
+      background: var(--fg); color: #F8F3EA;
+      border: none; border-radius: 8px;
+      font-family: 'Playfair Display', Georgia, serif; font-size: 1rem; font-style: italic;
+      cursor: pointer; transition: opacity 0.18s; letter-spacing: 0.01em;
+    }
+    .btn-primary:hover { opacity: 0.78; }
+    .btn-primary:disabled { opacity: 0.25; cursor: default; }
+
+    /* ── SAVED PREVIEW ─────────────────────────── */
+    .saved-preview-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 12px;
+      padding: 20px 20px 16px; text-align: left; margin-bottom: 16px;
+      animation: fadeIn 0.4s ease both;
+    }
+    .spc-label { font-size: 0.61rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); opacity: 0.7; margin-bottom: 12px; }
+    .spc-tier  { margin-bottom: 9px; }
+    .spc-tier-label { font-family: 'Playfair Display', serif; font-size: 0.82rem; font-style: italic; color: var(--fg); margin-bottom: 2px; }
+    .spc-tier-items { font-size: 0.81rem; color: var(--muted); line-height: 1.5; }
+
+    .btn-outline {
+      width: 100%; padding: 12px;
+      background: transparent; color: var(--fg);
+      border: 1px solid var(--border); border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 0.84rem;
+      cursor: pointer; transition: border-color 0.18s, background 0.18s; margin-bottom: 9px;
+    }
+    .btn-outline:hover { border-color: var(--accent); background: #FFF6EE; }
+
+    .link-btn {
+      background: none; border: none;
+      font-family: 'Inter', sans-serif; font-size: 0.77rem;
+      color: var(--muted); cursor: pointer;
+      text-decoration: underline; text-underline-offset: 2px; opacity: 0.6; padding: 4px 0;
+    }
+    .link-btn:hover { opacity: 1; }
+
+    #rebuild-form {
+      margin-top: 14px; padding-top: 14px;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.35s ease both;
+    }
+
+    /* ── CHAT SCREEN ───────────────────────────── */
+    #chat { display: none; flex-direction: column; height: 100vh; background: var(--bg); }
+
+    .chat-header {
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      flex-shrink: 0; background: var(--bg);
+    }
+
+    .chat-brand {
+      font-family: 'Playfair Display', serif; font-size: 0.88rem; font-style: italic;
+      color: var(--fg); flex-shrink: 0; letter-spacing: 0.01em;
+    }
+
+    .progress-wrap { flex: 1; height: 3px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    #progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #C8A882, var(--accent));
+      border-radius: 4px; width: 0%;
+      transition: width 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .btn-ghost {
+      font-size: 0.71rem; color: var(--muted);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Inter', sans-serif; padding: 4px 8px;
+      border-radius: 6px; opacity: 0.55; transition: opacity 0.18s; flex-shrink: 0;
+    }
+    .btn-ghost:hover { opacity: 1; }
+
+    /* ── MESSAGES ──────────────────────────────── */
+    .messages {
+      flex: 1; overflow-y: auto;
+      padding: 28px 20px 14px;
+      display: flex; flex-direction: column; gap: 9px;
+      max-width: 560px; width: 100%; margin: 0 auto;
+    }
+
+    .bubble {
+      max-width: 86%; padding: 11px 15px; border-radius: 16px;
+      font-size: 0.9rem; line-height: 1.62;
+      animation: fadeUp 0.28s ease both;
+    }
+    .bubble.ai {
+      background: var(--ai-bg); color: var(--fg);
+      border-bottom-left-radius: 3px; align-self: flex-start;
+      border: 1px solid #EEE0D0;
+    }
+    .bubble.user {
+      background: var(--fg); color: #F8F3EA;
+      border-bottom-right-radius: 3px; align-self: flex-end;
+    }
+
+    /* ── CHIPS ─────────────────────────────────── */
+    .chips-wrap {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      padding: 2px 0 6px; align-self: flex-start; max-width: 96%;
+      animation: fadeUp 0.32s 0.06s ease both;
+      opacity: 0; animation-fill-mode: forwards;
+    }
+    .chip {
+      padding: 7px 14px;
+      background: #FFF8F0; border: 1px solid #D4B896;
+      border-radius: 100px;
+      font-family: 'Inter', sans-serif; font-size: 0.8rem; color: var(--fg);
+      cursor: pointer; transition: background 0.14s, border-color 0.14s, transform 0.1s;
+      user-select: none; line-height: 1.3;
+    }
+    .chip:hover  { background: #FFE8CC; border-color: var(--accent); transform: translateY(-1px); }
+    .chip:active { transform: translateY(0); }
+
+    /* ── TYPING ────────────────────────────────── */
+    .typing-bubble {
+      display: flex; gap: 5px; align-items: center;
+      padding: 12px 15px; background: var(--ai-bg);
+      border: 1px solid #EEE0D0;
+      border-radius: 16px; border-bottom-left-radius: 3px;
+      align-self: flex-start; animation: fadeUp 0.24s ease both;
+    }
+    .typing-bubble span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); opacity: 0.35;
+      animation: blink 1.3s ease-in-out infinite;
+    }
+    .typing-bubble span:nth-child(2) { animation-delay: 0.22s; }
+    .typing-bubble span:nth-child(3) { animation-delay: 0.44s; }
+    @keyframes blink {
+      0%,80%,100% { transform: scale(1); opacity: 0.35; }
+      40%         { transform: scale(1.4); opacity: 1; }
+    }
+
+    /* ── THEME SWATCHES ────────────────────────── */
+    .theme-row {
+      align-self: flex-start;
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 0 2px;
+      animation: fadeIn 0.4s 0.2s ease both; opacity: 0; animation-fill-mode: forwards;
+    }
+    .theme-row-label { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.05em; }
+    .swatch {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 2px solid transparent; cursor: pointer;
+      transition: transform 0.14s, border-color 0.14s;
+    }
+    .swatch:hover   { transform: scale(1.18); }
+    .swatch.active  { border-color: var(--fg) !important; transform: scale(1.15); }
+
+    /* ── MENU CARD ─────────────────────────────── */
+    .menu-card {
+      align-self: stretch;
+      --mc-bg:   #F5EDD6;
+      --mc-ink:  #C42B2B;
+      --mc-soft: rgba(196,43,43,0.1);
+      background: var(--mc-bg);
+      border: 2px solid var(--mc-ink);
+      border-radius: 6px;
+      box-shadow: 4px 4px 0 var(--mc-ink);
+      overflow: hidden;
+      animation: fadeUp 0.4s ease both;
+      position: relative;
+    }
+
+    .menu-checker {
+      height: 10px;
+      background-image:
+        linear-gradient(45deg, var(--mc-ink) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--mc-ink) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--mc-ink) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--mc-ink) 75%);
+      background-size: 8px 8px;
+      background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+      background-color: var(--mc-bg);
+    }
+
+    .menu-inner {
+      margin: 10px;
+      border: 1px dashed var(--mc-ink);
+      border-radius: 3px;
+      opacity-for-border: 0.4;
+      padding: 18px 20px 16px;
+    }
+    /* Use outline trick for semi-transparent dashed border */
+    .menu-inner { border-color: color-mix(in srgb, var(--mc-ink) 35%, transparent); }
+
+    .menu-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.45rem; font-weight: 700; font-style: italic;
+      color: var(--mc-ink); text-align: center;
+      margin-bottom: 4px; letter-spacing: -0.01em;
+    }
+
+    .menu-subtitle {
+      font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--mc-ink); text-align: center; opacity: 0.55; margin-bottom: 16px;
+    }
+
+    .menu-divider-line {
+      height: 1px; background: var(--mc-ink); opacity: 0.2; margin: 12px 0;
+    }
+
+    .menu-tier { margin-bottom: 16px; }
+
+    .menu-tier-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    }
+
+    .tier-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1rem; font-weight: 600; font-style: italic;
+      color: var(--mc-ink); flex-shrink: 0;
+    }
+
+    .tier-sub {
+      font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--mc-ink); opacity: 0.45; font-family: 'Inter', sans-serif;
+    }
+
+    .tier-icons-row {
+      display: flex; gap: 4px; margin-left: auto; align-items: center;
+    }
+
+    .tier-ico {
+      width: 18px; height: 18px; opacity: 0.55;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    .tier-ico svg {
+      width: 100%; height: 100%;
+      stroke: var(--mc-ink); fill: none;
+      stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .menu-items { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+
+    .menu-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-family: 'Inter', sans-serif; font-size: 0.84rem;
+      color: color-mix(in srgb, var(--mc-ink) 75%, #000);
+      line-height: 1.45;
+    }
+
+    .menu-item-ico {
+      width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; opacity: 0.55;
+    }
+    .menu-item-ico svg {
+      width: 100%; height: 100%;
+      stroke: var(--mc-ink); fill: none;
+      stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .menu-item-dash { opacity: 0.3; flex-shrink: 0; margin-top: 0px; }
+
+    .menu-actions {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;
+    }
+
+    .btn-menu-save {
+      padding: 8px 18px;
+      background: var(--mc-ink); color: var(--mc-bg);
+      border: none; border-radius: 5px;
+      font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 500;
+      cursor: pointer; transition: opacity 0.18s;
+    }
+    .btn-menu-save:hover { opacity: 0.82; }
+
+    .btn-menu-outline {
+      padding: 8px 18px;
+      background: transparent; color: var(--mc-ink);
+      border: 1px solid var(--mc-ink); border-radius: 5px;
+      font-family: 'Inter', sans-serif; font-size: 0.76rem;
+      cursor: pointer; transition: background 0.18s;
+    }
+    .btn-menu-outline:hover { background: var(--mc-soft); }
+
+    .save-confirm {
+      font-size: 0.72rem; color: var(--mc-ink); margin-top: 7px;
+      font-style: italic; animation: fadeIn 0.3s ease both;
+    }
+
+    /* ── INPUT AREA ────────────────────────────── */
+    .chat-footer {
+      border-top: 1px solid var(--border); padding: 10px 20px;
+      flex-shrink: 0; background: var(--bg);
+    }
+    .chat-footer-inner {
+      max-width: 560px; margin: 0 auto;
+      display: flex; gap: 8px; align-items: flex-end;
+    }
+    #user-input {
+      flex: 1; padding: 9px 13px;
+      border: 1px solid var(--border); border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 0.87rem;
+      resize: none; outline: none; line-height: 1.5;
+      min-height: 38px; max-height: 100px;
+      transition: border-color 0.18s; color: var(--fg); background: #fff;
+    }
+    #user-input:focus { border-color: var(--accent); }
+    #user-input::placeholder { color: #ccc; }
+    .btn-send {
+      padding: 0 15px; height: 38px;
+      background: var(--fg); color: #F8F3EA;
+      border: none; border-radius: 8px;
+      font-size: 1rem; cursor: pointer; transition: opacity 0.18s; flex-shrink: 0;
+    }
+    .btn-send:hover { opacity: 0.78; }
+    .btn-send:disabled { opacity: 0.25; cursor: default; }
+  </style>
+</head>
+<body>
+
+<!-- ── SETUP ─────────────────────────────────────── -->
+<div id="setup">
+  <div class="setup-inner">
+    <span class="setup-tag">Intentional Leisure</span>
+
+    <!-- New user -->
+    <div id="new-user-view">
+      <h1>Build your<br>leisure menu.</h1>
+      <p class="desc">A few quiet questions.<br>A list you can reach for when you're tired.</p>
+      <div class="ornament"><div class="ornament-line"></div><div class="ornament-dot"></div><div class="ornament-line"></div></div>
+      <div class="field">
+        <label>Groq API Key</label>
+        <input type="password" id="api-key-input" placeholder="gsk_…" autocomplete="off" />
+      </div>
+      <p class="key-note">Free key at <a href="https://console.groq.com" target="_blank">console.groq.com</a> — stays only in this browser.</p>
+      <button class="btn-primary" onclick="startChat()">Begin →</button>
+    </div>
+
+    <!-- Returning user -->
+    <div id="returning-user-view" style="display:none">
+      <h1>Welcome back.</h1>
+      <p class="desc" style="margin-bottom:18px">Here's your leisure menu.</p>
+      <div class="saved-preview-card" id="saved-preview-card"></div>
+      <button class="btn-primary" onclick="viewSavedMenu()">Use this menu →</button>
+      <div style="margin-top:10px;text-align:center">
+        <button class="link-btn" onclick="showRebuildForm()">Rebuild my menu</button>
+      </div>
+      <div id="rebuild-form" style="display:none">
+        <div class="field" style="margin-top:4px">
+          <label>Groq API Key</label>
+          <input type="password" id="api-key-rebuild" placeholder="gsk_…" autocomplete="off" />
+        </div>
+        <button class="btn-primary" onclick="startFreshChat()">Start fresh →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CHAT ──────────────────────────────────────── -->
+<div id="chat">
+  <div class="chat-header">
+    <span class="chat-brand">Intentional Leisure</span>
+    <div class="progress-wrap"><div id="progress-fill"></div></div>
+    <button class="btn-ghost" onclick="resetChat()">↩ start over</button>
+  </div>
+  <div class="messages" id="messages"></div>
+  <div class="chat-footer" id="chat-footer">
+    <div class="chat-footer-inner">
+      <textarea id="user-input" placeholder="Or type your own answer…" rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="btn-send" id="send-btn" onclick="sendMessage()">↑</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── SVG ICON LIBRARY ─────────────────────────────────────────────────────── */
+const ICONS = {
+  book:        `<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>`,
+  headphones:  `<svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>`,
+  music:       `<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+  moon:        `<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`,
+  pen:         `<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg>`,
+  coffee:      `<svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`,
+  tv:          `<svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>`,
+  walk:        `<svg viewBox="0 0 24 24"><circle cx="12" cy="3.5" r="1.5"/><path d="M9 11.5l3-4 4 3.5-2 3"/><path d="M8.5 17.5l1.5-3.5 3-2 1 3.5-2 4h4.5"/><path d="M7.5 21l1.5-3.5"/></svg>`,
+  stretch:     `<svg viewBox="0 0 24 24"><circle cx="12" cy="3" r="2"/><path d="M6 8l6 3 6-3"/><path d="M12 11v11"/><path d="M9 18.5l3 3 3-3"/></svg>`,
+  breath:      `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><path d="M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>`,
+  bath:        `<svg viewBox="0 0 24 24"><path d="M9 6l4 4M2 12h20"/><path d="M4 12v4a6 6 0 0012 0v-4"/><path d="M8 21h8"/></svg>`,
+  plant:       `<svg viewBox="0 0 24 24"><path d="M12 22V12"/><path d="M12 12C12 6 6 4 4 6c2 5 8 6 8 6z"/><path d="M12 12c0-6 6-8 8-6-2 5-8 6-8 6z"/></svg>`,
+  film:        `<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>`,
+  eye:         `<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  stars:       `<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+  sun:         `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>`,
+};
+
+/* ─── ICON MATCHER ─────────────────────────────────────────────────────────── */
+function matchIcon(text) {
+  const t = text.toLowerCase();
+  if (/read|book|novel|chapter|page/.test(t))            return 'book';
+  if (/podcast|headphone|audio|listen to/.test(t))       return 'headphones';
+  if (/music|song|playlist|album|play/.test(t))          return 'music';
+  if (/sleep|nap|lie down|rest|doze/.test(t))            return 'moon';
+  if (/journal|write|diary|notebook|letter/.test(t))     return 'pen';
+  if (/tea|coffee|drink|sip|cup|cocoa/.test(t))          return 'coffee';
+  if (/tv|show|episode|watch|serie|netflix/.test(t))     return 'tv';
+  if (/walk|stroll|outside|air|wander/.test(t))          return 'walk';
+  if (/stretch|yoga|move|body|pilates/.test(t))          return 'stretch';
+  if (/breath|breathe|meditat|calm|stillness/.test(t))   return 'breath';
+  if (/bath|shower|soak|tub/.test(t))                    return 'bath';
+  if (/garden|plant|water|flower|soil/.test(t))          return 'plant';
+  if (/film|cinema|documentary|movie/.test(t))           return 'film';
+  if (/window|sky|gaze|outside|clouds/.test(t))          return 'eye';
+  if (/star|night|moon|dark sky/.test(t))                return 'stars';
+  if (/sun|morning|sunrise|light/.test(t))               return 'sun';
+  return null;
+}
+
+/* ─── COLOR THEMES ─────────────────────────────────────────────────────────── */
+const THEMES = [
+  { id:'retro',   name:'Retro Red',    bg:'#F5EDD6', ink:'#C42B2B', swatch:'#C42B2B' },
+  { id:'forest',  name:'Forest',       bg:'#F2EFE4', ink:'#2D5A3D', swatch:'#2D5A3D' },
+  { id:'navy',    name:'Navy',         bg:'#EFF2F8', ink:'#1B3A5C', swatch:'#1B3A5C' },
+  { id:'clay',    name:'Clay',         bg:'#FDF0E6', ink:'#8B3A1A', swatch:'#B5601A' },
+  { id:'rose',    name:'Dusty Rose',   bg:'#FDF0F2', ink:'#8B3050', swatch:'#A84060' },
+  { id:'plum',    name:'Plum',         bg:'#F2EEF8', ink:'#4A1D6A', swatch:'#6A2D8A' },
+];
+
+let selectedTheme = THEMES[0];
+
+/* ─── SYSTEM PROMPT ─────────────────────────────────────────────────────────── */
+const SYSTEM_PROMPT = `You are a warm, gentle guide — part caring therapist, part attentive chef — helping someone discover their personal Leisure Menu: a short list to reach for when tired, instead of a phone.
+
+The menu has three tiers:
+🌿 Appetizers: 5 min or less, zero setup, can be done lying down
+🍽️ Mains: 20–45 min, one simple thing to start, leaves you replenished
+🍮 Desserts: one episode, one album, one thing with a defined end
+
+Rules — follow carefully:
+1. ONE question per message. Never two.
+2. MAXIMUM 1 sentence before the question. Be warm, not wordy.
+3. Gently reflect their words back before moving on.
+4. Never suggest activities they haven't shown interest in.
+5. Up to 12 exchanges total. Move efficiently but warmly.
+6. After EVERY question, on its own line at the end, write:
+   OPTIONS: [A] | [B] | [C] | [D] | [E] | Something else
+   Give 5 specific, relevant options directly related to your question.
+
+When you have 2–3 per tier, warmly say you have everything you need. Ask if they're ready to see their menu.
+
+When ready, output ONLY this and nothing else:
+
+MY LEISURE MENU
+---
+APPETIZERS (under 5 min)
+- [item]
+- [item]
+- [item]
+
+MAINS (20-45 min)
+- [item]
+- [item]
+- [item]
+
+DESSERTS (one and done)
+- [item]
+- [item]
+- [item]
+
+Menu rules: use exact words, 1 short line each, nothing productive or self-improving, max 3 per tier.
+
+Begin: one warm sentence, then first question. End with OPTIONS.`;
+
+/* ─── STATE ─────────────────────────────────────────────────────────────────── */
+let apiKey        = '';
+let conversation  = [];
+let isLoading     = false;
+let questionCount = 0;
+const MAX_Q       = 12;
+let savedMenuData   = null;
+let currentMenuData = null;
+let menuCardEl      = null;
+
+/* ─── INIT ──────────────────────────────────────────────────────────────────── */
+window.addEventListener('load', () => {
+  const k = localStorage.getItem('il_key') || '';
+  if (k) document.getElementById('api-key-input').value = k;
+  try {
+    const j = localStorage.getItem('il_menu');
+    if (j) { savedMenuData = JSON.parse(j); showReturningView(savedMenuData); }
+  } catch (e) { localStorage.removeItem('il_menu'); }
+});
+
+/* ─── RETURNING VIEW ────────────────────────────────────────────────────────── */
+function showReturningView(menuData) {
+  document.getElementById('new-user-view').style.display       = 'none';
+  document.getElementById('returning-user-view').style.display = 'block';
+  const icons = { appetizers:'🌿', mains:'🍽️', desserts:'🍮' };
+  let html = '<div class="spc-label">Your Leisure Menu</div>';
+  for (const tier of menuData.tiers) {
+    const key = tier.label.toLowerCase();
+    html += `<div class="spc-tier">
+      <div class="spc-tier-label">${icons[key]||''} ${tier.label}</div>
+      <div class="spc-tier-items">${tier.items.slice(0,2).join(' · ')}${tier.items.length>2?' …':''}</div>
+    </div>`;
+  }
+  document.getElementById('saved-preview-card').innerHTML = html;
+}
+
+function showRebuildForm() {
+  document.getElementById('rebuild-form').style.display = 'block';
+  document.getElementById('api-key-rebuild').value = localStorage.getItem('il_key') || '';
+}
+
+function viewSavedMenu() {
+  currentMenuData = savedMenuData;
+  document.getElementById('setup').style.display    = 'none';
+  document.getElementById('chat').style.display     = 'flex';
+  document.getElementById('chat-footer').style.display = 'none';
+  document.getElementById('progress-fill').style.width = '100%';
+  renderMenuCard(savedMenuData);
+  const msgs = document.getElementById('messages');
+  const w = document.createElement('div');
+  w.style.cssText = 'text-align:center;padding:6px 0';
+  w.innerHTML = '<button class="link-btn" onclick="resetChat()" style="font-size:0.78rem">Rebuild my menu</button>';
+  msgs.appendChild(w);
+}
+
+/* ─── START / RESET ─────────────────────────────────────────────────────────── */
+function startChat() {
+  const k = document.getElementById('api-key-input').value.trim();
+  if (!k) { alert('Please enter your Groq API key.'); return; }
+  beginChat(k);
+}
+function startFreshChat() {
+  const k = document.getElementById('api-key-rebuild').value.trim();
+  if (!k) { alert('Please enter your Groq API key.'); return; }
+  localStorage.removeItem('il_menu');
+  savedMenuData = null;
+  beginChat(k);
+}
+function beginChat(key) {
+  apiKey = key;
+  localStorage.setItem('il_key', key);
+  document.getElementById('setup').style.display    = 'none';
+  document.getElementById('chat').style.display     = 'flex';
+  document.getElementById('chat-footer').style.display = '';
+  document.getElementById('messages').innerHTML     = '';
+  document.getElementById('progress-fill').style.width = '0%';
+  questionCount = 0; currentMenuData = null; menuCardEl = null;
+  conversation  = [{ role:'user', content:'ready' }];
+  callAPI();
+}
+function resetChat() {
+  if (isLoading) return;
+  conversation = []; questionCount = 0; currentMenuData = null; menuCardEl = null;
+  document.getElementById('messages').innerHTML        = '';
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('chat').style.display        = 'none';
+  document.getElementById('chat-footer').style.display = '';
+  document.getElementById('setup').style.display       = 'flex';
+  try {
+    const j = localStorage.getItem('il_menu');
+    if (j) {
+      savedMenuData = JSON.parse(j);
+      showReturningView(savedMenuData);
+      document.getElementById('rebuild-form').style.display = 'none';
+    } else {
+      savedMenuData = null;
+      document.getElementById('new-user-view').style.display       = 'block';
+      document.getElementById('returning-user-view').style.display = 'none';
+    }
+  } catch(e) {}
+}
+
+/* ─── INPUT ──────────────────────────────────────────────────────────────────── */
+function handleKey(e) {
+  if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+async function sendMessage(text) {
+  if (isLoading) return;
+  if (!text) {
+    const inp = document.getElementById('user-input');
+    text = inp.value.trim(); if (!text) return;
+    inp.value = ''; inp.style.height = 'auto';
+  }
+  document.querySelectorAll('.chips-wrap').forEach(c => c.remove());
+  addBubble('user', text);
+  conversation.push({ role:'user', content:text });
+  await callAPI();
+}
+
+/* ─── PROGRESS ───────────────────────────────────────────────────────────────── */
+function updateProgress() {
+  document.getElementById('progress-fill').style.width =
+    Math.min((questionCount / MAX_Q) * 100, 95) + '%';
+}
+
+/* ─── API ────────────────────────────────────────────────────────────────────── */
+async function callAPI() {
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+  const typingEl = addTyping();
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role:'system', content:SYSTEM_PROMPT }, ...conversation],
+        temperature: 0.85, max_tokens: 420
+      })
+    });
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message||`HTTP ${res.status}`); }
+    const data  = await res.json();
+    const reply = data.choices?.[0]?.message?.content?.trim() || '';
+    typingEl.remove();
+    conversation.push({ role:'assistant', content:reply });
+    if (isMenu(reply)) {
+      currentMenuData = parseMenu(reply);
+      renderThemeSwatches();
+      renderMenuCard(currentMenuData);
+      document.getElementById('progress-fill').style.width = '100%';
+    } else {
+      questionCount++;
+      updateProgress();
+      addBubble('ai', stripOptions(reply));
+      const opts = parseOptions(reply);
+      if (opts.length) renderChips(opts);
+    }
+  } catch(err) {
+    typingEl.remove();
+    addBubble('ai', `Something went wrong: ${err.message}`);
+  }
+  isLoading = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+/* ─── PARSERS ────────────────────────────────────────────────────────────────── */
+function parseOptions(text) {
+  const m = text.match(/OPTIONS:\s*(.+)/i);
+  if (!m) return [];
+  return m[1].split('|').map(o => o.trim()).filter(Boolean);
+}
+function stripOptions(text) { return text.replace(/\n?OPTIONS:.*$/im,'').trim(); }
+function isMenu(text) {
+  return text.includes('MY LEISURE MENU') ||
+    (text.includes('APPETIZERS') && text.includes('MAINS') && text.includes('DESSERTS'));
+}
+function parseMenu(text) {
+  const tiers = [
+    { key:'APPETIZERS', label:'Appetizers', sub:'under 5 min', icon:'🌿', items:[] },
+    { key:'MAINS',      label:'Mains',      sub:'20–45 min',   icon:'🍽️',  items:[] },
+    { key:'DESSERTS',   label:'Desserts',   sub:'one and done', icon:'🍮', items:[] },
+  ];
+  let cur = null;
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    if (!line || line==='---') continue;
+    const match = tiers.find(t => line.toUpperCase().startsWith(t.key));
+    if (match) { cur = match; continue; }
+    if (line.startsWith('-') && cur) cur.items.push(line.replace(/^-\s*/,''));
+  }
+  return { tiers: tiers.filter(t=>t.items.length), savedAt: Date.now() };
+}
+
+/* ─── RENDER HELPERS ─────────────────────────────────────────────────────────── */
+function addBubble(role, text) {
+  const msgs = document.getElementById('messages');
+  const el   = document.createElement('div');
+  el.className   = `bubble ${role}`;
+  el.textContent = text;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+function addTyping() {
+  const msgs = document.getElementById('messages');
+  const el   = document.createElement('div');
+  el.className = 'typing-bubble';
+  el.innerHTML  = '<span></span><span></span><span></span>';
+  msgs.appendChild(el); msgs.scrollTop = msgs.scrollHeight;
+  return el;
+}
+function renderChips(options) {
+  const msgs = document.getElementById('messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'chips-wrap';
+  for (const opt of options) {
+    const chip = document.createElement('button');
+    chip.className = 'chip'; chip.textContent = opt;
+    chip.onclick = () => { wrap.remove(); sendMessage(opt); };
+    wrap.appendChild(chip);
+  }
+  msgs.appendChild(wrap); msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* ─── THEME SWATCHES ─────────────────────────────────────────────────────────── */
+function renderThemeSwatches() {
+  const msgs = document.getElementById('messages');
+  const row  = document.createElement('div');
+  row.className = 'theme-row';
+  row.innerHTML = `<span class="theme-row-label">Pick your style</span>`;
+  THEMES.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className    = 'swatch' + (i===0?' active':'');
+    btn.title        = t.name;
+    btn.style.background = t.swatch;
+    btn.dataset.id   = t.id;
+    btn.onclick = () => {
+      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      applyTheme(t.id);
+    };
+    row.appendChild(btn);
+  });
+  msgs.appendChild(row); msgs.scrollTop = msgs.scrollHeight;
+}
+
+function applyTheme(id) {
+  const theme = THEMES.find(t => t.id === id);
+  if (!theme || !menuCardEl) return;
+  selectedTheme = theme;
+  menuCardEl.style.setProperty('--mc-bg',  theme.bg);
+  menuCardEl.style.setProperty('--mc-ink', theme.ink);
+  menuCardEl.style.setProperty('--mc-soft', `rgba(0,0,0,0.06)`);
+}
+
+/* ─── RENDER MENU CARD ───────────────────────────────────────────────────────── */
+function iconSVG(name) {
+  const svg = ICONS[name];
+  if (!svg) return '';
+  return `<span class="menu-item-ico">${svg}</span>`;
+}
+
+function renderMenuCard(menuData) {
+  const msgs = document.getElementById('messages');
+  const card = document.createElement('div');
+  card.className = 'menu-card';
+  menuCardEl = card;
+
+  // Tier-level icon sets
+  function tierIconRow(items) {
+    const matched = [...new Set(items.map(matchIcon).filter(Boolean))].slice(0, 4);
+    if (!matched.length) return '';
+    return '<div class="tier-icons-row">' +
+      matched.map(n => `<span class="tier-ico">${ICONS[n]}</span>`).join('') +
+      '</div>';
+  }
+
+  let html = `
+    <div class="menu-checker"></div>
+    <div class="menu-inner">
+      <div class="menu-title">My Leisure Menu</div>
+      <div class="menu-subtitle">Intentional Leisure</div>
+      <div class="menu-divider-line"></div>`;
+
+  for (const tier of menuData.tiers) {
+    html += `<div class="menu-tier">
+      <div class="menu-tier-header">
+        <span class="tier-name">${tier.label}</span>
+        <span class="tier-sub">${tier.sub}</span>
+        ${tierIconRow(tier.items)}
+      </div>
+      <ul class="menu-items">
+        ${tier.items.map(item => {
+          const ico = matchIcon(item);
+          return `<li class="menu-item">
+            ${ico ? `<span class="menu-item-ico">${ICONS[ico]}</span>` : '<span class="menu-item-dash">–</span>'}
+            <span>${item}</span>
+          </li>`;
+        }).join('')}
+      </ul>
+    </div>`;
+  }
+
+  html += `
+      <div class="menu-divider-line"></div>
+      <div class="menu-actions">
+        <button class="btn-menu-save" onclick="saveAsDefault()">Save as my menu</button>
+        <button class="btn-menu-outline" onclick="saveAsPhoto()">Save as photo</button>
+      </div>
+      <div id="save-confirm" class="save-confirm" style="display:none">✓ Saved — it'll be here on your next visit.</div>
+    </div>
+    <div class="menu-checker" style="margin-top:0"></div>`;
+
+  card.innerHTML = html;
+  msgs.appendChild(card);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* ─── SAVE AS DEFAULT ────────────────────────────────────────────────────────── */
+function saveAsDefault() {
+  if (!currentMenuData) return;
+  localStorage.setItem('il_menu', JSON.stringify(currentMenuData));
+  savedMenuData = currentMenuData;
+  const el = document.getElementById('save-confirm');
+  if (el) { el.style.display='block'; setTimeout(() => el.style.display='none', 3200); }
+}
+
+/* ─── SAVE AS PHOTO (Canvas) ─────────────────────────────────────────────────── */
+async function saveAsPhoto() {
+  if (!currentMenuData) return;
+  await document.fonts.ready;
+
+  const T   = selectedTheme;
+  const SC  = 2;
+  const W   = 560 * SC;
+  const P   = 52 * SC;
+
+  // Calculate dynamic height
+  let lh = 50 + 16 + 2 + 20 + 38 + 10 + 14; // top: pad,brand,div,gap,title,sub,gap
+  for (const tier of currentMenuData.tiers) {
+    lh += 16 + 12; // tier header + gap
+    lh += tier.items.length * 26;
+    lh += 16;
+  }
+  lh += 14 + 12 + 50; // bottom div + footer + bottom-pad
+  const H = Math.max(520, lh) * SC;
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, T.bg);
+  grad.addColorStop(1, shadeColor(T.bg, -8));
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Checkered bar top
+  drawChecker(ctx, 0, 0, W, 10 * SC, T.bg, T.ink, 8 * SC);
+
+  let y = 50 * SC;
+
+  // Brand label
+  ctx.font      = `500 ${10*SC}px Inter, -apple-system, sans-serif`;
+  ctx.fillStyle = T.ink;
+  ctx.globalAlpha = 0.6;
+  ctx.fillText('INTENTIONAL LEISURE', P, y);
+  ctx.globalAlpha = 1;
+  y += 16 * SC;
+
+  // Divider
+  ctx.strokeStyle = T.ink; ctx.lineWidth = SC; ctx.globalAlpha = 0.25;
+  ctx.beginPath(); ctx.moveTo(P, y); ctx.lineTo(W-P, y); ctx.stroke();
+  ctx.globalAlpha = 1;
+  y += 20 * SC;
+
+  // Title
+  ctx.font      = `italic 700 ${28*SC}px 'Playfair Display', Georgia, serif`;
+  ctx.fillStyle = T.ink;
+  ctx.fillText('My Leisure Menu', P, y);
+  y += 12 * SC;
+
+  // Subtitle
+  ctx.font      = `400 ${10*SC}px Inter, -apple-system, sans-serif`;
+  ctx.fillStyle = T.ink; ctx.globalAlpha = 0.4;
+  ctx.fillText('a menu for rest', P, y);
+  ctx.globalAlpha = 1;
+  y += 16 * SC;
+
+  // Divider
+  ctx.strokeStyle = T.ink; ctx.lineWidth = SC; ctx.globalAlpha = 0.2;
+  ctx.beginPath(); ctx.moveTo(P, y); ctx.lineTo(W-P, y); ctx.stroke();
+  ctx.globalAlpha = 1;
+  y += 18 * SC;
+
+  // Tiers
+  for (const tier of currentMenuData.tiers) {
+    // Section header
+    ctx.font      = `italic 600 ${14*SC}px 'Playfair Display', Georgia, serif`;
+    ctx.fillStyle = T.ink;
+    ctx.fillText(`${tier.icon}  ${tier.label}`, P, y);
+    // Sub
+    ctx.font = `400 ${9*SC}px Inter, sans-serif`;
+    ctx.globalAlpha = 0.45;
+    ctx.fillText(`  ${tier.sub}`, P + ctx.measureText(`${tier.icon}  ${tier.label}`).width + 6*SC, y - 1*SC);
+    ctx.globalAlpha = 1;
+    y += 14 * SC;
+
+    // Items
+    ctx.font      = `400 ${14*SC}px Inter, -apple-system, sans-serif`;
+    ctx.fillStyle = T.ink; ctx.globalAlpha = 0.82;
+    for (const item of tier.items) {
+      ctx.fillText(`–   ${item}`, P + 6*SC, y);
+      y += 26 * SC;
+    }
+    ctx.globalAlpha = 1;
+    y += 12 * SC;
+  }
+
+  // Bottom divider
+  ctx.strokeStyle = T.ink; ctx.lineWidth = SC; ctx.globalAlpha = 0.2;
+  ctx.beginPath(); ctx.moveTo(P, y); ctx.lineTo(W-P, y); ctx.stroke();
+  ctx.globalAlpha = 1;
+  y += 14 * SC;
+
+  // Footer
+  ctx.font      = `300 ${9*SC}px Inter, -apple-system, sans-serif`;
+  ctx.fillStyle = T.ink; ctx.globalAlpha = 0.38;
+  ctx.fillText('intentional-leisure.com', P, y);
+  ctx.globalAlpha = 1;
+
+  // Checkered bar bottom
+  drawChecker(ctx, 0, H - 10*SC, W, 10*SC, T.bg, T.ink, 8*SC);
+
+  // Outer border
+  ctx.strokeStyle = T.ink; ctx.lineWidth = 3*SC; ctx.globalAlpha = 0.9;
+  ctx.strokeRect(1.5*SC, 1.5*SC, W - 3*SC, H - 3*SC);
+  ctx.globalAlpha = 1;
+
+  canvas.toBlob(blob => {
+    const url  = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'my-leisure-menu.png';
+    link.href = url; link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, 'image/png');
+}
+
+function drawChecker(ctx, x, y, w, h, bg, ink, size) {
+  ctx.save();
+  ctx.fillStyle = bg; ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = ink;
+  const cols = Math.ceil(w / size);
+  const rows = Math.ceil(h / size);
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if ((r + c) % 2 === 0) ctx.fillRect(x + c*size, y + r*size, size, size);
+    }
+  }
+  ctx.restore();
+}
+
+function shadeColor(hex, pct) {
+  const n = parseInt(hex.slice(1), 16);
+  const amt = Math.round(2.55 * pct);
+  const R = Math.max(0, Math.min(255, (n >> 16) + amt));
+  const G = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + amt));
+  const B = Math.max(0, Math.min(255, (n & 0xff) + amt));
+  return `#${((1<<24)+(R<<16)+(G<<8)+B).toString(16).slice(1)}`;
+}
+</script>
+</body>
+</html>

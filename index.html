@@ -3,1024 +3,2456 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Intentional Leisure</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <title>Transition — Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:     #F8F3EA;
-      --fg:     #2A1A0E;
-      --muted:  #7A6048;
-      --border: #DDD0BC;
-      --ai-bg:  #FFF8F0;
-      --accent: #9E5C2A;
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #1A1F2E;
+      height: 100vh; overflow: hidden;
+      display: flex; flex-direction: column;
     }
 
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--fg); min-height: 100vh; }
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+    @keyframes slideDown{ from{opacity:0;transform:translateY(-18px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
+    @keyframes slideUp  { from{opacity:0;transform:translateY(18px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
+    @keyframes slideInR { from{opacity:0;transform:translateX(18px) scale(0.96)} to{opacity:1;transform:translateX(0) scale(1)} }
+    @keyframes breatheO { 0%,100%{transform:scale(1);opacity:.18} 50%{transform:scale(1.55);opacity:.42} }
+    @keyframes breatheM { 0%,100%{transform:scale(1);opacity:.35} 50%{transform:scale(1.35);opacity:.65} }
+    @keyframes breatheC { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
+    /* ── SETUP OVERLAY ─────────────────────────────── */
+    #setup-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: #0E1220;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    #setup-overlay.hiding { opacity: 0; transform: scale(1.04); pointer-events: none; }
+    #setup-overlay.gone   { display: none; }
 
-    /* ── SETUP ─────────────────────────────────── */
-    #setup {
-      min-height: 100vh;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 40px 24px;
-      animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) both;
-      background: var(--bg);
-    }
-
-    .setup-inner { max-width: 400px; width: 100%; text-align: center; }
-
-    .setup-tag {
-      display: inline-block;
-      font-size: 0.64rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--accent); opacity: 0.75; margin-bottom: 16px;
-    }
-
-    .setup-inner h1 {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: clamp(2rem, 6vw, 2.7rem); font-weight: 700; font-style: italic;
-      letter-spacing: -0.01em; line-height: 1.15;
-      color: var(--fg); margin-bottom: 12px;
+    .so-card {
+      background: #1E2438; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 32px 28px 28px;
+      max-width: 420px; width: 100%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
     }
 
-    .setup-inner .desc {
-      font-size: 0.88rem; font-weight: 300; line-height: 1.8;
-      color: var(--muted); margin-bottom: 32px;
+    .so-eyebrow {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: #5B8FD4; margin-bottom: 8px;
     }
+    .so-card h2 {
+      font-size: 1.35rem; font-weight: 600; color: #fff;
+      letter-spacing: -0.02em; margin-bottom: 6px;
+    }
+    .so-card .so-desc {
+      font-size: 0.82rem; color: rgba(255,255,255,0.45);
+      line-height: 1.6; margin-bottom: 24px;
+    }
+    .so-q {
+      font-size: 0.78rem; font-weight: 500;
+      color: rgba(255,255,255,0.75); margin-bottom: 9px;
+    }
+    .so-q span { font-weight: 300; color: rgba(255,255,255,0.35); }
 
-    .ornament {
-      display: flex; align-items: center; gap: 10px;
-      margin: 20px 0 28px;
-    }
-    .ornament-line { flex: 1; height: 1px; background: var(--border); }
-    .ornament-dot  { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.4; }
-
-    .field { display: flex; flex-direction: column; gap: 6px; text-align: left; margin-bottom: 10px; }
-    .field label {
-      font-size: 0.68rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
-    }
-    .field input {
-      width: 100%; padding: 11px 14px;
-      border: 1px solid var(--border); border-radius: 8px;
-      font-family: 'Inter', sans-serif; font-size: 0.88rem;
-      color: var(--fg); background: #fff; outline: none; transition: border-color 0.18s;
-    }
-    .field input:focus { border-color: var(--accent); }
-    .field input::placeholder { color: #ccc; }
-
-    .key-note { font-size: 0.69rem; color: #bbb; line-height: 1.6; text-align: left; margin-bottom: 20px; }
-    .key-note a { color: var(--muted); }
-
-    .btn-primary {
-      width: 100%; padding: 13px;
-      background: var(--fg); color: #F8F3EA;
-      border: none; border-radius: 8px;
-      font-family: 'Playfair Display', Georgia, serif; font-size: 1rem; font-style: italic;
-      cursor: pointer; transition: opacity 0.18s; letter-spacing: 0.01em;
-    }
-    .btn-primary:hover { opacity: 0.78; }
-    .btn-primary:disabled { opacity: 0.25; cursor: default; }
-
-    /* ── SAVED PREVIEW ─────────────────────────── */
-    .saved-preview-card {
-      background: #fff; border: 1px solid var(--border); border-radius: 12px;
-      padding: 20px 20px 16px; text-align: left; margin-bottom: 16px;
-      animation: fadeIn 0.4s ease both;
-    }
-    .spc-label { font-size: 0.61rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); opacity: 0.7; margin-bottom: 12px; }
-    .spc-tier  { margin-bottom: 9px; }
-    .spc-tier-label { font-family: 'Playfair Display', serif; font-size: 0.82rem; font-style: italic; color: var(--fg); margin-bottom: 2px; }
-    .spc-tier-items { font-size: 0.81rem; color: var(--muted); line-height: 1.5; }
-
-    .btn-outline {
-      width: 100%; padding: 12px;
-      background: transparent; color: var(--fg);
-      border: 1px solid var(--border); border-radius: 8px;
-      font-family: 'Inter', sans-serif; font-size: 0.84rem;
-      cursor: pointer; transition: border-color 0.18s, background 0.18s; margin-bottom: 9px;
-    }
-    .btn-outline:hover { border-color: var(--accent); background: #FFF6EE; }
-
-    .link-btn {
-      background: none; border: none;
-      font-family: 'Inter', sans-serif; font-size: 0.77rem;
-      color: var(--muted); cursor: pointer;
-      text-decoration: underline; text-underline-offset: 2px; opacity: 0.6; padding: 4px 0;
-    }
-    .link-btn:hover { opacity: 1; }
-
-    #rebuild-form {
-      margin-top: 14px; padding-top: 14px;
-      border-top: 1px solid var(--border);
-      animation: fadeUp 0.35s ease both;
-    }
-
-    /* ── CHAT SCREEN ───────────────────────────── */
-    #chat { display: none; flex-direction: column; height: 100vh; background: var(--bg); }
-
-    .chat-header {
-      padding: 10px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 12px;
-      flex-shrink: 0; background: var(--bg);
-    }
-
-    .chat-brand {
-      font-family: 'Playfair Display', serif; font-size: 0.88rem; font-style: italic;
-      color: var(--fg); flex-shrink: 0; letter-spacing: 0.01em;
-    }
-
-    .progress-wrap { flex: 1; height: 3px; background: var(--border); border-radius: 4px; overflow: hidden; }
-    #progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #C8A882, var(--accent));
-      border-radius: 4px; width: 0%;
-      transition: width 0.7s cubic-bezier(0.16,1,0.3,1);
-    }
-
-    .btn-ghost {
-      font-size: 0.71rem; color: var(--muted);
-      background: none; border: none; cursor: pointer;
-      font-family: 'Inter', sans-serif; padding: 4px 8px;
-      border-radius: 6px; opacity: 0.55; transition: opacity 0.18s; flex-shrink: 0;
-    }
-    .btn-ghost:hover { opacity: 1; }
-
-    /* ── MESSAGES ──────────────────────────────── */
-    .messages {
-      flex: 1; overflow-y: auto;
-      padding: 28px 20px 14px;
-      display: flex; flex-direction: column; gap: 9px;
-      max-width: 560px; width: 100%; margin: 0 auto;
-    }
-
-    .bubble {
-      max-width: 86%; padding: 11px 15px; border-radius: 16px;
-      font-size: 0.9rem; line-height: 1.62;
-      animation: fadeUp 0.28s ease both;
-    }
-    .bubble.ai {
-      background: var(--ai-bg); color: var(--fg);
-      border-bottom-left-radius: 3px; align-self: flex-start;
-      border: 1px solid #EEE0D0;
-    }
-    .bubble.user {
-      background: var(--fg); color: #F8F3EA;
-      border-bottom-right-radius: 3px; align-self: flex-end;
-    }
-
-    /* ── CHIPS ─────────────────────────────────── */
-    .chips-wrap {
-      display: flex; flex-wrap: wrap; gap: 6px;
-      padding: 2px 0 6px; align-self: flex-start; max-width: 96%;
-      animation: fadeUp 0.32s 0.06s ease both;
-      opacity: 0; animation-fill-mode: forwards;
-    }
-    .chip {
-      padding: 7px 14px;
-      background: #FFF8F0; border: 1px solid #D4B896;
+    .so-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .so-chip {
+      padding: 6px 13px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 100px;
-      font-family: 'Inter', sans-serif; font-size: 0.8rem; color: var(--fg);
-      cursor: pointer; transition: background 0.14s, border-color 0.14s, transform 0.1s;
-      user-select: none; line-height: 1.3;
+      font-family: 'Inter', sans-serif; font-size: 0.78rem;
+      color: rgba(255,255,255,0.6); cursor: pointer;
+      transition: all 0.13s; user-select: none;
     }
-    .chip:hover  { background: #FFE8CC; border-color: var(--accent); transform: translateY(-1px); }
-    .chip:active { transform: translateY(0); }
+    .so-chip:hover { border-color: #5B8FD4; background: rgba(91,143,212,0.12); color: #fff; }
+    .so-chip.on    { background: #4472A8; border-color: #4472A8; color: #fff; }
 
-    /* ── TYPING ────────────────────────────────── */
-    .typing-bubble {
-      display: flex; gap: 5px; align-items: center;
-      padding: 12px 15px; background: var(--ai-bg);
-      border: 1px solid #EEE0D0;
-      border-radius: 16px; border-bottom-left-radius: 3px;
-      align-self: flex-start; animation: fadeUp 0.24s ease both;
+    .so-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 16px 0; }
+
+    .so-btn {
+      width: 100%; padding: 13px;
+      background: #4472A8; color: #fff; border: none;
+      border-radius: 10px; font-family: 'Inter', sans-serif;
+      font-size: 0.92rem; font-weight: 600; cursor: pointer;
+      transition: opacity 0.15s; letter-spacing: -0.01em;
     }
-    .typing-bubble span {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--accent); opacity: 0.35;
-      animation: blink 1.3s ease-in-out infinite;
+    .so-btn:hover { opacity: 0.88; }
+
+    /* ── TOP BAR ───────────────────────────────────── */
+    .topbar {
+      height: 36px; background: rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; padding: 0 16px;
+      gap: 12px; flex-shrink: 0;
     }
-    .typing-bubble span:nth-child(2) { animation-delay: 0.22s; }
-    .typing-bubble span:nth-child(3) { animation-delay: 0.44s; }
-    @keyframes blink {
-      0%,80%,100% { transform: scale(1); opacity: 0.35; }
-      40%         { transform: scale(1.4); opacity: 1; }
+    .tb-dot { width: 11px; height: 11px; border-radius: 50%; }
+    .tb-red    { background: #FF5F57; }
+    .tb-yellow { background: #FFBD2E; }
+    .tb-green  { background: #28C840; }
+    .tb-title  { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-left: 8px; letter-spacing: 0.04em; }
+    .tb-time   { font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-left: auto; letter-spacing: 0.04em; }
+    .tb-reset  {
+      background: rgba(255,255,255,0.1); border: none;
+      color: rgba(255,255,255,0.5); font-family: 'Inter', sans-serif;
+      font-size: 0.68rem; padding: 3px 10px; border-radius: 4px; cursor: pointer;
+    }
+    .tb-reset:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* ── STAGE ─────────────────────────────────────── */
+    .stage { flex: 1; display: flex; overflow: hidden; position: relative; }
+
+    /* ── DESKTOP SIDE ──────────────────────────────── */
+    .desktop-side {
+      flex: 1; position: relative;
+      background: linear-gradient(160deg, #2C3550 0%, #1A2035 100%);
+      overflow: hidden; min-width: 0;
+    }
+    .desktop-side::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 28px 28px; pointer-events: none;
+    }
+    .desktop-label {
+      position: absolute; top: 14px; left: 18px;
+      font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(255,255,255,0.18);
+    }
+    .app-counter {
+      position: absolute; top: 14px; right: 18px;
+      font-size: 0.68rem; color: rgba(255,255,255,0.28);
+      transition: color 0.3s;
+    }
+    .app-counter.warn { color: #FFBD2E; }
+
+    /* ── WINDOWS ───────────────────────────────────── */
+    .win {
+      position: absolute; border-radius: 10px; overflow: hidden;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.5), 0 3px 14px rgba(0,0,0,0.3);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .win.closing { opacity: 0; transform: scale(0.94) translateY(8px); pointer-events: none; }
+    .win.closed  { display: none; }
+
+    .win-chrome { height: 32px; display: flex; align-items: center; padding: 0 12px; gap: 7px; flex-shrink: 0; }
+    .wc-btn { width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; flex-shrink: 0; }
+    .wc-btn:hover { filter: brightness(0.82); }
+    .wc-close { background: #FF5F57; }
+    .wc-min   { background: #FFBD2E; }
+    .wc-max   { background: #28C840; }
+    .win-title { font-size: 0.7rem; font-weight: 500; color: rgba(255,255,255,0.65); margin-left: 4px; }
+
+    /* SLACK */
+    #win-slack { width: 500px; top: 48px; left: 28px; z-index: 10; }
+    .slack-chrome   { background: #3F0E40; }
+    .slack-body     { display: flex; height: 290px; }
+    .slack-sidebar  { width: 190px; background: #3F0E40; padding: 10px 0; flex-shrink: 0; }
+    .slack-ws       { font-size: 0.78rem; font-weight: 700; color: #fff; padding: 6px 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px; }
+    .slack-section  { font-size: 0.6rem; font-weight: 600; color: rgba(255,255,255,0.38); letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 14px 2px; }
+    .slack-ch       { font-size: 0.76rem; color: rgba(255,255,255,0.58); padding: 4px 14px; }
+    .slack-ch::before { content: '# '; opacity: 0.45; }
+    .slack-ch.active { background: rgba(255,255,255,0.1); color: #fff; }
+    .slack-main     { flex: 1; background: #fff; display: flex; flex-direction: column; }
+    .slack-mhead    { height: 42px; border-bottom: 1px solid #eee; display: flex; align-items: center; padding: 0 14px; font-size: 0.8rem; font-weight: 700; color: #1D1C1D; gap: 5px; }
+    .slack-mhead span { font-weight: 400; color: #999; font-size: 0.72rem; }
+    .slack-msgs     { flex: 1; padding: 10px 14px; overflow: hidden; }
+    .slack-msg      { display: flex; gap: 8px; margin-bottom: 10px; }
+    .slack-av       { width: 30px; height: 30px; border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: #fff; }
+    .slack-name     { font-size: 0.75rem; font-weight: 700; color: #1D1C1D; margin-bottom: 1px; }
+    .slack-name span { font-weight: 400; color: #999; font-size: 0.68rem; margin-left: 4px; }
+    .slack-text     { font-size: 0.78rem; color: #1D1C1D; line-height: 1.4; }
+    .slack-inp      { height: 40px; border-top: 1px solid #eee; display: flex; align-items: center; padding: 0 10px; }
+    .slack-inp-box  { flex: 1; height: 26px; border: 1px solid #ddd; border-radius: 4px; padding: 0 10px; font-size: 0.75rem; color: #aaa; background: #fafafa; display: flex; align-items: center; }
+
+    /* GMAIL */
+    #win-gmail { width: 420px; top: 72px; left: 270px; z-index: 9; }
+    .gmail-chrome  { background: #F1F3F4; border-bottom: 1px solid #ddd; }
+    .gmail-body    { display: flex; height: 250px; }
+    .gmail-sidebar { width: 150px; background: #F1F3F4; padding: 8px 0; flex-shrink: 0; }
+    .gmail-compose { margin: 0 8px 10px; background: #fff; border: 1px solid #ddd; border-radius: 16px; padding: 9px 14px; font-size: 0.75rem; font-weight: 600; color: #444; cursor: default; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .gmail-nav     { font-size: 0.75rem; color: #222; padding: 4px 14px; cursor: default; display: flex; justify-content: space-between; }
+    .gmail-nav.active { background: #fce8e6; border-radius: 0 100px 100px 0; margin-right: 8px; font-weight: 600; }
+    .gmail-count   { font-size: 0.7rem; color: #c5221f; font-weight: 500; }
+    .gmail-main    { flex: 1; background: #fff; }
+    .gmail-toolbar { height: 42px; border-bottom: 1px solid #eee; display: flex; align-items: center; padding: 0 12px; }
+    .gmail-search  { flex: 1; height: 26px; background: #f1f3f4; border-radius: 20px; border: none; display: flex; align-items: center; padding: 0 12px; font-size: 0.75rem; color: #999; }
+    .gmail-row     { height: 40px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; padding: 0 10px; gap: 9px; }
+    .gmail-row.unread { background: #fff; }
+    .gmail-row.read   { background: #f6f6f6; }
+    .g-star    { font-size: 0.72rem; color: #ccc; }
+    .g-sender  { font-size: 0.75rem; width: 100px; flex-shrink: 0; }
+    .gmail-row.unread .g-sender { font-weight: 700; color: #202124; }
+    .gmail-row.read   .g-sender { color: #888; }
+    .g-subject { font-size: 0.75rem; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .gmail-row.unread .g-subject { font-weight: 600; color: #202124; }
+    .gmail-row.read   .g-subject { color: #999; }
+    .g-time    { font-size: 0.68rem; color: #999; flex-shrink: 0; }
+
+    /* DOCK */
+    .dock {
+      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.11); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.13); border-radius: 16px;
+      padding: 8px 12px; display: flex; gap: 9px; align-items: flex-end;
+    }
+    .dock-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: default; transition: transform 0.14s; }
+    .dock-icon:hover { transform: translateY(-4px) scale(1.1); }
+
+    /* ── DESKTOP NOTIFICATION ──────────────────────── */
+    #desktop-notif {
+      position: absolute; bottom: 76px; right: 16px; width: 290px;
+      background: rgba(28,32,46,0.94); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 14px;
+      padding: 13px 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      display: none; animation: slideInR 0.4s cubic-bezier(0.16,1,0.3,1) both; z-index: 100;
+    }
+    .dn-header { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+    .dn-icon   { width: 21px; height: 21px; border-radius: 6px; background: #4472A8; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #fff; font-weight: 700; flex-shrink: 0; }
+    .dn-app    { font-size: 0.62rem; font-weight: 600; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; }
+    .dn-time   { font-size: 0.62rem; color: rgba(255,255,255,0.25); margin-left: auto; }
+    .dn-title  { font-size: 0.86rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .dn-body   { font-size: 0.74rem; color: rgba(255,255,255,0.55); line-height: 1.4; margin-bottom: 11px; }
+    .dn-actions{ display: flex; gap: 7px; }
+    .dn-btn    { flex: 1; padding: 7px; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500; cursor: pointer; }
+    .dn-primary{ background: #4472A8; color: #fff; }
+    .dn-ghost  { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.55); }
+    .dn-btn:hover { opacity: 0.82; }
+
+    /* DIVIDER */
+    .divider-line { width: 1px; background: rgba(255,255,255,0.06); flex-shrink: 0; }
+
+    /* ── PHONE SIDE (bigger) ───────────────────────── */
+    .phone-side {
+      width: 420px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 12px 20px;
     }
 
-    /* ── THEME SWATCHES ────────────────────────── */
-    .theme-row {
-      align-self: flex-start;
-      display: flex; align-items: center; gap: 8px;
-      padding: 4px 0 2px;
-      animation: fadeIn 0.4s 0.2s ease both; opacity: 0; animation-fill-mode: forwards;
+    .phone-shell {
+      width: 300px; height: 588px;
+      background: #1A1917; border-radius: 44px;
+      border: 3px solid #3A3A3A;
+      box-shadow: 0 0 0 1px #111, 0 24px 60px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(255,255,255,0.05);
+      overflow: hidden; position: relative; display: flex; flex-direction: column;
     }
-    .theme-row-label { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.05em; }
-    .swatch {
-      width: 20px; height: 20px; border-radius: 50%;
-      border: 2px solid transparent; cursor: pointer;
-      transition: transform 0.14s, border-color 0.14s;
+    .phone-notch {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 96px; height: 28px; background: #1A1917;
+      border-radius: 0 0 18px 18px; z-index: 10;
     }
-    .swatch:hover   { transform: scale(1.18); }
-    .swatch.active  { border-color: var(--fg) !important; transform: scale(1.15); }
+    .phone-screen { flex: 1; overflow: hidden; position: relative; background: #F0EDE8; }
 
-    /* ── MENU CARD ─────────────────────────────── */
-    .menu-card {
-      align-self: stretch;
-      --mc-bg:   #F5EDD6;
-      --mc-ink:  #C42B2B;
-      --mc-soft: rgba(196,43,43,0.1);
-      background: var(--mc-bg);
-      border: 2px solid var(--mc-ink);
-      border-radius: 6px;
-      box-shadow: 4px 4px 0 var(--mc-ink);
+    .phone-status {
+      height: 46px; display: flex; align-items: flex-end;
+      padding: 0 22px 7px; justify-content: space-between;
+      flex-shrink: 0; font-size: 0.62rem; font-weight: 600;
+      color: #1A1917; background: #F0EDE8;
+      position: relative; z-index: 5;
+    }
+    .ps-icons { display: flex; gap: 4px; opacity: 0.65; }
+
+    /* ── PHONE STATES ──────────────────────────────── */
+    .phone-state {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      transition: opacity 0.38s ease, transform 0.38s ease;
+    }
+    .phone-state.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
+
+    /* IDLE */
+    #ps-idle { background: #F0EDE8; align-items: center; justify-content: center; }
+    .idle-time  { font-size: 3.2rem; font-weight: 200; letter-spacing: -0.04em; color: #1A1917; margin-bottom: 4px; }
+    .idle-date  { font-size: 0.78rem; color: #8B7B70; margin-bottom: 28px; }
+    .idle-apps  { display: grid; grid-template-columns: repeat(4, 54px); gap: 12px; }
+    .idle-app   { width: 54px; height: 54px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+
+    /* NOTIFICATION */
+    #ps-notif { background: #F0EDE8; padding-top: 46px; }
+    .notif-card {
+      margin: 10px 10px 0;
+      background: rgba(255,255,255,0.93); backdrop-filter: blur(20px);
+      border-radius: 18px; padding: 13px 15px 11px;
+      box-shadow: 0 4px 22px rgba(0,0,0,0.1);
+      animation: slideDown 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .nc-header    { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+    .nc-icon      { width: 22px; height: 22px; border-radius: 6px; background: #4472A8; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .nc-app       { font-size: 0.62rem; font-weight: 600; color: #999; letter-spacing: 0.04em; }
+    .nc-time      { font-size: 0.62rem; color: #bbb; margin-left: auto; }
+    .nc-title     { font-size: 0.84rem; font-weight: 700; color: #1A1917; margin-bottom: 3px; }
+    .nc-body      { font-size: 0.76rem; color: #666; line-height: 1.4; margin-bottom: 10px; }
+    .nc-actions   { display: flex; gap: 7px; }
+    .nc-btn       { flex: 1; padding: 7px; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.73rem; font-weight: 500; cursor: pointer; }
+    .nc-primary   { background: #4472A8; color: #fff; }
+    .nc-ghost     { background: #F0EDE8; color: #888; }
+    .nc-btn:hover { opacity: 0.82; }
+
+    /* GENTLE RE-ENGAGEMENT notification */
+    .gentle-notif {
+      margin: 0 10px;
+      background: rgba(255,255,255,0.93); backdrop-filter: blur(20px);
+      border-radius: 16px; padding: 12px 14px 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      animation: slideDown 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .gentle-notif .nc-title { font-weight: 600; font-size: 0.78rem; }
+    .gentle-notif .nc-body  { font-size: 0.72rem; margin-bottom: 8px; }
+    .gentle-comeback {
+      background: none; border: 1px solid #4472A8; color: #4472A8;
+      border-radius: 8px; padding: 6px 12px; font-family: 'Inter', sans-serif;
+      font-size: 0.72rem; font-weight: 500; cursor: pointer; width: 100%;
+      transition: background 0.14s;
+    }
+    .gentle-comeback:hover { background: #EBF2FA; }
+
+    /* THINKING */
+    #ps-thinking { background: #F0EDE8; align-items: center; justify-content: center; flex-direction: column; gap: 22px; padding-top: 46px; }
+    .pb-wrap  { position: relative; width: 80px; height: 80px; }
+    .pb-outer { position: absolute; inset: 0; border-radius: 50%; background: #4472A8; animation: breatheO 3.5s ease-in-out infinite; }
+    .pb-mid   { position: absolute; inset: 13px; border-radius: 50%; background: #4472A8; animation: breatheM 3.5s ease-in-out infinite; }
+    .pb-core  { position: absolute; inset: 26px; border-radius: 50%; background: #4472A8; animation: breatheC 3.5s ease-in-out infinite; }
+    .p-thinking-text { font-size: 0.8rem; color: #8B7B70; letter-spacing: 0.04em; }
+
+    /* SUGGESTIONS */
+    #ps-suggestions { background: #F0EDE8; padding: 46px 11px 11px; overflow-y: auto; flex-direction: column; }
+    .p-hdr      { margin-bottom: 12px; flex-shrink: 0; }
+    .p-hdr-time { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #4472A8; margin-bottom: 3px; }
+    .p-hdr h3   { font-size: 0.94rem; font-weight: 600; letter-spacing: -0.01em; color: #1A1917; margin-bottom: 3px; }
+    .p-hdr .p-ctx { font-size: 0.72rem; color: #8B7B70; line-height: 1.4; }
+
+    .p-sug {
+      background: #fff; border: 1px solid #E0DAD4; border-radius: 11px;
+      padding: 12px; margin-bottom: 8px; cursor: pointer;
+      transition: border-color 0.14s, box-shadow 0.14s, transform 0.12s;
+    }
+    .p-sug:hover { border-color: #4472A8; box-shadow: 0 2px 14px rgba(68,114,168,0.12); transform: translateY(-1px); }
+    .p-sug-title   { font-size: 0.84rem; font-weight: 700; color: #1A1917; margin-bottom: 5px; letter-spacing: -0.01em; }
+    .p-sug-because { font-size: 0.69rem; color: #4472A8; line-height: 1.45; background: #EBF2FA; border-radius: 5px; padding: 5px 8px; margin-bottom: 6px; }
+    .p-sug-because::before { content: 'because '; font-weight: 700; }
+    .p-sug-start   { font-size: 0.69rem; color: #8B7B70; line-height: 1.3; }
+    .p-sug-start::before { content: '→ '; }
+
+    .p-escape { text-align: center; padding: 6px 0 2px; flex-shrink: 0; }
+    .p-escape-btn {
+      background: none; border: none; font-family: 'Inter', sans-serif;
+      font-size: 0.7rem; color: #aaa; cursor: pointer;
+      text-decoration: underline; text-underline-offset: 2px;
+    }
+    .p-escape-btn:hover { color: #888; }
+
+    /* ACTIVITY */
+    #ps-activity { background: #F0EDE8; padding: 46px 11px 11px; align-items: center; justify-content: flex-start; flex-direction: column; gap: 10px; }
+    .activity-card { width: 100%; background: #fff; border: 1px solid #E0DAD4; border-radius: 14px; overflow: hidden; animation: fadeUp 0.4s ease both; }
+
+    .player-art    { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
+    .player-info   { padding: 14px 14px 8px; }
+    .player-title  { font-size: 0.9rem; font-weight: 700; margin-bottom: 2px; letter-spacing: -0.01em; }
+    .player-sub    { font-size: 0.72rem; color: #888; margin-bottom: 10px; }
+    .pbar-wrap     { height: 3px; background: #E0DAD4; border-radius: 2px; margin-bottom: 10px; }
+    .pbar-fill     { height: 100%; background: #4472A8; border-radius: 2px; width: 0%; transition: width 0.4s linear; }
+    .player-ctrls  { display: flex; align-items: center; justify-content: center; gap: 22px; padding: 0 14px 14px; }
+    .pc-btn   { background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.5; }
+    .pc-play  { width: 42px; height: 42px; border-radius: 50%; background: #4472A8; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #fff; }
+
+    .walk-card  { padding: 22px 16px; text-align: center; }
+    .walk-icon  { font-size: 2.8rem; margin-bottom: 10px; }
+    .walk-title { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; }
+    .walk-sub   { font-size: 0.73rem; color: #888; margin-bottom: 18px; }
+    .walk-timer { font-size: 2.4rem; font-weight: 200; letter-spacing: -0.04em; color: #4472A8; margin-bottom: 5px; }
+    .walk-lbl   { font-size: 0.62rem; color: #aaa; letter-spacing: 0.1em; }
+
+    .tea-card   { padding: 22px 16px; text-align: center; }
+    .tea-icon   { font-size: 2.8rem; margin-bottom: 10px; }
+    .tea-title  { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; }
+    .tea-sub    { font-size: 0.73rem; color: #888; margin-bottom: 16px; }
+    .ring-wrap  { width: 88px; height: 88px; margin: 0 auto 10px; position: relative; }
+    .ring-svg   { transform: rotate(-90deg); }
+    .ring-bg    { fill: none; stroke: #E0DAD4; stroke-width: 5; }
+    .ring-fill  { fill: none; stroke: #4472A8; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 245; stroke-dashoffset: 245; transition: stroke-dashoffset 1s linear; }
+    .ring-text  { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 300; color: #4472A8; }
+
+    .back-to-sug {
+      width: 100%; padding: 10px; background: transparent;
+      border: 1px solid #E0DAD4; border-radius: 10px; color: #8B7B70;
+      font-family: 'Inter', sans-serif; font-size: 0.78rem; cursor: pointer;
+      transition: border-color 0.14s, background 0.14s; flex-shrink: 0;
+    }
+    .back-to-sug:hover { border-color: #4472A8; background: #EBF2FA; color: #4472A8; }
+
+    /* HEURISTIC LABELS */
+    /* ── DESIGN NOTES PANEL ──────────────────────── */
+    #notes-panel {
+      position: fixed; top: 36px; right: 0; bottom: 0;
+      width: 300px; z-index: 400;
+      background: rgba(14,18,32,0.97);
+      border-left: 1px solid rgba(255,255,255,0.1);
+      display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.38s cubic-bezier(0.16,1,0.3,1);
       overflow: hidden;
-      animation: fadeUp 0.4s ease both;
-      position: relative;
+    }
+    #notes-panel.open { transform: translateX(0); }
+
+    .np-header {
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .np-title {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: #5B8FD4;
+    }
+    .np-close {
+      background: none; border: none; color: rgba(255,255,255,0.35);
+      cursor: pointer; font-size: 1rem; line-height: 1;
+      transition: color 0.14s;
+    }
+    .np-close:hover { color: #fff; }
+
+    .np-body { flex: 1; overflow-y: auto; padding: 14px 18px 20px; }
+
+    .np-vs {
+      background: rgba(255,255,255,0.05); border-radius: 10px;
+      padding: 10px 12px; margin-bottom: 16px;
+    }
+    .np-vs-label {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 5px;
+    }
+    .np-vs-row {
+      display: flex; gap: 8px; font-size: 0.72rem; line-height: 1.4;
+    }
+    .np-vs-bad  { color: #FF7B72; flex: 1; }
+    .np-vs-good { color: #7EE787; flex: 1; }
+    .np-vs-row .label { font-weight: 700; display: block; margin-bottom: 2px; font-size: 0.62rem; opacity: 0.7; }
+
+    .np-h {
+      margin-bottom: 14px; padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .np-h:last-child { border-bottom: none; margin-bottom: 0; }
+
+    .np-h-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+    .np-h-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #4472A8; color: #fff;
+      font-size: 0.62rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .np-h-name {
+      font-size: 0.78rem; font-weight: 700; color: #fff; line-height: 1.3;
+    }
+    .np-h-q    { font-size: 0.68rem; color: rgba(255,255,255,0.38); margin-bottom: 4px; font-style: italic; padding-left: 30px; }
+    .np-h-desc { font-size: 0.72rem; color: rgba(255,255,255,0.55); line-height: 1.5; padding-left: 30px; }
+    .np-h-tag  {
+      display: inline-block; font-size: 0.58rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      background: rgba(68,114,168,0.25); color: #88B4E0;
+      padding: 2px 7px; border-radius: 100px; margin-top: 5px; margin-left: 30px;
     }
 
-    .menu-checker {
-      height: 10px;
-      background-image:
-        linear-gradient(45deg, var(--mc-ink) 25%, transparent 25%),
-        linear-gradient(-45deg, var(--mc-ink) 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, var(--mc-ink) 75%),
-        linear-gradient(-45deg, transparent 75%, var(--mc-ink) 75%);
-      background-size: 8px 8px;
-      background-position: 0 0, 0 4px, 4px -4px, -4px 0;
-      background-color: var(--mc-bg);
+    .ann-toggle {
+      position: fixed; bottom: 14px; right: 14px;
+      background: rgba(255,255,255,0.13); color: #fff;
+      border: 1px solid rgba(255,255,255,0.18); border-radius: 100px;
+      padding: 7px 14px; font-family: 'Inter', sans-serif;
+      font-size: 0.68rem; font-weight: 500; cursor: pointer; z-index: 500;
+      transition: background 0.14s, right 0.38s cubic-bezier(0.16,1,0.3,1);
     }
+    .ann-toggle:hover { background: rgba(255,255,255,0.22); }
+    .ann-toggle.shifted { right: 314px; }
 
-    .menu-inner {
-      margin: 10px;
-      border: 1px dashed var(--mc-ink);
-      border-radius: 3px;
-      opacity-for-border: 0.4;
-      padding: 18px 20px 16px;
-    }
-    /* Use outline trick for semi-transparent dashed border */
-    .menu-inner { border-color: color-mix(in srgb, var(--mc-ink) 35%, transparent); }
+    .hlabel { display: none; }
 
-    .menu-title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1.45rem; font-weight: 700; font-style: italic;
-      color: var(--mc-ink); text-align: center;
-      margin-bottom: 4px; letter-spacing: -0.01em;
-    }
+    /* ── SCROLL-CHECK STATE ───────────────────────── */
+    #ps-scroll-check { background: #FDF8F2; }
+    .sc-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px 16px; text-align:center; }
+    .sc-emoji { font-size:2.6rem; margin-bottom:12px; }
+    .sc-title { font-size:1rem; font-weight:700; letter-spacing:-.02em; color:#1A1917; margin-bottom:8px; }
+    .sc-body .sc-msg { font-size:0.76rem; color:#8B7B70; line-height:1.6; margin-bottom:22px; }
+    .sc-back { width:100%; padding:12px; background:#4472A8; color:#fff; border:none; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.84rem; font-weight:600; cursor:pointer; margin-bottom:8px; transition:opacity .14s; }
+    .sc-back:hover { opacity:.82; }
+    .sc-through { background:none; border:none; font-family:'Inter',sans-serif; font-size:0.74rem; color:#aaa; cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
 
-    .menu-subtitle {
-      font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--mc-ink); text-align: center; opacity: 0.55; margin-bottom: 16px;
+    /* ── IDLE FLOATING NUDGE ─────────────────────── */
+    #idle-nudge {
+      display:none; position:absolute; top:58px; left:9px; right:9px; z-index:20;
+      animation: slideDown .5s cubic-bezier(.16,1,.3,1) both;
     }
+    .nudge-card {
+      background:rgba(255,255,255,.96); backdrop-filter:blur(20px);
+      border-radius:16px; padding:12px 14px 10px;
+      box-shadow:0 4px 20px rgba(0,0,0,.1);
+    }
+    .nudge-header { display:flex; align-items:center; gap:7px; margin-bottom:4px; }
+    .nudge-icon   { width:20px; height:20px; border-radius:5px; background:#4472A8; display:flex; align-items:center; justify-content:center; font-size:0.62rem; font-weight:700; color:#fff; }
+    .nudge-app    { font-size:0.6rem; font-weight:600; color:#aaa; letter-spacing:.06em; }
+    .nudge-dismiss{ background:none; border:none; font-size:0.68rem; color:#ccc; cursor:pointer; margin-left:auto; }
+    .nudge-title  { font-size:0.8rem; font-weight:700; color:#1A1917; margin-bottom:3px; }
+    .nudge-body   { font-size:0.72rem; color:#666; line-height:1.4; margin-bottom:8px; }
+    .nudge-action { background:none; border:1px solid #4472A8; color:#4472A8; border-radius:7px; padding:5px 12px; font-family:'Inter',sans-serif; font-size:0.72rem; cursor:pointer; }
+    .nudge-action:hover { background:#EBF2FA; }
 
-    .menu-divider-line {
-      height: 1px; background: var(--mc-ink); opacity: 0.2; margin: 12px 0;
-    }
+    /* ── WORK INTERRUPT STATE ────────────────────── */
+    #ps-work-interrupt { background:#FDF8F2; }
+    .wi-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px 16px; text-align:center; }
+    .wi-emoji { font-size:2.4rem; margin-bottom:12px; }
+    .wi-title { font-size:0.96rem; font-weight:700; color:#1A1917; margin-bottom:6px; letter-spacing:-.02em; }
+    .wi-msg   { font-size:0.74rem; color:#8B7B70; line-height:1.55; margin-bottom:20px; }
+    .wi-back  { width:100%; padding:11px; background:#4472A8; color:#fff; border:none; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; margin-bottom:8px; transition:opacity .14s; }
+    .wi-back:hover { opacity:.82; }
+    .wi-accept{ width:100%; padding:10px; background:transparent; border:1px solid #E0DAD4; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.8rem; color:#888; cursor:pointer; }
 
-    .menu-tier { margin-bottom: 16px; }
+    /* ── PURPOSE BANNER (activity header) ───────── */
+    .purpose-banner {
+      background:#EBF2FA; border-radius:8px; padding:9px 11px;
+      margin-bottom:10px; border-left:3px solid #4472A8;
+    }
+    .pb-label { font-size:0.58rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#4472A8; margin-bottom:3px; }
+    .pb-text  { font-size:0.72rem; color:#4472A8; line-height:1.5; }
 
-    .menu-tier-header {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
-    }
+    /* ── BATH ────────────────────────────────────── */
+    .bath-opts { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+    .bath-opt-row { display:flex; align-items:center; justify-content:space-between; }
+    .bath-opt-label { font-size:0.74rem; font-weight:500; color:#555; }
+    .bath-chips { display:flex; gap:5px; }
+    .bath-chip { padding:5px 10px; border:1px solid #E0DAD4; border-radius:100px; font-family:'Inter',sans-serif; font-size:0.7rem; cursor:pointer; transition:all .13s; background:#fff; color:#555; }
+    .bath-chip.on { background:#4472A8; border-color:#4472A8; color:#fff; }
+    .bath-no-phone { background:#1A1917; color:#fff; border:none; border-radius:10px; padding:12px; width:100%; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; margin-top:4px; }
 
-    .tier-name {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 1rem; font-weight: 600; font-style: italic;
-      color: var(--mc-ink); flex-shrink: 0;
+    /* ── TEA ANIMATION ──────────────────────────── */
+    .tea-scene      { display:flex; flex-direction:column; align-items:center; margin:10px 0 6px; position:relative; }
+    .steam-row      { display:flex; gap:8px; height:36px; align-items:flex-end; margin-bottom:2px; }
+    .wisp           { width:5px; border-radius:10px; background:linear-gradient(to top,rgba(180,160,140,.55),transparent); animation:wisp-up 2.2s ease-in-out infinite; transform-origin:bottom center; }
+    .wisp.w1        { height:22px; animation-delay:0s; }
+    .wisp.w2        { height:30px; animation-delay:.55s; }
+    .wisp.w3        { height:18px; animation-delay:1.1s; }
+    .wisp.w4        { height:26px; animation-delay:1.65s; }
+    @keyframes wisp-up {
+      0%   { opacity:0;   transform:translateY(0) scaleX(1); }
+      20%  { opacity:.65; }
+      60%  { opacity:.28; transform:translateY(-16px) scaleX(1.9); }
+      100% { opacity:0;   transform:translateY(-32px) scaleX(.5); }
     }
+    .tea-mug        { width:68px; height:60px; background:#fff; border:2.5px solid #C4A882; border-radius:5px 5px 16px 16px; position:relative; overflow:hidden; box-shadow:0 3px 10px rgba(180,140,100,.14); }
+    .mug-handle     { position:absolute; right:-14px; top:11px; width:14px; height:24px; border:2.5px solid #C4A882; border-left:none; border-radius:0 10px 10px 0; }
+    .tea-liquid     { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top,#A8521C,#C87830,#E0A040); height:0%; transition:height 2.8s cubic-bezier(.4,0,.2,1); border-radius:0 0 13px 13px; }
+    .mug-bubbles    { position:absolute; bottom:0; left:0; right:0; height:10px; }
+    .mbubble        { position:absolute; bottom:2px; border-radius:50%; background:rgba(255,255,255,.45); animation:mbub 2.8s ease-in-out infinite; }
+    .mb1            { width:5px; height:5px; left:10px; animation-delay:.2s; }
+    .mb2            { width:4px; height:4px; left:26px; animation-delay:.9s; }
+    .mb3            { width:6px; height:6px; left:44px; animation-delay:1.7s; }
+    @keyframes mbub { 0%,100%{opacity:.45;transform:scale(1)} 50%{opacity:.8;transform:scale(1.15) translateY(-1px)} }
+    .tea-saucer     { width:90px; height:11px; background:linear-gradient(to bottom,#C4A882,#A88860); border-radius:50%; margin-top:2px; box-shadow:0 3px 8px rgba(0,0,0,.09); }
+    .tea-phase-text { font-size:0.67rem; color:#8B7B70; font-style:italic; margin-top:7px; letter-spacing:.03em; min-height:16px; animation:fadeIn .4s ease; }
+    .step-row       { display:flex; gap:8px; align-items:flex-start; margin-bottom:7px; cursor:pointer; transition:opacity .2s; }
+    .step-row:hover { opacity:.8; }
+    .step-circle    { width:18px; height:18px; border-radius:50%; border:1.5px solid #C4A882; display:flex; align-items:center; justify-content:center; font-size:.6rem; color:#C4A882; flex-shrink:0; margin-top:1px; transition:all .2s; }
+    .step-circle.done { background:#4472A8; border-color:#4472A8; color:#fff; }
 
-    .tier-sub {
-      font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--mc-ink); opacity: 0.45; font-family: 'Inter', sans-serif;
-    }
+    /* ── BATH ANIMATION ──────────────────────────── */
+    .bath-scene     { position:relative; display:flex; flex-direction:column; align-items:center; margin:8px 0 10px; }
+    .bath-steam-row { display:flex; gap:6px; height:28px; align-items:flex-end; margin-bottom:2px; }
+    .bath-tub-wrap  { position:relative; }
+    .bath-tub-body  { width:130px; height:58px; border:2.5px solid #C4A882; border-top:none; border-radius:0 0 50px 50px; background:#fff; position:relative; overflow:hidden; }
+    .bath-water-fill{ position:absolute; bottom:0; left:0; right:0; height:0%; background:linear-gradient(to top,#5B9EC4,#7BBCE0,#A0D4F0); transition:height 3s cubic-bezier(.4,0,.2,1); border-radius:0 0 48px 48px; }
+    .bath-wave      { position:absolute; top:0; left:-20px; right:-20px; height:12px; animation:wave-move 2.5s linear infinite; }
+    .bath-wave svg  { width:100%; height:100%; }
+    @keyframes wave-move { 0%{transform:translateX(0)} 100%{transform:translateX(20px)} }
+    .bath-duck      { position:absolute; font-size:1.1rem; bottom:28%; right:22px; animation:duck-bob 2s ease-in-out infinite; z-index:2; }
+    @keyframes duck-bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+    .bath-tub-legs  { display:flex; justify-content:space-between; width:100px; margin-top:2px; padding:0 10px; }
+    .bath-leg       { width:6px; height:10px; background:#C4A882; border-radius:0 0 3px 3px; }
+    .bath-add-row   { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .bath-add-chip  { padding:5px 10px; border:1px solid #E0DAD4; border-radius:100px; font-size:0.7rem; background:#fff; cursor:pointer; transition:all .13s; color:#555; display:flex; gap:4px; align-items:center; }
+    .bath-add-chip.on  { background:#4472A8; border-color:#4472A8; color:#fff; }
+    .bath-add-chip:hover:not(.on) { border-color:#4472A8; }
+    .scent-note     { font-size:0.68rem; color:#4472A8; background:#EBF2FA; border-radius:6px; padding:5px 9px; margin-bottom:10px; font-style:italic; min-height:20px; animation:fadeIn .3s ease; }
 
-    .tier-icons-row {
-      display: flex; gap: 4px; margin-left: auto; align-items: center;
-    }
+    /* completion moment */
+    .completion-card { text-align:center; padding:20px 14px; }
+    .completion-check { font-size:2rem; margin-bottom:10px; }
+    .completion-title { font-size:0.94rem; font-weight:700; letter-spacing:-.01em; margin-bottom:6px; }
+    .completion-msg   { font-size:0.76rem; color:#8B7B70; line-height:1.55; margin-bottom:14px; }
+    .mood-row  { display:flex; justify-content:center; gap:8px; margin-bottom:12px; }
+    .mood-btn  { font-size:1.3rem; cursor:pointer; transition:transform .12s; border:none; background:none; padding:4px; border-radius:50%; }
+    .mood-btn:hover { transform:scale(1.3); }
+    .mood-btn.picked { background:#EBF2FA; transform:scale(1.2); }
 
-    .tier-ico {
-      width: 18px; height: 18px; opacity: 0.55;
-      display: inline-flex; align-items: center; justify-content: center;
-    }
+    /* dock clickable */
+    .dock-icon.clickable { cursor:pointer; }
+    .dock-icon.clickable:hover { transform:translateY(-4px) scale(1.1); }
 
-    .tier-ico svg {
-      width: 100%; height: 100%;
-      stroke: var(--mc-ink); fill: none;
-      stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
-    }
+    /* ── ACTIVITY SCROLL FIX ──────────────────────── */
+    #ps-activity { overflow: hidden; }
+    .act-scroll  { flex:1; overflow-y:auto; padding:0 11px 6px; }
+    .act-footer  { flex-shrink:0; padding:0 11px 11px; }
 
-    .menu-items { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+    /* ── WALK ──────────────────────────────────────── */
+    .walk-stats  { display:flex; gap:14px; justify-content:center; margin:4px 0 10px; }
+    .walk-stat   { font-size:0.8rem; color:#4472A8; font-weight:600; }
+    .walk-stat span { font-weight:300; color:#aaa; font-size:0.7rem; margin-right:3px; }
+    .walk-turns  { text-align:left; margin-bottom:10px; }
+    .walk-turn   { display:flex; gap:8px; font-size:0.74rem; color:#555; margin-bottom:6px; align-items:flex-start; line-height:1.4; }
+    .turn-num    { width:18px; height:18px; border-radius:50%; background:#4472A8; color:#fff; font-size:0.6rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+    .walk-intent { font-size:0.72rem; color:#6B6560; font-style:italic; line-height:1.55; border-top:1px solid #E0DAD4; padding-top:9px; margin-top:4px; margin-bottom:10px; }
+    .walk-new-route { background:none; border:1px solid #E0DAD4; color:#8B7B70; font-family:'Inter',sans-serif; font-size:0.72rem; padding:7px 12px; border-radius:8px; cursor:pointer; width:100%; transition:all .14s; }
+    .walk-new-route:hover { border-color:#4472A8; color:#4472A8; }
 
-    .menu-item {
-      display: flex; align-items: flex-start; gap: 8px;
-      font-family: 'Inter', sans-serif; font-size: 0.84rem;
-      color: color-mix(in srgb, var(--mc-ink) 75%, #000);
-      line-height: 1.45;
-    }
+    /* ── MUSIC QUEUE ───────────────────────────────── */
+    .song-queue  { border-top:1px solid #E0DAD4; padding:8px 14px 6px; }
+    .queue-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#ccc; margin-bottom:6px; }
+    .queue-row   { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid #F5F5F5; }
+    .queue-row:last-child { border-bottom:none; }
+    .queue-row.playing .queue-name { font-weight:700; color:#4472A8; }
+    .queue-name  { font-size:0.75rem; color:#555; flex:1; }
+    .queue-name .qa { color:#aaa; font-weight:400; }
+    .queue-dur   { font-size:0.68rem; color:#ccc; }
+    .playing-dot { width:6px; height:6px; border-radius:50%; background:#4472A8; flex-shrink:0; animation:blink-dot 1.2s ease-in-out infinite; }
+    @keyframes blink-dot { 0%,100%{opacity:.3} 50%{opacity:1} }
 
-    .menu-item-ico {
-      width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; opacity: 0.55;
-    }
-    .menu-item-ico svg {
-      width: 100%; height: 100%;
-      stroke: var(--mc-ink); fill: none;
-      stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
-    }
+    /* ── DRAWING ───────────────────────────────────── */
+    .draw-prompt  { font-size:0.74rem; color:#4472A8; background:#EBF2FA; border-radius:8px; padding:9px 11px; margin-bottom:8px; line-height:1.5; }
+    .draw-prompt strong { font-weight:700; display:block; font-size:0.6rem; letter-spacing:.08em; text-transform:uppercase; color:#aaa; margin-bottom:2px; }
+    .canvas-wrap  { border:1px solid #E0DAD4; border-radius:8px; overflow:hidden; background:#fff; margin-bottom:7px; }
+    canvas        { display:block; cursor:crosshair; touch-action:none; }
+    .canvas-tools { display:flex; gap:5px; margin-bottom:7px; }
+    .ct-btn       { flex:1; padding:6px 0; border:1px solid #E0DAD4; border-radius:7px; font-family:'Inter',sans-serif; font-size:0.72rem; background:#fff; cursor:pointer; transition:all .13s; text-align:center; }
+    .ct-btn.active  { background:#4472A8; color:#fff; border-color:#4472A8; }
+    .ct-btn:hover:not(.active) { border-color:#4472A8; }
+    .draw-note    { width:100%; padding:7px 10px; border:1px solid #E0DAD4; border-radius:7px; font-family:'Inter',sans-serif; font-size:0.78rem; resize:none; outline:none; height:44px; display:block; }
+    .draw-note:focus { border-color:#4472A8; }
+    .log-toggle   { background:none; border:none; font-family:'Inter',sans-serif; font-size:0.72rem; color:#4472A8; cursor:pointer; padding:7px 0 2px; width:100%; text-align:left; }
+    .log-entry    { background:#F8F6F4; border-radius:6px; padding:8px 10px; margin-bottom:5px; animation:fadeUp .3s ease both; }
+    .log-entry-meta { font-size:0.62rem; color:#bbb; margin-bottom:3px; }
+    .log-entry-prompt { font-size:0.69rem; color:#aaa; font-style:italic; margin-bottom:2px; }
+    .log-entry-note { font-size:0.75rem; color:#444; }
+    .log-empty { font-size:0.72rem; color:#ccc; font-style:italic; }
 
-    .menu-item-dash { opacity: 0.3; flex-shrink: 0; margin-top: 0px; }
+    /* ── PODCAST ───────────────────────────────────── */
+    .pod-art      { width:100%; height:110px; display:flex; align-items:center; justify-content:center; font-size:2.8rem; }
+    .pod-info     { padding:10px 14px 4px; }
+    .pod-show     { font-size:0.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#4472A8; margin-bottom:3px; }
+    .pod-title    { font-size:0.86rem; font-weight:700; margin-bottom:4px; letter-spacing:-.01em; line-height:1.3; }
+    .pod-desc     { font-size:0.71rem; color:#888; line-height:1.4; margin-bottom:8px; }
+    .pod-ctrls    { display:flex; align-items:center; justify-content:center; gap:12px; padding:0 14px 10px; }
+    .pod-skip-btn { background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; }
+    .pod-skip-btn .sk-icon { font-size:1.1rem; }
+    .pod-skip-btn .sk-label { font-size:0.58rem; font-weight:600; color:#aaa; letter-spacing:.04em; }
+    .pod-queue    { border-top:1px solid #E0DAD4; padding:8px 14px 4px; }
 
-    .menu-actions {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;
-    }
+    /* ── JOURNAL ───────────────────────────────────── */
+    .j-prompt     { font-size:0.74rem; color:#4472A8; background:#EBF2FA; border-radius:8px; padding:9px 11px; margin-bottom:8px; line-height:1.5; }
+    .j-prompt strong { font-weight:700; display:block; font-size:0.6rem; letter-spacing:.08em; text-transform:uppercase; color:#aaa; margin-bottom:2px; }
+    .j-ta         { width:100%; padding:10px 11px; border:1px solid #E0DAD4; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.82rem; line-height:1.65; resize:none; outline:none; min-height:110px; color:#1A1917; display:block; }
+    .j-ta:focus   { border-color:#4472A8; }
+    .j-footer     { display:flex; gap:7px; margin-top:7px; }
+    .j-save       { flex:1; padding:8px; background:#4472A8; color:#fff; border:none; border-radius:7px; font-family:'Inter',sans-serif; font-size:0.76rem; font-weight:500; cursor:pointer; transition:opacity .14s; }
+    .j-save:hover { opacity:.82; }
+    .j-log-btn    { padding:8px 12px; background:transparent; border:1px solid #E0DAD4; border-radius:7px; font-family:'Inter',sans-serif; font-size:0.76rem; color:#888; cursor:pointer; }
 
-    .btn-menu-save {
-      padding: 8px 18px;
-      background: var(--mc-ink); color: var(--mc-bg);
-      border: none; border-radius: 5px;
-      font-family: 'Inter', sans-serif; font-size: 0.76rem; font-weight: 500;
-      cursor: pointer; transition: opacity 0.18s;
-    }
-    .btn-menu-save:hover { opacity: 0.82; }
+    /* ── READING ───────────────────────────────────── */
+    .read-book    { background:#EBF2FA; border-radius:8px; padding:10px 12px; margin-bottom:10px; display:flex; gap:10px; align-items:center; }
+    .book-spine   { width:36px; height:52px; border-radius:3px 5px 5px 3px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; box-shadow:2px 2px 4px rgba(0,0,0,.1); }
+    .book-title   { font-size:0.84rem; font-weight:700; color:#1A1917; margin-bottom:2px; }
+    .book-author  { font-size:0.7rem; color:#888; }
+    .read-purpose { font-size:0.72rem; color:#6B6560; font-style:italic; line-height:1.5; margin-bottom:10px; }
+    .read-fact    { font-size:0.69rem; color:#aaa; line-height:1.5; border-top:1px solid #E0DAD4; padding-top:8px; margin-top:4px; font-style:italic; }
 
-    .btn-menu-outline {
-      padding: 8px 18px;
-      background: transparent; color: var(--mc-ink);
-      border: 1px solid var(--mc-ink); border-radius: 5px;
-      font-family: 'Inter', sans-serif; font-size: 0.76rem;
-      cursor: pointer; transition: background 0.18s;
-    }
-    .btn-menu-outline:hover { background: var(--mc-soft); }
-
-    .save-confirm {
-      font-size: 0.72rem; color: var(--mc-ink); margin-top: 7px;
-      font-style: italic; animation: fadeIn 0.3s ease both;
-    }
-
-    /* ── INPUT AREA ────────────────────────────── */
-    .chat-footer {
-      border-top: 1px solid var(--border); padding: 10px 20px;
-      flex-shrink: 0; background: var(--bg);
-    }
-    .chat-footer-inner {
-      max-width: 560px; margin: 0 auto;
-      display: flex; gap: 8px; align-items: flex-end;
-    }
-    #user-input {
-      flex: 1; padding: 9px 13px;
-      border: 1px solid var(--border); border-radius: 8px;
-      font-family: 'Inter', sans-serif; font-size: 0.87rem;
-      resize: none; outline: none; line-height: 1.5;
-      min-height: 38px; max-height: 100px;
-      transition: border-color 0.18s; color: var(--fg); background: #fff;
-    }
-    #user-input:focus { border-color: var(--accent); }
-    #user-input::placeholder { color: #ccc; }
-    .btn-send {
-      padding: 0 15px; height: 38px;
-      background: var(--fg); color: #F8F3EA;
-      border: none; border-radius: 8px;
-      font-size: 1rem; cursor: pointer; transition: opacity 0.18s; flex-shrink: 0;
-    }
-    .btn-send:hover { opacity: 0.78; }
-    .btn-send:disabled { opacity: 0.25; cursor: default; }
+    /* ── STRETCHING ────────────────────────────────── */
+    .stretch-seq  { text-align:center; }
+    .stretch-pose { font-size:2.8rem; margin-bottom:8px; }
+    .stretch-name { font-size:0.96rem; font-weight:700; letter-spacing:-.01em; margin-bottom:4px; }
+    .stretch-inst { font-size:0.74rem; color:#8B7B70; line-height:1.55; margin-bottom:12px; }
+    .stretch-prog { display:flex; gap:5px; justify-content:center; margin-bottom:12px; }
+    .sp-dot       { width:7px; height:7px; border-radius:50%; background:#E0DAD4; transition:all .3s; }
+    .sp-dot.done  { background:#4472A8; }
+    .sp-dot.current { background:#4472A8; transform:scale(1.4); }
+    .stretch-timer-num { font-size:2.2rem; font-weight:200; letter-spacing:-.04em; color:#4472A8; margin-bottom:4px; }
+    .stretch-next-btn  { width:100%; padding:10px; background:#4472A8; color:#fff; border:none; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; transition:opacity .14s; }
+    .stretch-next-btn:hover { opacity:.82; }
+    .stretch-next-label { font-size:0.67rem; color:#ccc; margin-top:5px; }
   </style>
 </head>
 <body>
 
-<!-- ── SETUP ─────────────────────────────────────── -->
-<div id="setup">
-  <div class="setup-inner">
-    <span class="setup-tag">Intentional Leisure</span>
+<!-- ════ SETUP OVERLAY ════════════════════════════════ -->
+<div id="setup-overlay">
+  <div class="so-card">
+    <div class="so-eyebrow">Before the demo</div>
+    <h2>Quick — tell me about you.</h2>
+    <p class="so-desc">Your answers make the suggestions personal. This takes 20 seconds.</p>
 
-    <!-- New user -->
-    <div id="new-user-view">
-      <h1>Build your<br>leisure menu.</h1>
-      <p class="desc">A few quiet questions.<br>A list you can reach for when you're tired.</p>
-      <div class="ornament"><div class="ornament-line"></div><div class="ornament-dot"></div><div class="ornament-line"></div></div>
-      <div class="field">
-        <label>Groq API Key</label>
-        <input type="password" id="api-key-input" placeholder="gsk_…" autocomplete="off" />
+    <div class="so-q">What usually helps you decompress after work? <span>(pick a few)</span></div>
+    <div class="so-chips" id="so-decompress"></div>
+
+    <div class="so-divider"></div>
+
+    <div class="so-q">What do you tend to reach for when tired, but regret?</div>
+    <div class="so-chips" id="so-regret"></div>
+
+    <div class="so-divider"></div>
+
+    <!-- API Key -->
+    <div style="margin-bottom:14px">
+      <div class="so-q">Groq API key <span>(optional — makes suggestions real AI)</span></div>
+      <input type="password" id="so-api-key" placeholder="gsk_…"
+        style="width:100%;padding:9px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+               border-radius:8px;font-family:'Inter',sans-serif;font-size:0.82rem;color:#fff;outline:none;
+               transition:border-color .15s;"
+        onfocus="this.style.borderColor='#5B8FD4'"
+        onblur="this.style.borderColor='rgba(255,255,255,.15)'"
+      />
+      <div style="font-size:0.64rem;color:rgba(255,255,255,.28);margin-top:5px">
+        Free at console.groq.com · stays only in this browser · without it the demo uses example suggestions
       </div>
-      <p class="key-note">Free key at <a href="https://console.groq.com" target="_blank">console.groq.com</a> — stays only in this browser.</p>
-      <button class="btn-primary" onclick="startChat()">Begin →</button>
     </div>
 
-    <!-- Returning user -->
-    <div id="returning-user-view" style="display:none">
-      <h1>Welcome back.</h1>
-      <p class="desc" style="margin-bottom:18px">Here's your leisure menu.</p>
-      <div class="saved-preview-card" id="saved-preview-card"></div>
-      <button class="btn-primary" onclick="viewSavedMenu()">Use this menu →</button>
-      <div style="margin-top:10px;text-align:center">
-        <button class="link-btn" onclick="showRebuildForm()">Rebuild my menu</button>
-      </div>
-      <div id="rebuild-form" style="display:none">
-        <div class="field" style="margin-top:4px">
-          <label>Groq API Key</label>
-          <input type="password" id="api-key-rebuild" placeholder="gsk_…" autocomplete="off" />
-        </div>
-        <button class="btn-primary" onclick="startFreshChat()">Start fresh →</button>
-      </div>
-    </div>
+    <button class="so-btn" onclick="startDemo()">Start demo →</button>
   </div>
 </div>
 
-<!-- ── CHAT ──────────────────────────────────────── -->
-<div id="chat">
-  <div class="chat-header">
-    <span class="chat-brand">Intentional Leisure</span>
-    <div class="progress-wrap"><div id="progress-fill"></div></div>
-    <button class="btn-ghost" onclick="resetChat()">↩ start over</button>
-  </div>
-  <div class="messages" id="messages"></div>
-  <div class="chat-footer" id="chat-footer">
-    <div class="chat-footer-inner">
-      <textarea id="user-input" placeholder="Or type your own answer…" rows="1"
-        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-      <button class="btn-send" id="send-btn" onclick="sendMessage()">↑</button>
+<!-- ════ TOPBAR ══════════════════════════════════════ -->
+<div class="topbar">
+  <div class="tb-dot tb-red"></div>
+  <div class="tb-dot tb-yellow"></div>
+  <div class="tb-dot tb-green"></div>
+  <span class="tb-title">Feifey's MacBook Pro</span>
+  <span class="tb-time" id="tb-time">5:03 PM</span>
+  <button class="tb-reset" onclick="resetDemo()">↺ Reset demo</button>
+</div>
+
+<div class="stage">
+
+  <!-- ════ DESKTOP SIDE ════ -->
+  <div class="desktop-side" id="desktop">
+    <div class="desktop-label">Work in progress</div>
+    <div class="app-counter" id="app-counter">2 work apps open</div>
+
+    <!-- SLACK -->
+    <div class="win" id="win-slack">
+      <span class="hlabel" style="top:-10px;right:0">← LLM had no trigger point</span>
+      <div class="win-chrome slack-chrome">
+        <button class="wc-btn wc-close" onclick="closeApp('slack')" title="Close Slack"></button>
+        <button class="wc-btn wc-min"></button>
+        <button class="wc-btn wc-max"></button>
+        <span class="win-title">Slack — SVA Design</span>
+      </div>
+      <div class="slack-body">
+        <div class="slack-sidebar">
+          <div class="slack-ws">SVA Design</div>
+          <div class="slack-section">Channels</div>
+          <div class="slack-ch active">thesis-2026</div>
+          <div class="slack-ch">design-feedback</div>
+          <div class="slack-ch">general</div>
+          <div class="slack-ch">random</div>
+          <div class="slack-section" style="margin-top:8px">Direct</div>
+          <div class="slack-ch" style="color:rgba(255,255,255,0.9)">Yuxuan</div>
+        </div>
+        <div class="slack-main">
+          <div class="slack-mhead"># thesis-2026 <span>4 members</span></div>
+          <div class="slack-msgs">
+            <div class="slack-msg">
+              <div class="slack-av" style="background:#E8734A">Y</div>
+              <div>
+                <div class="slack-name">Yuxuan <span>4:44 PM</span></div>
+                <div class="slack-text">reviewed your latest deck — the memory section is really strong 👍</div>
+              </div>
+            </div>
+            <div class="slack-msg">
+              <div class="slack-av" style="background:#4472A8">F</div>
+              <div>
+                <div class="slack-name">Feifey <span>4:51 PM</span></div>
+                <div class="slack-text">thank you!! tweaking the interaction demo, almost there</div>
+              </div>
+            </div>
+            <div class="slack-msg">
+              <div class="slack-av" style="background:#5A8A5A">A</div>
+              <div>
+                <div class="slack-name">Ada <span>5:00 PM</span></div>
+                <div class="slack-text">presentation starts at 6 — good luck everyone 🎉</div>
+              </div>
+            </div>
+          </div>
+          <div class="slack-inp"><div class="slack-inp-box">Message #thesis-2026</div></div>
+        </div>
+      </div>
     </div>
+
+    <!-- GMAIL -->
+    <div class="win" id="win-gmail" style="top:72px;left:262px;z-index:9">
+      <div class="win-chrome gmail-chrome" style="justify-content:flex-start;gap:7px">
+        <button class="wc-btn wc-close" onclick="closeApp('gmail')" style="background:#FF5F57" title="Close Gmail"></button>
+        <button class="wc-btn wc-min"   style="background:#FFBD2E"></button>
+        <button class="wc-btn wc-max"   style="background:#28C840"></button>
+        <span class="win-title" style="color:#666">Gmail — Inbox (3)</span>
+      </div>
+      <div class="gmail-body">
+        <div class="gmail-sidebar">
+          <div class="gmail-compose">✏ Compose</div>
+          <div class="gmail-nav active">Inbox <span class="gmail-count">3</span></div>
+          <div class="gmail-nav">Starred</div>
+          <div class="gmail-nav">Sent</div>
+          <div class="gmail-nav">Drafts <span class="gmail-count">2</span></div>
+        </div>
+        <div class="gmail-main">
+          <div class="gmail-toolbar"><div class="gmail-search">Search in mail</div></div>
+          <div class="gmail-row unread"><span class="g-star">☆</span><span class="g-sender">Thesis Advisor</span><span class="g-subject">Final feedback on framing doc — looks great, one small...</span><span class="g-time">5:01 PM</span></div>
+          <div class="gmail-row unread"><span class="g-star">☆</span><span class="g-sender">SVA IxD</span><span class="g-subject">Tonight's presentation — room change to Suite 302</span><span class="g-time">4:30 PM</span></div>
+          <div class="gmail-row read"><span class="g-star">★</span><span class="g-sender">Design Weekly</span><span class="g-subject">LLM trust patterns, ambient interfaces, and this week's...</span><span class="g-time">9:14 AM</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCK -->
+    <div class="dock">
+      <div class="dock-icon">🔍</div>
+      <div class="dock-icon">📁</div>
+      <div class="dock-icon clickable" id="dock-slack" onclick="reopenApp('slack')" title="Reopen Slack" style="background:#4A154B;border-radius:10px;font-size:0.8rem;color:#fff;font-weight:800">S</div>
+      <div class="dock-icon clickable" id="dock-gmail" onclick="reopenApp('gmail')" title="Reopen Gmail" style="background:#fff;border-radius:10px;font-size:0.7rem;font-weight:800;color:#EA4335">M</div>
+      <div class="dock-icon" style="background:#1DB954;border-radius:10px;padding:6px">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+      </div>
+      <div class="dock-icon">📝</div>
+      <div class="dock-icon">⚙️</div>
+    </div>
+
+    <!-- Desktop notification -->
+    <div id="desktop-notif">
+      <span class="hlabel" style="bottom:-10px;left:0">Latency Tolerance →</span>
+      <div class="dn-header">
+        <div class="dn-icon">T</div>
+        <span class="dn-app">TRANSITION</span>
+        <span class="dn-time" id="dn-time">now</span>
+      </div>
+      <div class="dn-title">Last work app closed.</div>
+      <div class="dn-body">You've been in work mode all day. Ready to switch?</div>
+      <div class="dn-actions">
+        <button class="dn-btn dn-primary" onclick="openTransition()">Let's switch →</button>
+        <button class="dn-btn dn-ghost"   onclick="dismissNotif()">Not yet</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider-line"></div>
+
+  <!-- ════ PHONE SIDE ════ -->
+  <div class="phone-side">
+    <div class="phone-shell">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+
+        <!-- IDLE -->
+        <div class="phone-state" id="ps-idle">
+          <div class="phone-status">
+            <span id="ps-clock">5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:16px">
+            <div class="idle-time" id="idle-clock">5:03</div>
+            <div class="idle-date">Wednesday, April 29</div>
+            <div class="idle-apps">
+              <div class="idle-app" style="background:#4A154B;font-size:0.78rem;color:#fff;font-weight:800">S</div>
+              <div class="idle-app" style="background:#fff;border:1px solid #eee;font-size:0.74rem;font-weight:800;color:#EA4335">M</div>
+              <div class="idle-app" style="background:#1DB954;font-size:1.1rem">♪</div>
+              <div class="idle-app" style="background:#F5F5F5;font-size:1.2rem">🗓</div>
+              <div class="idle-app" style="background:#4472A8;border-radius:13px;font-size:0.62rem;color:#fff;font-weight:700">T</div>
+              <div class="idle-app" style="background:#F5F5F5">📷</div>
+              <div class="idle-app" style="background:#F5F5F5">🗺</div>
+              <div class="idle-app" style="background:#F5F5F5">⚙️</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NOTIFICATION -->
+        <div class="phone-state hidden" id="ps-notif">
+          <div class="phone-status" style="background:#F0EDE8">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div style="flex:1;padding-top:8px">
+            <div class="notif-card">
+              <div class="nc-header">
+                <div class="nc-icon">T</div>
+                <span class="nc-app">TRANSITION</span>
+                <span class="nc-time">now</span>
+              </div>
+              <div class="nc-title">Last work app closed.</div>
+              <div class="nc-body" id="notif-body">You've been in work mode all day. Let me help you switch.</div>
+              <div class="nc-actions">
+                <button class="nc-btn nc-primary" onclick="openTransition()">Let's go →</button>
+                <button class="nc-btn nc-ghost"   onclick="scrollAnyway()">Not now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- THINKING -->
+        <div class="phone-state hidden" id="ps-thinking">
+          <div class="phone-status" style="background:#F0EDE8">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div class="pb-wrap">
+            <div class="pb-outer"></div>
+            <div class="pb-mid"></div>
+            <div class="pb-core"></div>
+          </div>
+          <p class="p-thinking-text">Taking a moment…</p>
+        </div>
+
+        <!-- SUGGESTIONS -->
+        <div class="phone-state hidden" id="ps-suggestions" style="overflow-y:auto">
+          <div class="phone-status" style="background:#F0EDE8;position:sticky;top:0;z-index:5">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div style="padding:0 11px 11px;flex:1;overflow-y:auto" id="sug-wrap">
+            <div class="p-hdr">
+              <span class="hlabel" style="top:-8px;right:0">Memory Awareness</span>
+              <div class="p-hdr-time">5:03 PM · WEDNESDAY</div>
+              <h3>You just finished work.</h3>
+              <p class="p-ctx" id="p-ctx-text">You've closed everything. This is the window.</p>
+            </div>
+            <div id="sug-list"></div>
+            <div class="p-escape" style="position:relative">
+              <span class="hlabel" style="top:-8px;right:0">Trust Calibration</span>
+              <button class="p-escape-btn" onclick="scrollAnyway()">I'll scroll anyway</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVITY -->
+        <div class="phone-state hidden" id="ps-activity">
+          <div class="phone-status" style="background:#F0EDE8;flex-shrink:0;z-index:5">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div class="act-scroll"><div id="activity-content"></div></div>
+          <div class="act-footer">
+            <button class="back-to-sug" onclick="setPhoneState('suggestions')">← Try a different one</button>
+          </div>
+        </div>
+
+        <!-- SCROLL-CHECK (intervention before scrolling) -->
+        <div class="phone-state hidden" id="ps-scroll-check">
+          <div class="phone-status" style="background:#FDF8F2;flex-shrink:0">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div class="sc-body">
+            <div class="sc-emoji">💭</div>
+            <div class="sc-title">Opening <span id="sc-regret-name">Instagram</span>?</div>
+            <p class="sc-msg" id="sc-msg">
+              You told me this makes you feel worse after.<br>
+              That's not a judgment — it's what you said.
+            </p>
+            <button class="sc-back" onclick="setPhoneState('suggestions')">← My rest option instead</button>
+            <button class="sc-through" onclick="actuallyScroll()">Open it anyway</button>
+          </div>
+        </div>
+
+        <!-- WORK INTERRUPT -->
+        <div class="phone-state hidden" id="ps-work-interrupt">
+          <div class="phone-status" style="background:#FDF8F2;flex-shrink:0">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div class="wi-body">
+            <div class="wi-emoji">💼</div>
+            <div class="wi-title">Back to work?</div>
+            <p class="wi-msg" id="wi-msg">
+              <span id="wi-app-name">Slack</span> just reopened.<br>
+              Your rest session is paused — it'll be here when you're done.
+            </p>
+            <button class="wi-back" onclick="resumeRest()">← Back to rest</button>
+            <button class="wi-accept" onclick="acceptWork()">Yeah, just a quick check</button>
+          </div>
+        </div>
+
+        <!-- Floating nudge (overlays idle screen) -->
+        <div id="idle-nudge" style="display:none;position:absolute;top:58px;left:9px;right:9px;z-index:20">
+          <div class="nudge-card">
+            <div class="nudge-header">
+              <div class="nudge-icon">T</div>
+              <span class="nudge-app">TRANSITION</span>
+              <button class="nudge-dismiss" onclick="document.getElementById('idle-nudge').style.display='none'">✕</button>
+            </div>
+            <div class="nudge-title" id="nudge-title">Still scrolling? 💙</div>
+            <div class="nudge-body"  id="nudge-body">Your rest idea is still here whenever you're ready.</div>
+            <button class="nudge-action" onclick="nudgeComeBack()">Take me back →</button>
+          </div>
+        </div>
+
+      </div><!-- /phone-screen -->
+    </div>
+  </div>
+
+</div><!-- /stage -->
+
+<button class="ann-toggle" id="ann-btn" onclick="toggleAnns()">⚑ Design notes</button>
+
+<!-- ════ DESIGN NOTES PANEL ════════════════════════ -->
+<div id="notes-panel">
+  <div class="np-header">
+    <span class="np-title">Design Decisions</span>
+    <button class="np-close" onclick="toggleAnns()">✕</button>
+  </div>
+  <div class="np-body">
+
+    <!-- vs. original LLM -->
+    <div class="np-vs">
+      <div class="np-vs-label">vs. original LLM output (Gemini Prompt 2)</div>
+      <div class="np-vs-row">
+        <div class="np-vs-bad"><span class="label">❌ LLM gave</span>Generic alternatives. No personalization. No reasoning shown. No escape hatch.</div>
+        <div class="np-vs-good"><span class="label">✓ We designed</span>Every decision below addresses a specific failure in that output.</div>
+      </div>
+    </div>
+
+    <div class="np-h">
+      <div class="np-h-row">
+        <div class="np-h-num">1</div>
+        <div class="np-h-name">Latency Tolerance</div>
+      </div>
+      <div class="np-h-q">Does the user know it's working?</div>
+      <div class="np-h-desc">The 3-second breathing circle isn't loading — it's a designed pause. The LLM's version had zero thinking state; a response appeared from nowhere.</div>
+      <span class="np-h-tag">→ breathing circle on phone</span>
+    </div>
+
+    <div class="np-h">
+      <div class="np-h-row">
+        <div class="np-h-num">2</div>
+        <div class="np-h-name">Capability Discovery</div>
+      </div>
+      <div class="np-h-q">Does a new user know what this can and can't do?</div>
+      <div class="np-h-desc">Scope is stated on first launch: "I help you switch from work mode to rest mode. That's all I do." The LLM generated 6+ unrelated concepts with no declared scope.</div>
+      <span class="np-h-tag">→ home screen subtitle</span>
+    </div>
+
+    <div class="np-h">
+      <div class="np-h-row">
+        <div class="np-h-num">3</div>
+        <div class="np-h-name">Transparency</div>
+      </div>
+      <div class="np-h-q">Does the user understand why it said that?</div>
+      <div class="np-h-desc">Every suggestion has a visible "because" line citing the user's own profile words. The LLM offered "listen to your acoustic playlist" with zero explanation of why.</div>
+      <span class="np-h-tag">→ blue "because" line on each suggestion</span>
+    </div>
+
+    <div class="np-h">
+      <div class="np-h-row">
+        <div class="np-h-num">4</div>
+        <div class="np-h-name">Trust Calibration</div>
+      </div>
+      <div class="np-h-q">Can the user tell when to trust or verify the output?</div>
+      <div class="np-h-desc">"I'll scroll anyway" is never hidden. The user always owns the choice. A gentle re-engagement fires after 6 seconds — not a nag, just a reminder. The LLM had no escape path.</div>
+      <span class="np-h-tag">→ escape hatch + gentle follow-up</span>
+    </div>
+
+    <div class="np-h">
+      <div class="np-h-row">
+        <div class="np-h-num">5</div>
+        <div class="np-h-name">Memory Awareness</div>
+      </div>
+      <div class="np-h-q">Does the user know what the agent remembers or forgets?</div>
+      <div class="np-h-desc">The setup screen shows exactly what will be stored before committing. The notification body uses the user's exact words ("before you open Instagram"). The LLM had no memory at all — same generic options every time.</div>
+      <span class="np-h-tag">→ setup preview + personalised suggestions</span>
+    </div>
+
   </div>
 </div>
 
 <script>
-/* ─── SVG ICON LIBRARY ─────────────────────────────────────────────────────── */
-const ICONS = {
-  book:        `<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>`,
-  headphones:  `<svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>`,
-  music:       `<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
-  moon:        `<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`,
-  pen:         `<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z"/></svg>`,
-  coffee:      `<svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`,
-  tv:          `<svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>`,
-  walk:        `<svg viewBox="0 0 24 24"><circle cx="12" cy="3.5" r="1.5"/><path d="M9 11.5l3-4 4 3.5-2 3"/><path d="M8.5 17.5l1.5-3.5 3-2 1 3.5-2 4h4.5"/><path d="M7.5 21l1.5-3.5"/></svg>`,
-  stretch:     `<svg viewBox="0 0 24 24"><circle cx="12" cy="3" r="2"/><path d="M6 8l6 3 6-3"/><path d="M12 11v11"/><path d="M9 18.5l3 3 3-3"/></svg>`,
-  breath:      `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><path d="M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>`,
-  bath:        `<svg viewBox="0 0 24 24"><path d="M9 6l4 4M2 12h20"/><path d="M4 12v4a6 6 0 0012 0v-4"/><path d="M8 21h8"/></svg>`,
-  plant:       `<svg viewBox="0 0 24 24"><path d="M12 22V12"/><path d="M12 12C12 6 6 4 4 6c2 5 8 6 8 6z"/><path d="M12 12c0-6 6-8 8-6-2 5-8 6-8 6z"/></svg>`,
-  film:        `<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>`,
-  eye:         `<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
-  stars:       `<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-  sun:         `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>`,
+/* ─── DEMO PROFILE ─────────────────────────────── */
+const DECOMPRESS_OPTS = ['A walk','Music','Reading','Tea','Stretching','Drawing','Journaling','A bath','Podcast'];
+const REGRET_OPTS     = ['Instagram','TikTok','YouTube Shorts','Twitter / X','Reddit','News sites'];
+
+let demoProfile = { decompress: [], regret: [] };
+
+/* ─── SUGGESTION TEMPLATES ─────────────────────── */
+const SUG_LIBRARY = {
+  'A walk':    { activity: 'A route walk near you',                type: 'walk',     start: 'Put on your shoes. Leave your phone at home.' },
+  'Music':     { activity: 'Evening wind-down playlist',           type: 'music',    start: 'Open Spotify. Hit play on whatever\'s saved.' },
+  'Reading':   { activity: 'One chapter of your book',             type: 'reading',  start: 'Pick up the book. Read one page — that\'s enough.' },
+  'Tea':       { activity: 'Brew tea, phone face-down',            type: 'tea',      start: 'Fill the kettle. Put your phone face-down.' },
+  'Stretching':{ activity: 'Guided 10-min stretch sequence',       type: 'stretch',  start: 'Lie on your back and reach your arms up.' },
+  'Drawing':   { activity: 'Sketch from today\'s prompt',          type: 'drawing',  start: 'Open your sketchbook to any blank page.' },
+  'Journaling':{ activity: '3-line journal entry',                 type: 'journal',  start: 'Open to today\'s date. Write one sentence.' },
+  'A bath':    { activity: 'Warm bath, no phone',                  type: 'bath',     start: 'Turn on the tap. Set your phone in the other room.' },
+  'Podcast':   { activity: 'One podcast episode',                  type: 'podcast',  start: 'Pick an episode. Set the phone down and just listen.' },
 };
 
-/* ─── ICON MATCHER ─────────────────────────────────────────────────────────── */
-function matchIcon(text) {
-  const t = text.toLowerCase();
-  if (/read|book|novel|chapter|page/.test(t))            return 'book';
-  if (/podcast|headphone|audio|listen to/.test(t))       return 'headphones';
-  if (/music|song|playlist|album|play/.test(t))          return 'music';
-  if (/sleep|nap|lie down|rest|doze/.test(t))            return 'moon';
-  if (/journal|write|diary|notebook|letter/.test(t))     return 'pen';
-  if (/tea|coffee|drink|sip|cup|cocoa/.test(t))          return 'coffee';
-  if (/tv|show|episode|watch|serie|netflix/.test(t))     return 'tv';
-  if (/walk|stroll|outside|air|wander/.test(t))          return 'walk';
-  if (/stretch|yoga|move|body|pilates/.test(t))          return 'stretch';
-  if (/breath|breathe|meditat|calm|stillness/.test(t))   return 'breath';
-  if (/bath|shower|soak|tub/.test(t))                    return 'bath';
-  if (/garden|plant|water|flower|soil/.test(t))          return 'plant';
-  if (/film|cinema|documentary|movie/.test(t))           return 'film';
-  if (/window|sky|gaze|outside|clouds/.test(t))          return 'eye';
-  if (/star|night|moon|dark sky/.test(t))                return 'stars';
-  if (/sun|morning|sunrise|light/.test(t))               return 'sun';
-  return null;
-}
-
-/* ─── COLOR THEMES ─────────────────────────────────────────────────────────── */
-const THEMES = [
-  { id:'retro',   name:'Retro Red',    bg:'#F5EDD6', ink:'#C42B2B', swatch:'#C42B2B' },
-  { id:'forest',  name:'Forest',       bg:'#F2EFE4', ink:'#2D5A3D', swatch:'#2D5A3D' },
-  { id:'navy',    name:'Navy',         bg:'#EFF2F8', ink:'#1B3A5C', swatch:'#1B3A5C' },
-  { id:'clay',    name:'Clay',         bg:'#FDF0E6', ink:'#8B3A1A', swatch:'#B5601A' },
-  { id:'rose',    name:'Dusty Rose',   bg:'#FDF0F2', ink:'#8B3050', swatch:'#A84060' },
-  { id:'plum',    name:'Plum',         bg:'#F2EEF8', ink:'#4A1D6A', swatch:'#6A2D8A' },
+const FALLBACK_SUGS = [
+  { activity: 'A route walk near you',       type: 'walk',    start: 'Put on your shoes. Step outside.' },
+  { activity: 'Evening wind-down playlist',  type: 'music',   start: 'Open Spotify. Press play.' },
+  { activity: 'Brew tea, phone face-down',   type: 'tea',     start: 'Fill the kettle. Phone face-down.' },
 ];
 
-let selectedTheme = THEMES[0];
+function buildSuggestions() {
+  const chosen = demoProfile.decompress.length ? demoProfile.decompress : ['A walk','Music','Tea'];
+  const regret  = demoProfile.regret[0] || 'scrolling';
 
-/* ─── SYSTEM PROMPT ─────────────────────────────────────────────────────────── */
-const SYSTEM_PROMPT = `You are a warm, gentle guide — part caring therapist, part attentive chef — helping someone discover their personal Leisure Menu: a short list to reach for when tired, instead of a phone.
+  const becauseFor = k => ({
+    'A walk':    `you said walking helps you decompress — new route generated every time`,
+    'Music':     `you listed music as restorative — skip through songs, no scrolling needed`,
+    'Reading':   `you said reading helps you wind down — one chapter is all you need to start`,
+    'Tea':       `you said you reach for ${regret} after work — making tea interrupts that reflex`,
+    'Stretching':`you listed stretching as restorative — your body has been still all day`,
+    'Drawing':   `you said drawing helps you decompress — today's prompt is already waiting`,
+    'Journaling':`you listed journaling as something that helps — 3 lines, that's the whole ask`,
+    'A bath':    `you said a bath helps you transition — and it has zero ${regret} risk`,
+    'Podcast':   `you said listening helps you decompress — episode queued, no browsing needed`,
+  }[k] || `you chose this as something that helps you decompress`);
 
-The menu has three tiers:
-🌿 Appetizers: 5 min or less, zero setup, can be done lying down
-🍽️ Mains: 20–45 min, one simple thing to start, leaves you replenished
-🍮 Desserts: one episode, one album, one thing with a defined end
+  return chosen
+    .map(k => SUG_LIBRARY[k] ? { ...SUG_LIBRARY[k], because: becauseFor(k) } : null)
+    .filter(Boolean)
+    .slice(0, 5); // show all chosen, up to 5
+}
 
-Rules — follow carefully:
-1. ONE question per message. Never two.
-2. MAXIMUM 1 sentence before the question. Be warm, not wordy.
-3. Gently reflect their words back before moving on.
-4. Never suggest activities they haven't shown interest in.
-5. Up to 12 exchanges total. Move efficiently but warmly.
-6. After EVERY question, on its own line at the end, write:
-   OPTIONS: [A] | [B] | [C] | [D] | [E] | Something else
-   Give 5 specific, relevant options directly related to your question.
+/* ─── STATE ────────────────────────────────────── */
+let appsOpen     = ['slack','gmail'];
+let annsOn       = false;
+let genTimer     = null;
+let walkInt      = null;
+let teaInt       = null;
+let playerInt    = null;
+let gentleTimer  = null;
+let currentSugs  = [];
+let demoApiKey   = '';
+let lastSugsWereLive = false;
 
-When you have 2–3 per tier, warmly say you have everything you need. Ask if they're ready to see their menu.
-
-When ready, output ONLY this and nothing else:
-
-MY LEISURE MENU
----
-APPETIZERS (under 5 min)
-- [item]
-- [item]
-- [item]
-
-MAINS (20-45 min)
-- [item]
-- [item]
-- [item]
-
-DESSERTS (one and done)
-- [item]
-- [item]
-- [item]
-
-Menu rules: use exact words, 1 short line each, nothing productive or self-improving, max 3 per tier.
-
-Begin: one warm sentence, then first question. End with OPTIONS.`;
-
-/* ─── STATE ─────────────────────────────────────────────────────────────────── */
-let apiKey        = '';
-let conversation  = [];
-let isLoading     = false;
-let questionCount = 0;
-const MAX_Q       = 12;
-let savedMenuData   = null;
-let currentMenuData = null;
-let menuCardEl      = null;
-
-/* ─── INIT ──────────────────────────────────────────────────────────────────── */
+/* ─── SETUP CHIPS ───────────────────────────────── */
 window.addEventListener('load', () => {
-  const k = localStorage.getItem('il_key') || '';
-  if (k) document.getElementById('api-key-input').value = k;
-  try {
-    const j = localStorage.getItem('il_menu');
-    if (j) { savedMenuData = JSON.parse(j); showReturningView(savedMenuData); }
-  } catch (e) { localStorage.removeItem('il_menu'); }
+  buildSetupChips('so-decompress', DECOMPRESS_OPTS, 'decompress');
+  buildSetupChips('so-regret',     REGRET_OPTS,     'regret');
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Pre-fill saved API key
+  const saved = localStorage.getItem('il_key') || '';
+  if (saved) document.getElementById('so-api-key').value = saved;
 });
 
-/* ─── RETURNING VIEW ────────────────────────────────────────────────────────── */
-function showReturningView(menuData) {
-  document.getElementById('new-user-view').style.display       = 'none';
-  document.getElementById('returning-user-view').style.display = 'block';
-  const icons = { appetizers:'🌿', mains:'🍽️', desserts:'🍮' };
-  let html = '<div class="spc-label">Your Leisure Menu</div>';
-  for (const tier of menuData.tiers) {
-    const key = tier.label.toLowerCase();
-    html += `<div class="spc-tier">
-      <div class="spc-tier-label">${icons[key]||''} ${tier.label}</div>
-      <div class="spc-tier-items">${tier.items.slice(0,2).join(' · ')}${tier.items.length>2?' …':''}</div>
-    </div>`;
+function buildSetupChips(id, opts, key) {
+  const wrap = document.getElementById(id);
+  opts.forEach(opt => {
+    const b = document.createElement('button');
+    b.className   = 'so-chip';
+    b.textContent = opt;
+    b.onclick = () => {
+      b.classList.toggle('on');
+      const arr = demoProfile[key];
+      const i   = arr.indexOf(opt);
+      i > -1 ? arr.splice(i,1) : arr.push(opt);
+    };
+    wrap.appendChild(b);
+  });
+}
+
+function startDemo() {
+  // Save API key if entered
+  const keyInput = document.getElementById('so-api-key');
+  if (keyInput?.value?.trim()) {
+    demoApiKey = keyInput.value.trim();
+    localStorage.setItem('il_key', demoApiKey);
+  } else {
+    demoApiKey = localStorage.getItem('il_key') || '';
   }
-  document.getElementById('saved-preview-card').innerHTML = html;
+
+  const overlay = document.getElementById('setup-overlay');
+  overlay.classList.add('hiding');
+  setTimeout(() => overlay.classList.add('gone'), 500);
+  setPhoneState('idle');
 }
 
-function showRebuildForm() {
-  document.getElementById('rebuild-form').style.display = 'block';
-  document.getElementById('api-key-rebuild').value = localStorage.getItem('il_key') || '';
+/* ─── CLOCK ─────────────────────────────────────── */
+function updateClock() {
+  const t = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const s = t.replace(/ AM| PM/,'');
+  document.getElementById('tb-time').textContent    = t;
+  document.getElementById('idle-clock').textContent = s;
+  document.getElementById('ps-clock').textContent   = s;
 }
 
-function viewSavedMenu() {
-  currentMenuData = savedMenuData;
-  document.getElementById('setup').style.display    = 'none';
-  document.getElementById('chat').style.display     = 'flex';
-  document.getElementById('chat-footer').style.display = 'none';
-  document.getElementById('progress-fill').style.width = '100%';
-  renderMenuCard(savedMenuData);
-  const msgs = document.getElementById('messages');
-  const w = document.createElement('div');
-  w.style.cssText = 'text-align:center;padding:6px 0';
-  w.innerHTML = '<button class="link-btn" onclick="resetChat()" style="font-size:0.78rem">Rebuild my menu</button>';
-  msgs.appendChild(w);
+/* ─── CLOSE APP ─────────────────────────────────── */
+function closeApp(name) {
+  const win = document.getElementById('win-' + name);
+  win.classList.add('closing');
+  setTimeout(() => win.classList.add('closed'), 400);
+  appsOpen = appsOpen.filter(a => a !== name);
+  updateCounter();
+  if (appsOpen.length === 0) setTimeout(fireNotification, 700);
 }
 
-/* ─── START / RESET ─────────────────────────────────────────────────────────── */
-function startChat() {
-  const k = document.getElementById('api-key-input').value.trim();
-  if (!k) { alert('Please enter your Groq API key.'); return; }
-  beginChat(k);
+function updateCounter() {
+  const el = document.getElementById('app-counter');
+  if (appsOpen.length === 0) { el.textContent = 'No work apps open'; el.classList.add('warn'); }
+  else { el.textContent = appsOpen.length + ' work app' + (appsOpen.length > 1 ? 's' : '') + ' open'; el.classList.remove('warn'); }
 }
-function startFreshChat() {
-  const k = document.getElementById('api-key-rebuild').value.trim();
-  if (!k) { alert('Please enter your Groq API key.'); return; }
-  localStorage.removeItem('il_menu');
-  savedMenuData = null;
-  beginChat(k);
+
+/* ─── FIRE NOTIFICATION ─────────────────────────── */
+function fireNotification() {
+  const t = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  document.getElementById('dn-time').textContent = t;
+  document.getElementById('desktop-notif').style.display = 'block';
+
+  // Personalise notification body
+  const regret = demoProfile.regret[0] || 'scrolling';
+  document.getElementById('notif-body').textContent =
+    `You've been in work mode all day. Before you open ${regret}, let me help you switch.`;
+
+  setPhoneState('notif');
 }
-function beginChat(key) {
-  apiKey = key;
-  localStorage.setItem('il_key', key);
-  document.getElementById('setup').style.display    = 'none';
-  document.getElementById('chat').style.display     = 'flex';
-  document.getElementById('chat-footer').style.display = '';
-  document.getElementById('messages').innerHTML     = '';
-  document.getElementById('progress-fill').style.width = '0%';
-  questionCount = 0; currentMenuData = null; menuCardEl = null;
-  conversation  = [{ role:'user', content:'ready' }];
-  callAPI();
+
+function dismissNotif() {
+  document.getElementById('desktop-notif').style.display = 'none';
+  setPhoneState('idle');
 }
-function resetChat() {
-  if (isLoading) return;
-  conversation = []; questionCount = 0; currentMenuData = null; menuCardEl = null;
-  document.getElementById('messages').innerHTML        = '';
-  document.getElementById('progress-fill').style.width = '0%';
-  document.getElementById('chat').style.display        = 'none';
-  document.getElementById('chat-footer').style.display = '';
-  document.getElementById('setup').style.display       = 'flex';
-  try {
-    const j = localStorage.getItem('il_menu');
-    if (j) {
-      savedMenuData = JSON.parse(j);
-      showReturningView(savedMenuData);
-      document.getElementById('rebuild-form').style.display = 'none';
-    } else {
-      savedMenuData = null;
-      document.getElementById('new-user-view').style.display       = 'block';
-      document.getElementById('returning-user-view').style.display = 'none';
+
+/* ─── SCROLL ANYWAY — shows intervention screen ─── */
+function scrollAnyway() {
+  document.getElementById('desktop-notif').style.display = 'none';
+  if (gentleTimer) clearTimeout(gentleTimer);
+
+  const regret = demoProfile.regret[0] || 'social media';
+  const sug    = currentSugs[0]?.activity || 'your rest option';
+
+  // Show the intervention/check screen on the phone
+  document.getElementById('sc-regret-name').textContent = regret;
+  document.getElementById('sc-msg').innerHTML =
+    `You told me <strong>${regret}</strong> makes you feel worse after.<br>That's not a judgment — it's what you said.`;
+  setPhoneState('scroll-check');
+}
+
+/* ─── ACTUALLY SCROLL — confirmed, go to idle ───── */
+function actuallyScroll() {
+  setPhoneState('idle');
+
+  // After 4 seconds show the floating nudge ON the idle screen
+  if (gentleTimer) clearTimeout(gentleTimer);
+  gentleTimer = setTimeout(() => {
+    const regret = demoProfile.regret[0] || 'Instagram';
+    const sug    = currentSugs[0]?.activity || 'your rest idea';
+    document.getElementById('nudge-title').textContent = `Still on ${regret}? 💙`;
+    document.getElementById('nudge-body').textContent  =
+      `You said this makes you feel worse after. Your "${sug}" idea is still here.`;
+    const nudge = document.getElementById('idle-nudge');
+    nudge.style.display = 'block';
+    nudge.style.animation = 'none'; nudge.offsetHeight;
+    nudge.style.animation = 'slideDown .5s cubic-bezier(.16,1,.3,1) both';
+    // Auto-dismiss after 8 seconds
+    setTimeout(() => { nudge.style.display = 'none'; }, 8000);
+  }, 4000);
+}
+
+function nudgeComeBack() {
+  document.getElementById('idle-nudge').style.display = 'none';
+  if (currentSugs.length) { renderSuggestions(currentSugs); setPhoneState('suggestions'); }
+  else openTransition();
+}
+
+/* ─── OPEN TRANSITION ───────────────────────────── */
+async function openTransition() {
+  document.getElementById('desktop-notif').style.display = 'none';
+  if (gentleTimer) clearTimeout(gentleTimer);
+  setPhoneState('thinking');
+
+  // Run AI call + minimum breathing time simultaneously
+  const [sugs] = await Promise.all([
+    fetchLiveSuggestions(),
+    new Promise(r => setTimeout(r, 2800)) // breathing animation always shows
+  ]);
+
+  currentSugs = sugs;
+  renderSuggestions(sugs);
+  setPhoneState('suggestions');
+}
+
+/* ─── GROQ API CALL ─────────────────────────────── */
+async function fetchLiveSuggestions() {
+  if (!demoApiKey) {
+    lastSugsWereLive = false;
+    return buildSuggestions(); // fallback to pre-set
+  }
+
+  const profile = [
+    demoProfile.decompress.length ? `What helps them decompress: ${demoProfile.decompress.join(', ')}` : '',
+    demoProfile.regret.length     ? `What they tend to regret: ${demoProfile.regret.join(', ')}`       : '',
+  ].filter(Boolean).join('\n') || 'No profile provided — make 3 general suggestions.';
+
+  const VALID_TYPES = ['walk','music','podcast','drawing','journal','reading','stretch','tea','bath'];
+
+  const system = `You are a calm transition guide. Someone just finished work and wants to switch to rest mode.
+
+User profile:
+${profile}
+
+Generate exactly 3 personalized transition suggestions. Rules:
+- Each must be specific and immediately startable (under 10 seconds to begin)
+- Each "because" must quote something from their profile using their exact words
+- Never suggest anything from their regret list
+- Pick the most fitting type for each from this exact list: ${VALID_TYPES.join(', ')}
+
+Respond ONLY in valid JSON, no other text:
+{
+  "suggestions": [
+    {
+      "activity": "Short specific activity name, 6 words max",
+      "because": "One sentence quoting their exact profile words",
+      "start": "Single first physical action to take",
+      "type": "one of: ${VALID_TYPES.join('|')}"
     }
-  } catch(e) {}
-}
+  ]
+}`;
 
-/* ─── INPUT ──────────────────────────────────────────────────────────────────── */
-function handleKey(e) {
-  if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-}
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
-}
-async function sendMessage(text) {
-  if (isLoading) return;
-  if (!text) {
-    const inp = document.getElementById('user-input');
-    text = inp.value.trim(); if (!text) return;
-    inp.value = ''; inp.style.height = 'auto';
-  }
-  document.querySelectorAll('.chips-wrap').forEach(c => c.remove());
-  addBubble('user', text);
-  conversation.push({ role:'user', content:text });
-  await callAPI();
-}
-
-/* ─── PROGRESS ───────────────────────────────────────────────────────────────── */
-function updateProgress() {
-  document.getElementById('progress-fill').style.width =
-    Math.min((questionCount / MAX_Q) * 100, 95) + '%';
-}
-
-/* ─── API ────────────────────────────────────────────────────────────────────── */
-async function callAPI() {
-  isLoading = true;
-  document.getElementById('send-btn').disabled = true;
-  const typingEl = addTyping();
   try {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${apiKey}` },
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${demoApiKey}`
+      },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{ role:'system', content:SYSTEM_PROMPT }, ...conversation],
-        temperature: 0.85, max_tokens: 420
+        model:       'llama-3.3-70b-versatile',
+        messages:    [
+          { role: 'system', content: system },
+          { role: 'user',   content: `It's ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}. I just finished work.` }
+        ],
+        temperature: 0.8,
+        max_tokens:  500
       })
     });
-    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message||`HTTP ${res.status}`); }
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     const data  = await res.json();
     const reply = data.choices?.[0]?.message?.content?.trim() || '';
-    typingEl.remove();
-    conversation.push({ role:'assistant', content:reply });
-    if (isMenu(reply)) {
-      currentMenuData = parseMenu(reply);
-      renderThemeSwatches();
-      renderMenuCard(currentMenuData);
-      document.getElementById('progress-fill').style.width = '100%';
-    } else {
-      questionCount++;
-      updateProgress();
-      addBubble('ai', stripOptions(reply));
-      const opts = parseOptions(reply);
-      if (opts.length) renderChips(opts);
-    }
-  } catch(err) {
-    typingEl.remove();
-    addBubble('ai', `Something went wrong: ${err.message}`);
+    const match = reply.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('No JSON in response');
+
+    const parsed = JSON.parse(match[0]);
+    const sugs   = (parsed.suggestions || []).map(s => ({
+      ...s,
+      type: VALID_TYPES.includes(s.type) ? s.type : 'tea' // safe fallback type
+    })).slice(0, 5);
+
+    if (!sugs.length) throw new Error('Empty suggestions');
+
+    lastSugsWereLive = true;
+    return sugs;
+
+  } catch (err) {
+    console.warn('Groq call failed, using pre-set suggestions:', err.message);
+    lastSugsWereLive = false;
+    return buildSuggestions();
   }
-  isLoading = false;
-  document.getElementById('send-btn').disabled = false;
 }
 
-/* ─── PARSERS ────────────────────────────────────────────────────────────────── */
-function parseOptions(text) {
-  const m = text.match(/OPTIONS:\s*(.+)/i);
-  if (!m) return [];
-  return m[1].split('|').map(o => o.trim()).filter(Boolean);
-}
-function stripOptions(text) { return text.replace(/\n?OPTIONS:.*$/im,'').trim(); }
-function isMenu(text) {
-  return text.includes('MY LEISURE MENU') ||
-    (text.includes('APPETIZERS') && text.includes('MAINS') && text.includes('DESSERTS'));
-}
-function parseMenu(text) {
-  const tiers = [
-    { key:'APPETIZERS', label:'Appetizers', sub:'under 5 min', icon:'🌿', items:[] },
-    { key:'MAINS',      label:'Mains',      sub:'20–45 min',   icon:'🍽️',  items:[] },
-    { key:'DESSERTS',   label:'Desserts',   sub:'one and done', icon:'🍮', items:[] },
-  ];
-  let cur = null;
-  for (const raw of text.split('\n')) {
-    const line = raw.trim();
-    if (!line || line==='---') continue;
-    const match = tiers.find(t => line.toUpperCase().startsWith(t.key));
-    if (match) { cur = match; continue; }
-    if (line.startsWith('-') && cur) cur.items.push(line.replace(/^-\s*/,''));
-  }
-  return { tiers: tiers.filter(t=>t.items.length), savedAt: Date.now() };
-}
+/* ─── RENDER SUGGESTIONS ────────────────────────── */
+function renderSuggestions(sugs) {
+  const list = document.getElementById('sug-list');
+  list.innerHTML = '';
 
-/* ─── RENDER HELPERS ─────────────────────────────────────────────────────────── */
-function addBubble(role, text) {
-  const msgs = document.getElementById('messages');
-  const el   = document.createElement('div');
-  el.className   = `bubble ${role}`;
-  el.textContent = text;
-  msgs.appendChild(el);
-  msgs.scrollTop = msgs.scrollHeight;
-  return el;
-}
-function addTyping() {
-  const msgs = document.getElementById('messages');
-  const el   = document.createElement('div');
-  el.className = 'typing-bubble';
-  el.innerHTML  = '<span></span><span></span><span></span>';
-  msgs.appendChild(el); msgs.scrollTop = msgs.scrollHeight;
-  return el;
-}
-function renderChips(options) {
-  const msgs = document.getElementById('messages');
-  const wrap = document.createElement('div');
-  wrap.className = 'chips-wrap';
-  for (const opt of options) {
-    const chip = document.createElement('button');
-    chip.className = 'chip'; chip.textContent = opt;
-    chip.onclick = () => { wrap.remove(); sendMessage(opt); };
-    wrap.appendChild(chip);
-  }
-  msgs.appendChild(wrap); msgs.scrollTop = msgs.scrollHeight;
-}
+  // Context line
+  const regret = demoProfile.regret[0] || 'scrolling';
+  document.getElementById('p-ctx-text').textContent =
+    `Before you open ${regret} — here's what you said helps.`;
 
-/* ─── THEME SWATCHES ─────────────────────────────────────────────────────────── */
-function renderThemeSwatches() {
-  const msgs = document.getElementById('messages');
-  const row  = document.createElement('div');
-  row.className = 'theme-row';
-  row.innerHTML = `<span class="theme-row-label">Pick your style</span>`;
-  THEMES.forEach((t, i) => {
-    const btn = document.createElement('button');
-    btn.className    = 'swatch' + (i===0?' active':'');
-    btn.title        = t.name;
-    btn.style.background = t.swatch;
-    btn.dataset.id   = t.id;
-    btn.onclick = () => {
-      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
-      btn.classList.add('active');
-      applyTheme(t.id);
-    };
-    row.appendChild(btn);
+  // AI / demo mode badge
+  const badge = document.createElement('div');
+  badge.style.cssText = `display:flex;align-items:center;gap:5px;margin-bottom:10px;font-size:0.62rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;`;
+  badge.innerHTML = lastSugsWereLive
+    ? `<span style="width:6px;height:6px;border-radius:50%;background:#5A8A5A;flex-shrink:0"></span><span style="color:#5A8A5A">Generated by AI for you</span>`
+    : `<span style="width:6px;height:6px;border-radius:50%;background:#aaa;flex-shrink:0"></span><span style="color:#aaa">Example suggestions — add a Groq key for live AI</span>`;
+  list.appendChild(badge);
+
+  sugs.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'p-sug';
+    card.innerHTML = `
+      <span class="hlabel" style="top:-8px;left:0">Transparency</span>
+      <div class="p-sug-title">${esc(s.activity)}</div>
+      <div class="p-sug-because">${esc(s.because || '')}</div>
+      <div class="p-sug-start">${esc(s.start)}</div>`;
+    card.onclick = () => startActivity(s);
+    list.appendChild(card);
   });
-  msgs.appendChild(row); msgs.scrollTop = msgs.scrollHeight;
 }
 
-function applyTheme(id) {
-  const theme = THEMES.find(t => t.id === id);
-  if (!theme || !menuCardEl) return;
-  selectedTheme = theme;
-  menuCardEl.style.setProperty('--mc-bg',  theme.bg);
-  menuCardEl.style.setProperty('--mc-ink', theme.ink);
-  menuCardEl.style.setProperty('--mc-soft', `rgba(0,0,0,0.06)`);
+/* ─── PURPOSE BANNERS ───────────────────────────── */
+const PURPOSES = {
+  walk:    'Walking for 20 min lowers cortisol directly. Not exercise — a nervous system reset.',
+  music:   'Passive listening is one of the most efficient forms of mental recovery. This is time well spent.',
+  podcast: 'One episode with no second screen. You\'re giving your visual cortex a full rest.',
+  drawing: 'Creative work uses a completely different part of your brain than the work you just finished.',
+  journal: '3 minutes of reflection produces the same stress relief as 30 minutes of passive distraction.',
+  reading: 'Reading fiction reduces stress by up to 68% in 6 minutes — faster than a walk or music.',
+  stretch: 'Each stretch below takes tension you stored today and gives it somewhere to go.',
+  tea:     'Making tea with intention breaks the phone-reflex and gives you 10 minutes of genuine stillness.',
+  bath:    'A warm bath raises, then drops your core temperature — the physical signal your body needs to truly rest.',
+};
+
+function purposeBanner(type) {
+  const text = PURPOSES[type] || '';
+  if (!text) return '';
+  return `<div class="purpose-banner"><div class="pb-label">Why this, right now</div><div class="pb-text">${text}</div></div>`;
 }
 
-/* ─── RENDER MENU CARD ───────────────────────────────────────────────────────── */
-function iconSVG(name) {
-  const svg = ICONS[name];
-  if (!svg) return '';
-  return `<span class="menu-item-ico">${svg}</span>`;
-}
-
-function renderMenuCard(menuData) {
-  const msgs = document.getElementById('messages');
-  const card = document.createElement('div');
-  card.className = 'menu-card';
-  menuCardEl = card;
-
-  // Tier-level icon sets
-  function tierIconRow(items) {
-    const matched = [...new Set(items.map(matchIcon).filter(Boolean))].slice(0, 4);
-    if (!matched.length) return '';
-    return '<div class="tier-icons-row">' +
-      matched.map(n => `<span class="tier-ico">${ICONS[n]}</span>`).join('') +
-      '</div>';
-  }
-
-  let html = `
-    <div class="menu-checker"></div>
-    <div class="menu-inner">
-      <div class="menu-title">My Leisure Menu</div>
-      <div class="menu-subtitle">Intentional Leisure</div>
-      <div class="menu-divider-line"></div>`;
-
-  for (const tier of menuData.tiers) {
-    html += `<div class="menu-tier">
-      <div class="menu-tier-header">
-        <span class="tier-name">${tier.label}</span>
-        <span class="tier-sub">${tier.sub}</span>
-        ${tierIconRow(tier.items)}
+/* ─── COMPLETION MOMENT ─────────────────────────── */
+function showCompletion(activityName) {
+  const regret = demoProfile.regret[0] || '';
+  const wrap   = document.getElementById('activity-content');
+  wrap.innerHTML = `
+    <div class="activity-card">
+      <div class="completion-card">
+        <div class="completion-check">✓</div>
+        <div class="completion-title">${esc(activityName)}</div>
+        <div class="completion-msg">
+          ${regret ? `You chose this instead of ${esc(regret)} today. That's intentional.` : 'You showed up for yourself today.'}
+        </div>
+        <div style="font-size:0.72rem;color:#aaa;margin-bottom:8px">How do you feel now?</div>
+        <div class="mood-row">
+          ${['😔','😐','🙂','😊','✨'].map(e=>`<button class="mood-btn" onclick="pickMood(this,'${e}')">${e}</button>`).join('')}
+        </div>
+        <button class="back-to-sug" onclick="setPhoneState('suggestions')" style="margin-top:6px">See all options</button>
       </div>
-      <ul class="menu-items">
-        ${tier.items.map(item => {
-          const ico = matchIcon(item);
-          return `<li class="menu-item">
-            ${ico ? `<span class="menu-item-ico">${ICONS[ico]}</span>` : '<span class="menu-item-dash">–</span>'}
-            <span>${item}</span>
-          </li>`;
-        }).join('')}
-      </ul>
     </div>`;
-  }
+  clearTimers();
+}
 
-  html += `
-      <div class="menu-divider-line"></div>
-      <div class="menu-actions">
-        <button class="btn-menu-save" onclick="saveAsDefault()">Save as my menu</button>
-        <button class="btn-menu-outline" onclick="saveAsPhoto()">Save as photo</button>
+function pickMood(btn, emoji) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('picked'));
+  btn.classList.add('picked');
+}
+
+/* ─── START ACTIVITY ────────────────────────────── */
+function startActivity(s) {
+  setPhoneState('activity');
+  const wrap = document.getElementById('activity-content');
+  wrap.innerHTML = '';
+  clearTimers();
+
+  const map = {
+    walk:    renderWalk,
+    music:   renderMusic,
+    podcast: renderPodcast,
+    drawing: renderDrawing,
+    journal: renderJournal,
+    reading: renderReading,
+    stretch: renderStretch,
+    tea:     renderTea,
+    bath:    renderBath,
+  };
+  (map[s.type] || ((w) => renderGenericTimer(w, s.activity)))(wrap);
+}
+
+/* ══════════════════════════════════════════════════
+   ACTIVITY RENDERERS
+══════════════════════════════════════════════════ */
+
+/* ── WALK ──────────────────────────────────────── */
+const WALK_ROUTES = [
+  { name:'The Neighborhood Loop',   dist:'1.4 mi', eta:'28 min', turns:['Out your door, turn left','Right at the main street','Left through the side streets','Straight back home'] },
+  { name:'Green Space Route',       dist:'1.8 mi', eta:'36 min', turns:['Head toward the nearest park','Full loop inside the park','Exit the far gate','Back home via a different street'] },
+  { name:'The Short Reset',         dist:'0.8 mi', eta:'16 min', turns:['One block forward','Right, one block','Right, one block back','Right — you\'re home'] },
+  { name:'The Long Exhale',         dist:'2.4 mi', eta:'48 min', turns:['Head in the direction of downtown','Loop around the main block','Quieter streets back','Home from the far side'] },
+  { name:'The Dusk Circuit',        dist:'1.2 mi', eta:'24 min', turns:['Left out the door','Follow the long street down','Circle the block at the end','Back the way you came'] },
+];
+const WALK_PURPOSES = [
+  'This walk has one job: give your thoughts somewhere to go that isn\'t a screen.',
+  'Cortisol drops within 20 minutes of walking. No music needed — just feet on ground.',
+  'Decision fatigue is real. The only choice you need to make: left, or right.',
+  'This isn\'t exercise. It\'s a system reset. Your body already knows how to do this.',
+  'Walking at dusk activates your parasympathetic nervous system. It\'s not a luxury — it\'s recovery.',
+];
+
+function renderWalk(wrap) {
+  const route   = WALK_ROUTES[Math.floor(Math.random() * WALK_ROUTES.length)];
+  const purpose = WALK_PURPOSES[Math.floor(Math.random() * WALK_PURPOSES.length)];
+  _drawWalkCard(wrap, route, purpose);
+}
+
+function _drawWalkCard(wrap, route, purpose) {
+  wrap.innerHTML = purposeBanner('walk');
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div class="walk-card">
+      <div class="walk-icon">🗺</div>
+      <div class="walk-title">${esc(route.name)}</div>
+      <div class="walk-stats">
+        <span class="walk-stat"><span>📍</span>${route.dist}</span>
+        <span class="walk-stat"><span>⏱</span>~${route.eta}</span>
       </div>
-      <div id="save-confirm" class="save-confirm" style="display:none">✓ Saved — it'll be here on your next visit.</div>
+      <div class="walk-turns">
+        ${route.turns.map((t,i)=>`<div class="walk-turn"><span class="turn-num">${i+1}</span><span>${t}</span></div>`).join('')}
+      </div>
+      <div class="walk-intent">"${purpose}"</div>
+      <button class="walk-new-route" onclick="rerollWalk(this)">↺ Generate a different route</button>
+    </div>`;
+  wrap.appendChild(card);
+
+  let secs = parseInt(route.eta) * 60;
+  walkInt = setInterval(() => {
+    secs--; if (secs < 0) { clearInterval(walkInt); return; }
+    const el = document.getElementById('walk-timer');
+    if (el) el.textContent = Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
+  }, 1000);
+}
+
+function rerollWalk(btn) {
+  clearInterval(walkInt);
+  const wrap = btn.closest('#activity-content');
+  const route   = WALK_ROUTES[Math.floor(Math.random() * WALK_ROUTES.length)];
+  const purpose = WALK_PURPOSES[Math.floor(Math.random() * WALK_PURPOSES.length)];
+  _drawWalkCard(wrap, route, purpose);
+}
+
+/* ── MUSIC ─────────────────────────────────────── */
+const PLAYLIST = [
+  { title:'Sycamore',            artist:'Bill Frisell',         dur:'4:32', gradient:'linear-gradient(135deg,#1a3a5c,#2d6a8c)' },
+  { title:'Stars',               artist:'Nils Frahm',           dur:'5:14', gradient:'linear-gradient(135deg,#2c1654,#6b4fa0)' },
+  { title:'Gymnopédie No.1',     artist:'Erik Satie',           dur:'3:41', gradient:'linear-gradient(135deg,#1a4a2e,#3a8a5c)' },
+  { title:'Re: Stacks',          artist:'Bon Iver',             dur:'5:15', gradient:'linear-gradient(135deg,#4a2c1a,#8a5c3a)' },
+  { title:'Comptine d\'un autre été', artist:'Yann Tiersen',   dur:'2:32', gradient:'linear-gradient(135deg,#1a2a4a,#3a5a8a)' },
+  { title:'Blue Ridge Mountains', artist:'Fleet Foxes',         dur:'4:45', gradient:'linear-gradient(135deg,#1a3a1a,#3a6a3a)' },
+  { title:'Slow Burn',           artist:'Kacey Musgraves',      dur:'3:52', gradient:'linear-gradient(135deg,#4a1a3a,#8a3a6a)' },
+];
+
+let musicIdx = 0;
+
+function renderMusic(wrap) {
+  musicIdx = 0;
+  _drawMusicCard(wrap);
+
+  if (ambientPlayer) ambientPlayer.stop();
+  ambientPlayer = new AmbientPlayer();
+  ambientPlayer.start();
+}
+
+function _drawMusicCard(wrap) {
+  wrap.innerHTML = '';
+  const song = PLAYLIST[musicIdx];
+  const next1 = PLAYLIST[(musicIdx+1) % PLAYLIST.length];
+  const next2 = PLAYLIST[(musicIdx+2) % PLAYLIST.length];
+
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div class="player-art" style="background:${song.gradient}">🎵</div>
+    <div class="player-info">
+      <div class="player-title" id="song-title">${esc(song.title)}</div>
+      <div class="player-sub"   id="song-artist">${esc(song.artist)}</div>
+      <div class="pbar-wrap"><div class="pbar-fill" id="pbar"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.62rem;color:#ccc;margin-top:3px">
+        <span id="ptime">0:00</span><span>${song.dur}</span>
+      </div>
     </div>
-    <div class="menu-checker" style="margin-top:0"></div>`;
+    <div class="player-ctrls">
+      <button class="pc-btn" onclick="prevSong()">⏮</button>
+      <button class="pc-play" id="play-btn" onclick="togglePlayback(this)">⏸</button>
+      <button class="pc-btn" onclick="nextSong()">⏭</button>
+    </div>
+    <div style="text-align:center;padding:0 14px 6px;font-size:0.62rem;color:#bbb">♪ ambient audio playing</div>
+    <div class="song-queue">
+      <div class="queue-label">Up next</div>
+      <div class="queue-row playing">
+        <div class="playing-dot"></div>
+        <span class="queue-name">${esc(song.title)} <span class="qa">— ${esc(song.artist)}</span></span>
+        <span class="queue-dur">${song.dur}</span>
+      </div>
+      <div class="queue-row">
+        <span style="width:6px"></span>
+        <span class="queue-name">${esc(next1.title)} <span class="qa">— ${esc(next1.artist)}</span></span>
+        <span class="queue-dur">${next1.dur}</span>
+      </div>
+      <div class="queue-row">
+        <span style="width:6px"></span>
+        <span class="queue-name">${esc(next2.title)} <span class="qa">— ${esc(next2.artist)}</span></span>
+        <span class="queue-dur">${next2.dur}</span>
+      </div>
+    </div>`;
+  wrap.appendChild(card);
 
-  card.innerHTML = html;
-  msgs.appendChild(card);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-/* ─── SAVE AS DEFAULT ────────────────────────────────────────────────────────── */
-function saveAsDefault() {
-  if (!currentMenuData) return;
-  localStorage.setItem('il_menu', JSON.stringify(currentMenuData));
-  savedMenuData = currentMenuData;
-  const el = document.getElementById('save-confirm');
-  if (el) { el.style.display='block'; setTimeout(() => el.style.display='none', 3200); }
-}
-
-/* ─── SAVE AS PHOTO (Canvas) ─────────────────────────────────────────────────── */
-async function saveAsPhoto() {
-  if (!currentMenuData) return;
-  await document.fonts.ready;
-
-  const T   = selectedTheme;
-  const SC  = 2;
-  const W   = 560 * SC;
-  const P   = 52 * SC;
-
-  // Calculate dynamic height
-  let lh = 50 + 16 + 2 + 20 + 38 + 10 + 14; // top: pad,brand,div,gap,title,sub,gap
-  for (const tier of currentMenuData.tiers) {
-    lh += 16 + 12; // tier header + gap
-    lh += tier.items.length * 26;
-    lh += 16;
-  }
-  lh += 14 + 12 + 50; // bottom div + footer + bottom-pad
-  const H = Math.max(520, lh) * SC;
-
-  const canvas = document.createElement('canvas');
-  canvas.width  = W;
-  canvas.height = H;
-  const ctx = canvas.getContext('2d');
-
-  // Background
-  const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, T.bg);
-  grad.addColorStop(1, shadeColor(T.bg, -8));
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Checkered bar top
-  drawChecker(ctx, 0, 0, W, 10 * SC, T.bg, T.ink, 8 * SC);
-
-  let y = 50 * SC;
-
-  // Brand label
-  ctx.font      = `500 ${10*SC}px Inter, -apple-system, sans-serif`;
-  ctx.fillStyle = T.ink;
-  ctx.globalAlpha = 0.6;
-  ctx.fillText('INTENTIONAL LEISURE', P, y);
-  ctx.globalAlpha = 1;
-  y += 16 * SC;
-
-  // Divider
-  ctx.strokeStyle = T.ink; ctx.lineWidth = SC; ctx.globalAlpha = 0.25;
-  ctx.beginPath(); ctx.moveTo(P, y); ctx.lineTo(W-P, y); ctx.stroke();
-  ctx.globalAlpha = 1;
-  y += 20 * SC;
-
-  // Title
-  ctx.font      = `italic 700 ${28*SC}px 'Playfair Display', Georgia, serif`;
-  ctx.fillStyle = T.ink;
-  ctx.fillText('My Leisure Menu', P, y);
-  y += 12 * SC;
-
-  // Subtitle
-  ctx.font      = `400 ${10*SC}px Inter, -apple-system, sans-serif`;
-  ctx.fillStyle = T.ink; ctx.globalAlpha = 0.4;
-  ctx.fillText('a menu for rest', P, y);
-  ctx.globalAlpha = 1;
-  y += 16 * SC;
-
-  // Divider
-  ctx.strokeStyle = T.ink; ctx.lineWidth = SC; ctx.globalAlpha = 0.2;
-  ctx.beginPath(); ctx.moveTo(P, y); ctx.lineTo(W-P, y); ctx.stroke();
-  ctx.globalAlpha = 1;
-  y += 18 * SC;
-
-  // Tiers
-  for (const tier of currentMenuData.tiers) {
-    // Section header
-    ctx.font      = `italic 600 ${14*SC}px 'Playfair Display', Georgia, serif`;
-    ctx.fillStyle = T.ink;
-    ctx.fillText(`${tier.icon}  ${tier.label}`, P, y);
-    // Sub
-    ctx.font = `400 ${9*SC}px Inter, sans-serif`;
-    ctx.globalAlpha = 0.45;
-    ctx.fillText(`  ${tier.sub}`, P + ctx.measureText(`${tier.icon}  ${tier.label}`).width + 6*SC, y - 1*SC);
-    ctx.globalAlpha = 1;
-    y += 14 * SC;
-
-    // Items
-    ctx.font      = `400 ${14*SC}px Inter, -apple-system, sans-serif`;
-    ctx.fillStyle = T.ink; ctx.globalAlpha = 0.82;
-    for (const item of tier.items) {
-      ctx.fillText(`–   ${item}`, P + 6*SC, y);
-      y += 26 * SC;
+  // Animated progress
+  let p = 0;
+  playerInt = setInterval(() => {
+    p = Math.min(p + 0.15, 100);
+    const pb = document.getElementById('pbar');
+    const pt = document.getElementById('ptime');
+    if (pb) pb.style.width = p + '%';
+    if (pt) {
+      const totalSecs = parseInt(song.dur.split(':')[0])*60 + parseInt(song.dur.split(':')[1]);
+      const elapsed = Math.round(p/100 * totalSecs);
+      pt.textContent = Math.floor(elapsed/60)+':'+String(elapsed%60).padStart(2,'0');
     }
-    ctx.globalAlpha = 1;
-    y += 12 * SC;
-  }
-
-  // Bottom divider
-  ctx.strokeStyle = T.ink; ctx.lineWidth = SC; ctx.globalAlpha = 0.2;
-  ctx.beginPath(); ctx.moveTo(P, y); ctx.lineTo(W-P, y); ctx.stroke();
-  ctx.globalAlpha = 1;
-  y += 14 * SC;
-
-  // Footer
-  ctx.font      = `300 ${9*SC}px Inter, -apple-system, sans-serif`;
-  ctx.fillStyle = T.ink; ctx.globalAlpha = 0.38;
-  ctx.fillText('intentional-leisure.com', P, y);
-  ctx.globalAlpha = 1;
-
-  // Checkered bar bottom
-  drawChecker(ctx, 0, H - 10*SC, W, 10*SC, T.bg, T.ink, 8*SC);
-
-  // Outer border
-  ctx.strokeStyle = T.ink; ctx.lineWidth = 3*SC; ctx.globalAlpha = 0.9;
-  ctx.strokeRect(1.5*SC, 1.5*SC, W - 3*SC, H - 3*SC);
-  ctx.globalAlpha = 1;
-
-  canvas.toBlob(blob => {
-    const url  = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = 'my-leisure-menu.png';
-    link.href = url; link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }, 'image/png');
+    if (!pb) clearInterval(playerInt);
+  }, 120);
 }
 
-function drawChecker(ctx, x, y, w, h, bg, ink, size) {
-  ctx.save();
-  ctx.fillStyle = bg; ctx.fillRect(x, y, w, h);
-  ctx.fillStyle = ink;
-  const cols = Math.ceil(w / size);
-  const rows = Math.ceil(h / size);
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if ((r + c) % 2 === 0) ctx.fillRect(x + c*size, y + r*size, size, size);
+function nextSong() {
+  clearInterval(playerInt);
+  musicIdx = (musicIdx + 1) % PLAYLIST.length;
+  const wrap = document.getElementById('activity-content');
+  _drawMusicCard(wrap);
+  if (ambientPlayer) ambientPlayer._playChord();
+}
+
+function prevSong() {
+  clearInterval(playerInt);
+  musicIdx = (musicIdx - 1 + PLAYLIST.length) % PLAYLIST.length;
+  const wrap = document.getElementById('activity-content');
+  _drawMusicCard(wrap);
+  if (ambientPlayer) ambientPlayer._playChord();
+}
+
+function togglePlayback(btn) {
+  if (!ambientPlayer || !ambientPlayer.ctx) {
+    ambientPlayer = new AmbientPlayer(); ambientPlayer.start(); btn.textContent = '⏸';
+  } else { ambientPlayer.stop(); ambientPlayer = null; btn.textContent = '▶'; }
+}
+
+/* ── PODCAST ────────────────────────────────────── */
+const PODCASTS = [
+  { show:'Design Matters',      title:'On Making Things That Last', desc:'Debbie Millman talks with designers about creative longevity, resilience, and the long game of making.', art:'🎙', gradient:'linear-gradient(135deg,#1a2a4a,#2a4a6a)', dur:'52:14' },
+  { show:'99% Invisible',       title:'The Landlord\'s Dilemma',    desc:'A story about architecture, power, and the invisible systems that shape where we live and how we rest.', art:'🏛', gradient:'linear-gradient(135deg,#2a1a4a,#4a2a6a)', dur:'31:07' },
+  { show:'The Moth Radio Hour', title:'Strangers at the Table',     desc:'Five true, first-person stories about unexpected connections — and the moments that shift everything.', art:'🦋', gradient:'linear-gradient(135deg,#1a3a2a,#2a6a4a)', dur:'58:22' },
+  { show:'How I Built This',    title:'Patagonia\'s Yvon Chouinard', desc:'The founder of Patagonia on building a company you\'re not embarrassed by — and then giving it away.', art:'🏔', gradient:'linear-gradient(135deg,#2a1a1a,#6a3a2a)', dur:'45:18' },
+];
+
+let podIdx = 0;
+
+function renderPodcast(wrap) {
+  podIdx = 0;
+  _drawPodcastCard(wrap);
+  if (ambientPlayer) ambientPlayer.stop();
+  ambientPlayer = new AmbientPlayer();
+  ambientPlayer.start();
+}
+
+function _drawPodcastCard(wrap) {
+  wrap.innerHTML = '';
+  const ep   = PODCASTS[podIdx];
+  const next = PODCASTS[(podIdx+1) % PODCASTS.length];
+
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div class="pod-art" style="background:${ep.gradient}">${ep.art}</div>
+    <div class="pod-info">
+      <div class="pod-show">${esc(ep.show)}</div>
+      <div class="pod-title">${esc(ep.title)}</div>
+      <div class="pod-desc">${esc(ep.desc)}</div>
+      <div class="pbar-wrap"><div class="pbar-fill" id="ppbar"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.62rem;color:#ccc;margin-top:3px;margin-bottom:8px">
+        <span id="pod-time">0:00</span><span>${ep.dur}</span>
+      </div>
+    </div>
+    <div class="pod-ctrls">
+      <button class="pod-skip-btn" onclick="podSkip(-30)">
+        <span class="sk-icon">⏪</span><span class="sk-label">30s</span>
+      </button>
+      <button class="pc-play" onclick="togglePlayback(this)">⏸</button>
+      <button class="pod-skip-btn" onclick="podSkip(30)">
+        <span class="sk-icon">⏩</span><span class="sk-label">30s</span>
+      </button>
+    </div>
+    <div class="pod-queue">
+      <div class="queue-label">Next episode</div>
+      <div class="queue-row" style="cursor:pointer" onclick="nextPod()">
+        <span class="queue-name">${esc(next.title)} <span class="qa">— ${esc(next.show)}</span></span>
+        <span class="queue-dur">${next.dur}</span>
+      </div>
+    </div>`;
+  wrap.appendChild(card);
+
+  let secs = 0;
+  const totalSecs = parseInt(ep.dur.split(':')[0])*60 + parseInt(ep.dur.split(':')[1]);
+  playerInt = setInterval(() => {
+    secs = Math.min(secs + 1, totalSecs);
+    const pb = document.getElementById('ppbar');
+    const pt = document.getElementById('pod-time');
+    if (pb) pb.style.width = (secs/totalSecs*100) + '%';
+    if (pt) pt.textContent = Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
+    if (!pb) clearInterval(playerInt);
+  }, 500);
+}
+
+function nextPod() {
+  clearInterval(playerInt);
+  podIdx = (podIdx+1) % PODCASTS.length;
+  _drawPodcastCard(document.getElementById('activity-content'));
+  if (ambientPlayer) ambientPlayer._playChord();
+}
+
+let podSeek = 0;
+function podSkip(delta) {
+  podSeek = Math.max(0, podSeek + delta);
+  const pt = document.getElementById('pod-time');
+  if (pt) pt.textContent = Math.floor(podSeek/60)+':'+String(podSeek%60).padStart(2,'0');
+}
+
+/* ── DRAWING ────────────────────────────────────── */
+const DRAW_PROMPTS = [
+  'Sketch the thing nearest to your right hand — but make it look like it\'s from the future.',
+  'Draw the view from the closest window. You have exactly 5 minutes.',
+  'Sketch your own hand holding something you use every day.',
+  'Draw what "tired" looks like, if it were a shape or creature.',
+  'Sketch one object from your desk that you never actually think about.',
+  'Draw the room you\'re in from the perspective of the ceiling.',
+  'Sketch what today felt like, without using words or numbers.',
+];
+
+function renderDrawing(wrap) {
+  const prompt = DRAW_PROMPTS[Math.floor(Math.random() * DRAW_PROMPTS.length)];
+  const log    = JSON.parse(localStorage.getItem('draw_log') || '[]');
+
+  wrap.innerHTML = `
+    <div class="draw-prompt">
+      <strong>Today's sketch prompt</strong>
+      ${esc(prompt)}
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="sketch-canvas" width="278" height="180"></canvas>
+    </div>
+    <div class="canvas-tools">
+      <button class="ct-btn active" id="ct-pen"    onclick="setTool('pen',this)">✏ Pencil</button>
+      <button class="ct-btn"        id="ct-eraser" onclick="setTool('eraser',this)">◻ Erase</button>
+      <button class="ct-btn"        id="ct-clear"  onclick="clearCanvas()">✕ Clear</button>
+    </div>
+    <textarea class="draw-note" id="draw-note" placeholder="What did you make? (optional note)"></textarea>
+    <button class="save-log-btn" onclick="saveDrawLog('${esc(prompt).replace(/'/g,"&#39;")}')">Save to my log →</button>
+    <button class="log-toggle" onclick="toggleDrawLog(this)">▸ Past entries (${log.length})</button>
+    <div id="draw-log-list" style="display:none">
+      ${log.length ? log.slice(-3).reverse().map(e=>`
+        <div class="log-entry">
+          <div class="log-entry-meta">${e.date}</div>
+          <div class="log-entry-prompt">${esc(e.prompt)}</div>
+          ${e.note ? `<div class="log-entry-note">${esc(e.note)}</div>` : ''}
+        </div>`).join('') : '<p class="log-empty">No entries yet.</p>'}
+    </div>`;
+
+  // Init canvas
+  setTimeout(() => {
+    const canvas = document.getElementById('sketch-canvas');
+    if (!canvas) return;
+    const ctx2  = canvas.getContext('2d');
+    let drawing = false, tool = 'pen';
+
+    window._drawTool = t => { tool = t; };
+
+    const getPos = e => {
+      const r = canvas.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      return [src.clientX - r.left, src.clientY - r.top];
+    };
+    const start = e => { drawing = true; ctx2.beginPath(); const [x,y] = getPos(e); ctx2.moveTo(x,y); e.preventDefault(); };
+    const draw  = e => {
+      if (!drawing) return;
+      const [x,y] = getPos(e);
+      ctx2.lineWidth   = tool==='eraser' ? 18 : 2;
+      ctx2.strokeStyle = tool==='eraser' ? '#fff' : '#1A1917';
+      ctx2.lineCap = 'round'; ctx2.lineJoin = 'round';
+      ctx2.lineTo(x,y); ctx2.stroke(); ctx2.beginPath(); ctx2.moveTo(x,y);
+      e.preventDefault();
+    };
+    const stop  = () => drawing = false;
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup',   stop);
+    canvas.addEventListener('mouseleave',stop);
+    canvas.addEventListener('touchstart', start, {passive:false});
+    canvas.addEventListener('touchmove',  draw,  {passive:false});
+    canvas.addEventListener('touchend',   stop);
+  }, 50);
+}
+
+function setTool(t, btn) {
+  document.querySelectorAll('.ct-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window._drawTool && window._drawTool(t);
+}
+
+function clearCanvas() {
+  const canvas = document.getElementById('sketch-canvas');
+  if (canvas) canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+}
+
+function saveDrawLog(prompt) {
+  const note = document.getElementById('draw-note')?.value?.trim() || '';
+  const log  = JSON.parse(localStorage.getItem('draw_log') || '[]');
+  log.push({ date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}), prompt, note });
+  localStorage.setItem('draw_log', JSON.stringify(log));
+  const btn = document.querySelector('.save-log-btn');
+  if (btn) { btn.textContent = '✓ Saved to log'; btn.style.background = '#5A8A5A'; }
+  const toggle = document.querySelector('.log-toggle');
+  if (toggle) toggle.textContent = `▸ Past entries (${log.length})`;
+}
+
+function toggleDrawLog(btn) {
+  const list = document.getElementById('draw-log-list');
+  if (!list) return;
+  const open = list.style.display !== 'none';
+  list.style.display = open ? 'none' : 'block';
+  btn.textContent = (open ? '▸' : '▾') + btn.textContent.slice(1);
+}
+
+/* ── JOURNAL ────────────────────────────────────── */
+const JOURNAL_PROMPTS = [
+  'What\'s one thing from today you don\'t want to forget?',
+  'What drained you today, and what, if anything, refilled you?',
+  'If today had a title, what would it be?',
+  'What\'s one thing you\'re carrying that you could put down tonight?',
+  'What would "enough" look like for you today?',
+  'Write three sentences about what happened. Then one about how it felt.',
+];
+
+function renderJournal(wrap) {
+  wrap.innerHTML = purposeBanner('journal');
+  const prompt = JOURNAL_PROMPTS[Math.floor(Math.random() * JOURNAL_PROMPTS.length)];
+  const log    = JSON.parse(localStorage.getItem('journal_log') || '[]');
+
+  wrap.innerHTML = `
+    <div class="j-prompt">
+      <strong>Today's prompt</strong>
+      ${esc(prompt)}
+    </div>
+    <textarea class="j-ta" id="j-ta" placeholder="Write here — no one reads this but you."></textarea>
+    <div class="j-footer">
+      <button class="j-save" onclick="saveJournal('${esc(prompt).replace(/'/g,"&#39;")}')">Save entry →</button>
+      <button class="j-log-btn" onclick="showJournalLog()">Past (${log.length})</button>
+    </div>
+    <div id="j-log" style="display:none;margin-top:10px"></div>
+    <div class="read-fact" style="margin-top:10px">
+      "3 minutes of reflection produces similar cortisol reduction to 30 minutes of passive distraction — with lasting effect." — Journal of Experimental Psychology, 2014
+    </div>`;
+}
+
+function saveJournal(prompt) {
+  const text = document.getElementById('j-ta')?.value?.trim();
+  if (!text) return;
+  const log = JSON.parse(localStorage.getItem('journal_log') || '[]');
+  log.push({ date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}), prompt, text });
+  localStorage.setItem('journal_log', JSON.stringify(log));
+  const btn = document.querySelector('.j-save');
+  if (btn) { btn.textContent = '✓ Saved'; btn.style.background = '#5A8A5A'; }
+}
+
+function showJournalLog() {
+  const log  = JSON.parse(localStorage.getItem('journal_log') || '[]');
+  const wrap = document.getElementById('j-log');
+  if (!wrap) return;
+  if (wrap.style.display !== 'none') { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  wrap.innerHTML = log.length ? log.slice(-5).reverse().map(e=>`
+    <div class="log-entry">
+      <div class="log-entry-meta">${esc(e.date)}</div>
+      <div class="log-entry-prompt">${esc(e.prompt)}</div>
+      <div class="log-entry-note">${esc(e.text?.slice(0,120))}${e.text?.length>120?'…':''}</div>
+    </div>`).join('') : '<p class="log-empty">No entries yet.</p>';
+}
+
+/* ── READING ────────────────────────────────────── */
+const BOOKS = [
+  { title:'Bewilderment',           author:'Richard Powers',       emoji:'🌿', bg:'#2a4a2a' },
+  { title:'The Midnight Library',   author:'Matt Haig',            emoji:'📚', bg:'#1a2a4a' },
+  { title:'Crying in H Mart',       author:'Michelle Zauner',      emoji:'🌸', bg:'#4a2a3a' },
+  { title:'Tomorrow, and Tomorrow', author:'Gabrielle Zevin',      emoji:'🎮', bg:'#2a2a4a' },
+  { title:'Braiding Sweetgrass',    author:'Robin Wall Kimmerer',  emoji:'🌱', bg:'#2a3a2a' },
+];
+
+function renderReading(wrap) {
+  wrap.innerHTML = purposeBanner('reading');
+  const book = BOOKS[Math.floor(Math.random() * BOOKS.length)];
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div style="padding:16px 14px 14px">
+      <div class="read-book">
+        <div class="book-spine" style="background:${book.bg}">${book.emoji}</div>
+        <div class="book-info">
+          <div class="book-title">${esc(book.title)}</div>
+          <div class="book-author">${esc(book.author)}</div>
+        </div>
+      </div>
+      <div class="read-purpose">
+        Reading fiction reduces stress by up to 68% within 6 minutes — faster than walking or music. One chapter is exactly enough to start.
+      </div>
+      <div class="walk-timer" id="read-timer" style="color:#4472A8;font-size:2rem;text-align:center;font-weight:200;letter-spacing:-0.04em">20:00</div>
+      <div class="walk-lbl" style="text-align:center;margin-bottom:14px">READING WINDOW</div>
+      <textarea class="j-ta" id="read-note" placeholder="One sentence about what you read…" style="min-height:50px"></textarea>
+      <button class="j-save" style="margin-top:7px" onclick="saveReadLog()">Save note →</button>
+      <div class="read-fact">
+        You don't need to finish. You just need to start. Pick up wherever you left off.
+      </div>
+    </div>`;
+  wrap.appendChild(card);
+
+  let secs = 1200;
+  walkInt = setInterval(() => {
+    secs--; if (secs<0) { clearInterval(walkInt); return; }
+    const el = document.getElementById('read-timer');
+    if (el) el.textContent = Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
+    else clearInterval(walkInt);
+  }, 1000);
+}
+
+function saveReadLog() {
+  const note = document.getElementById('read-note')?.value?.trim();
+  if (!note) return;
+  const btn = document.querySelector('#activity-content .j-save');
+  if (btn) { btn.textContent = '✓ Saved'; btn.style.background = '#5A8A5A'; }
+}
+
+/* ── STRETCHING ─────────────────────────────────── */
+const STRETCHES = [
+  { name:'Neck rolls',        pose:'🔄', inst:'Slowly roll your head in a circle, 4x each direction. Keep your shoulders down.',       secs:45 },
+  { name:'Shoulder cross',    pose:'🤝', inst:'Bring one arm across your chest and hold it with the other. 30 seconds per side.',      secs:60 },
+  { name:'Forward fold',      pose:'🙇', inst:'Stand or sit. Slowly fold forward and let your head hang completely. Breathe.',          secs:60 },
+  { name:'Hip flexor stretch',pose:'🦵', inst:'Step one foot forward into a lunge, drop the back knee. Hold and breathe. 30 sec each.', secs:60 },
+  { name:'Seated twist',      pose:'🌀', inst:'Sit upright, place one hand behind you and twist gently. Hold 30 seconds per side.',    secs:60 },
+  { name:'Savasana',          pose:'🧘', inst:'Lie flat on your back, arms slightly apart, palms up. Close your eyes. Just breathe.',   secs:90 },
+];
+
+let stretchStep = 0;
+let stretchIntv = null;
+
+function renderStretch(wrap) {
+  stretchStep = 0;
+  _drawStretchCard(wrap);
+}
+
+function _drawStretchCard(wrap) {
+  clearInterval(stretchIntv);
+  const s = STRETCHES[stretchStep];
+  // On last step finishing → show completion
+  if (stretchStep >= STRETCHES.length) { showCompletion('10-min stretch sequence'); return; }
+
+  const isLast = stretchStep === STRETCHES.length - 1;
+  if (stretchStep === 0) wrap.innerHTML = purposeBanner('stretch');
+
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div style="padding:18px 14px 16px">
+      <div class="stretch-seq">
+        <div class="stretch-pose">${s.pose}</div>
+        <div class="stretch-name">${s.name}</div>
+        <div class="stretch-inst">${s.inst}</div>
+        <div class="stretch-prog">
+          ${STRETCHES.map((_,i)=>`<div class="sp-dot ${i<stretchStep?'done':i===stretchStep?'current':''}"></div>`).join('')}
+        </div>
+        <div style="font-size:0.68rem;color:#aaa;margin-bottom:8px">${stretchStep+1} of ${STRETCHES.length}</div>
+        <div class="stretch-timer-num" id="stretch-num">${s.secs}</div>
+        <div class="walk-lbl" style="margin-bottom:14px">SECONDS</div>
+        <button class="stretch-next-btn" onclick="nextStretch()" id="stretch-next-btn">
+          ${stretchStep < STRETCHES.length-1 ? 'Next →' : 'Finish ✓'}
+        </button>
+        ${stretchStep < STRETCHES.length-1 ? `<div class="stretch-next-label">Next: ${STRETCHES[stretchStep+1].name}</div>` : ''}
+      </div>
+    </div>`;
+  wrap.innerHTML = '';
+  wrap.appendChild(card);
+
+  let rem = s.secs;
+  stretchIntv = setInterval(() => {
+    rem--;
+    const el = document.getElementById('stretch-num');
+    if (el) el.textContent = rem;
+    else clearInterval(stretchIntv);
+    if (rem <= 0) {
+      clearInterval(stretchIntv);
+      const btn = document.getElementById('stretch-next-btn');
+      if (btn) { btn.style.animation = 'fadeIn .3s ease both'; btn.style.background = '#5A8A5A'; }
     }
-  }
-  ctx.restore();
+  }, 1000);
 }
 
-function shadeColor(hex, pct) {
-  const n = parseInt(hex.slice(1), 16);
-  const amt = Math.round(2.55 * pct);
-  const R = Math.max(0, Math.min(255, (n >> 16) + amt));
-  const G = Math.max(0, Math.min(255, ((n >> 8) & 0xff) + amt));
-  const B = Math.max(0, Math.min(255, (n & 0xff) + amt));
-  return `#${((1<<24)+(R<<16)+(G<<8)+B).toString(16).slice(1)}`;
+function nextStretch() {
+  clearInterval(stretchIntv);
+  stretchStep++;
+  const wrap = document.getElementById('activity-content');
+  if (stretchStep >= STRETCHES.length) {
+    showCompletion('10-min stretch sequence');
+    return;
+  }
+  // Last pose (savasana) → start ambient audio
+  if (stretchStep === STRETCHES.length - 1) {
+    if (!ambientPlayer) { ambientPlayer = new AmbientPlayer(); ambientPlayer.start(); }
+  }
+  _drawStretchCard(wrap);
 }
+
+/* ── BATH ──────────────────────────────────────────── */
+const SCENT_NOTES = {
+  'Lavender':    'Calming. Lowers heart rate. Best for nights when your brain won\'t stop.',
+  'Eucalyptus':  'Opens the airways. Feels like a spa reset. Good after a heavy day.',
+  'Rose':        'Warm and grounding. Signals your nervous system that the day is done.',
+  'Citrus':      'Gently uplifting without being stimulating. Good for a slow unwind.',
+  'Unscented':   'Sometimes simplicity is the whole point. Just warm water.',
+};
+
+const BATH_LISTEN = [
+  { label:'🎵 Ambient playlist', sub:'Low tempo, no lyrics' },
+  { label:'🎙 One podcast ep.',  sub:'Put it on, set the phone down' },
+  { label:'🔇 Total silence',    sub:'The water is enough' },
+  { label:'🌧 Rain sounds',      sub:'Background noise without stimulation' },
+];
+
+function renderBath(wrap) {
+  wrap.innerHTML = purposeBanner('bath');
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div style="padding:14px 14px 14px">
+
+      <!-- Animated bathtub -->
+      <div class="bath-scene">
+        <div class="bath-steam-row">
+          <div class="wisp w2" style="height:18px;animation-delay:.3s"></div>
+          <div class="wisp w1" style="height:24px;animation-delay:.0s"></div>
+          <div class="wisp w3" style="height:16px;animation-delay:.9s"></div>
+        </div>
+        <div class="bath-tub-wrap">
+          <div class="bath-tub-body">
+            <div class="bath-water-fill" id="bath-water"></div>
+            <div class="bath-wave">
+              <svg viewBox="0 0 160 12" preserveAspectRatio="none">
+                <path d="M0 6 Q20 0 40 6 Q60 12 80 6 Q100 0 120 6 Q140 12 160 6 L160 12 L0 12 Z"
+                  fill="rgba(123,188,224,0.45)"/>
+              </svg>
+            </div>
+            <div class="bath-duck">🦆</div>
+          </div>
+          <div class="bath-tub-legs">
+            <div class="bath-leg"></div>
+            <div class="bath-leg"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scent picker -->
+      <div style="margin-bottom:8px">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-bottom:7px">Aromatherapy</div>
+        <div class="bath-add-row">
+          ${Object.keys(SCENT_NOTES).map((s,i)=>
+            `<button class="bath-add-chip${i===0?' on':''}" onclick="pickScent(this,'${s}')">${s}</button>`
+          ).join('')}
+        </div>
+        <div class="scent-note" id="scent-note">${SCENT_NOTES['Lavender']}</div>
+      </div>
+
+      <!-- What to listen to -->
+      <div style="margin-bottom:10px">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-bottom:7px">While you soak</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${BATH_LISTEN.map((l,i)=>`
+            <div class="step-row" onclick="pickListen(this)" style="border:1px solid #E0DAD4;border-radius:8px;padding:7px 10px;${i===0?'border-color:#4472A8;background:#EBF2FA;':''}">
+              <div style="flex:1">
+                <div style="font-size:0.78rem;font-weight:600;color:#1A1917">${l.label}</div>
+                <div style="font-size:0.67rem;color:#aaa">${l.sub}</div>
+              </div>
+              <div class="step-circle${i===0?' done':''}" style="margin-top:4px;flex-shrink:0"></div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Duration + timer -->
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:10px">
+        <button class="bath-chip"    onclick="bathDur(this,15)">15 min</button>
+        <button class="bath-chip on" onclick="bathDur(this,20)">20 min</button>
+        <button class="bath-chip"    onclick="bathDur(this,30)">30 min</button>
+      </div>
+      <div class="walk-timer" id="bath-timer"
+        style="text-align:center;color:#4472A8;font-size:2.2rem;font-weight:200;letter-spacing:-.04em;margin-bottom:3px">20:00</div>
+      <div class="walk-lbl" style="text-align:center;margin-bottom:10px">REMAINING</div>
+
+      <div class="walk-intent">"Phone stays out here. The only job right now is to be somewhere warm."</div>
+      <button class="bath-no-phone" style="margin-top:10px"
+        onclick="showCompletion('Warm bath ritual')">Done — phone stayed out ✓</button>
+    </div>`;
+  wrap.appendChild(card);
+
+  // Fill water animation
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      const w = document.getElementById('bath-water');
+      if (w) w.style.height = '68%';
+    }, 300);
+  });
+
+  startBathTimer(20);
+}
+
+function pickScent(btn, name) {
+  btn.closest('.bath-add-row').querySelectorAll('.bath-add-chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  const note = document.getElementById('scent-note');
+  if (note) {
+    note.style.opacity = '0';
+    setTimeout(() => { note.textContent = SCENT_NOTES[name] || ''; note.style.opacity = '1'; }, 200);
+  }
+}
+
+function pickListen(row) {
+  const rows = row.parentElement.querySelectorAll('.step-row');
+  rows.forEach(r => {
+    r.style.borderColor = '#E0DAD4'; r.style.background = '';
+    r.querySelector('.step-circle')?.classList.remove('done');
+  });
+  row.style.borderColor = '#4472A8'; row.style.background = '#EBF2FA';
+  row.querySelector('.step-circle')?.classList.add('done');
+}
+
+function bathDur(btn, mins) {
+  btn.closest('div').querySelectorAll('.bath-chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  startBathTimer(mins);
+}
+
+function bathPick(btn) {
+  btn.closest('.bath-chips').querySelectorAll('.bath-chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function startBathTimer(mins) {
+  clearInterval(teaInt);
+  let secs = mins * 60;
+  const total = secs;
+  teaInt = setInterval(() => {
+    secs--; if (secs<0){clearInterval(teaInt);return;}
+    const el = document.getElementById('bath-timer');
+    if (el) el.textContent = Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
+    else clearInterval(teaInt);
+  }, 1000);
+}
+
+/* ── TEA ──────────────────────────────────────────── */
+
+const TEA_PHASES = [
+  { at:0,     text:'filling the kettle...' },
+  { at:8000,  text:'heating up...' },
+  { at:22000, text:'steeping ☕' },
+  { at:42000, text:'ready to sip 🍵' },
+];
+
+const TEA_STEPS = [
+  'Put your phone face-down on the counter',
+  'Fill the kettle and switch it on',
+  'Pick your favourite mug',
+  'Sit down before the water\'s even ready',
+];
+
+function renderTea(wrap) {
+  wrap.innerHTML = purposeBanner('tea');
+  const circ = 2 * Math.PI * 38;
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div style="padding:14px 14px 14px">
+
+      <!-- Animated mug -->
+      <div class="tea-scene">
+        <div class="steam-row">
+          <div class="wisp w1"></div>
+          <div class="wisp w2"></div>
+          <div class="wisp w3"></div>
+          <div class="wisp w4"></div>
+        </div>
+        <div class="tea-mug">
+          <div class="mug-handle"></div>
+          <div class="tea-liquid" id="tea-fill"></div>
+          <div class="mug-bubbles">
+            <div class="mbubble mb1"></div>
+            <div class="mbubble mb2"></div>
+            <div class="mbubble mb3"></div>
+          </div>
+        </div>
+        <div class="tea-saucer"></div>
+        <div class="tea-phase-text" id="tea-phase">filling the kettle...</div>
+      </div>
+
+      <!-- Ritual checklist -->
+      <div style="margin-bottom:12px">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-bottom:8px">Your ritual</div>
+        ${TEA_STEPS.map((s,i)=>`
+          <div class="step-row" onclick="checkTeaStep(this)">
+            <div class="step-circle" id="sc${i}"></div>
+            <span style="font-size:0.77rem;color:#555;line-height:1.4">${s}</span>
+          </div>`).join('')}
+      </div>
+
+      <!-- Ring timer -->
+      <div class="ring-wrap" style="margin:0 auto 6px">
+        <svg class="ring-svg" width="80" height="80" viewBox="0 0 88 88">
+          <circle class="ring-bg"   cx="44" cy="44" r="38"/>
+          <circle class="ring-fill" id="tea-ring" cx="44" cy="44" r="38"
+            style="stroke-dasharray:${circ};stroke-dashoffset:${circ}"/>
+        </svg>
+        <div class="ring-text" id="tea-text">10:00</div>
+      </div>
+      <div class="walk-lbl" style="margin-bottom:10px">STEEPING</div>
+
+      <div class="walk-intent">"No decisions in here. Just warmth."</div>
+      <button class="bath-no-phone" style="margin-top:10px"
+        onclick="showCompletion('Tea ritual')">Tea is ready ✓</button>
+    </div>`;
+  wrap.appendChild(card);
+
+  // Animate fill after paint
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      const fill = document.getElementById('tea-fill');
+      if (fill) fill.style.height = '62%';
+    }, 200);
+  });
+
+  // Phase text transitions
+  TEA_PHASES.forEach(({at, text}) => {
+    setTimeout(() => {
+      const el = document.getElementById('tea-phase');
+      if (el) { el.style.opacity='0'; setTimeout(()=>{ if(el){el.textContent=text;el.style.opacity='1';} },300); }
+    }, at);
+  });
+
+  // Ring countdown
+  let secs = 600;
+  teaInt = setInterval(() => {
+    secs--;
+    if (secs < 0) { clearInterval(teaInt); return; }
+    const pct  = secs / 600;
+    const ring = document.getElementById('tea-ring');
+    const txt  = document.getElementById('tea-text');
+    if (ring) ring.style.strokeDashoffset = circ * (1 - pct);
+    if (txt)  txt.textContent = Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
+    else clearInterval(teaInt);
+  }, 1000);
+}
+
+function checkTeaStep(row) {
+  const circle = row.querySelector('.step-circle');
+  const label  = row.querySelector('span');
+  const done   = circle.classList.toggle('done');
+  label.style.textDecoration = done ? 'line-through' : '';
+  label.style.color          = done ? '#bbb' : '#555';
+}
+
+/* ── BATH ─────────────────────────────────────────── */
+
+function renderGenericTimer(wrap, name) {
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div class="walk-card">
+      <div class="walk-icon">⏱</div>
+      <div class="walk-title">${esc(name)}</div>
+      <div class="walk-sub">10-minute window. You've got this.</div>
+      <div class="walk-timer" id="gen-timer">10:00</div>
+      <div class="walk-lbl">MINUTES</div>
+    </div>`;
+  wrap.appendChild(card);
+  let secs = 600;
+  genTimer = setInterval(() => {
+    secs--;
+    const el = document.getElementById('gen-timer');
+    if (el) el.textContent = Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
+    else clearInterval(genTimer);
+  }, 1000);
+}
+
+/* ─── PHONE STATE ───────────────────────────────── */
+function setPhoneState(name) {
+  ['idle','notif','thinking','suggestions','activity','scroll-check','work-interrupt'].forEach(s => {
+    const el = document.getElementById('ps-' + s);
+    if (el) el.classList.toggle('hidden', s !== name);
+  });
+  // Hide idle nudge when leaving idle
+  if (name !== 'idle') {
+    document.getElementById('idle-nudge').style.display = 'none';
+  }
+}
+
+/* ─── REOPEN APP (dock click) ───────────────────── */
+let pausedState = null; // remember what we were doing
+
+function reopenApp(name) {
+  // Ignore if already open
+  if (appsOpen.includes(name)) return;
+
+  const win = document.getElementById('win-' + name);
+  win.classList.remove('closing','closed');
+  win.style.opacity = '0'; win.style.transform = 'translateY(12px) scale(0.96)';
+  requestAnimationFrame(() => {
+    win.style.transition = 'opacity .4s ease, transform .4s ease';
+    win.style.opacity    = '1';
+    win.style.transform  = 'translateY(0) scale(1)';
+  });
+
+  appsOpen.push(name);
+  updateCounter();
+
+  // Pause audio
+  if (ambientPlayer) { ambientPlayer.stop(); ambientPlayer = null; }
+  clearInterval(walkInt); clearInterval(teaInt); clearInterval(playerInt); clearInterval(genTimer);
+
+  // Remember which state we were in
+  const active = ['activity','suggestions','thinking','notif'].find(s =>
+    !document.getElementById('ps-'+s).classList.contains('hidden'));
+  pausedState = active || null;
+
+  // Show work interrupt on phone (unless already idle)
+  if (pausedState) {
+    document.getElementById('wi-app-name').textContent = name === 'slack' ? 'Slack' : 'Gmail';
+    const msgs = { activity: 'Your rest session is paused.', suggestions: 'Your options are still here.', thinking: 'The suggestion is paused.' };
+    document.getElementById('wi-msg').innerHTML =
+      `<span id="wi-app-name">${name === 'slack' ? 'Slack' : 'Gmail'}</span> just reopened.<br>
+       <span style="color:#8B7B70">${msgs[pausedState] || 'Your rest session is paused.'}</span>`;
+    setPhoneState('work-interrupt');
+  }
+}
+
+function resumeRest() {
+  if (pausedState) setPhoneState(pausedState);
+  else setPhoneState('suggestions');
+  // Restart audio if we were on activity
+  if (pausedState === 'activity') {
+    const musicCard = document.getElementById('pbar') || document.getElementById('ppbar');
+    if (musicCard) { ambientPlayer = new AmbientPlayer(); ambientPlayer.start(); }
+  }
+}
+
+function acceptWork() {
+  setPhoneState('idle');
+  pausedState = null;
+}
+
+/* ─── HELPERS ───────────────────────────────────── */
+function clearTimers() {
+  [walkInt, teaInt, playerInt, genTimer, stretchIntv].forEach(t => t && clearInterval(t));
+  walkInt = teaInt = playerInt = genTimer = stretchIntv = null;
+  if (ambientPlayer) { ambientPlayer.stop(); ambientPlayer = null; }
+}
+
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ─── RESET ─────────────────────────────────────── */
+function resetDemo() {
+  clearTimers(); // also stops audio
+  if (gentleTimer) { clearTimeout(gentleTimer); gentleTimer = null; }
+  appsOpen = ['slack','gmail'];
+  pausedState = null;
+  ['slack','gmail'].forEach(a => {
+    const w = document.getElementById('win-' + a);
+    w.classList.remove('closing','closed');
+    w.style.transition = ''; w.style.opacity = ''; w.style.transform = '';
+  });
+  document.getElementById('desktop-notif').style.display = 'none';
+
+  // Restore notification card to default
+  const card = document.querySelector('#ps-notif .notif-card');
+  if (card) card.innerHTML = `
+    <div class="nc-header"><div class="nc-icon">T</div><span class="nc-app">TRANSITION</span><span class="nc-time">now</span></div>
+    <div class="nc-title">Last work app closed.</div>
+    <div class="nc-body" id="notif-body">You've been in work mode all day. Let me help you switch.</div>
+    <div class="nc-actions">
+      <button class="nc-btn nc-primary" onclick="openTransition()">Let's go →</button>
+      <button class="nc-btn nc-ghost" onclick="scrollAnyway()">Not now</button>
+    </div>`;
+
+  updateCounter();
+  setPhoneState('idle');
+}
+
+/* ─── DESIGN NOTES PANEL ────────────────────────── */
+function toggleAnns() {
+  annsOn = !annsOn;
+  document.getElementById('notes-panel').classList.toggle('open', annsOn);
+  const btn = document.getElementById('ann-btn');
+  btn.textContent = annsOn ? '✕ Close notes' : '⚑ Design notes';
+  btn.classList.toggle('shifted', annsOn);
+}
+
+/* ─── WEB AUDIO AMBIENT PLAYER ──────────────────── */
+class AmbientPlayer {
+  constructor() { this.ctx = null; this.nodes = []; this.timer = null; this.step = 0; }
+
+  start() {
+    try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { console.warn('Web Audio not supported'); return; }
+
+    // Am pentatonic chord progression (relaxing, no tension)
+    this.progressions = [
+      [110, 220, 261.63, 329.63],   // Am  A2+A3+C4+E4
+      [87.31, 174.61, 220, 261.63], // F   F2+F3+A3+C4
+      [130.81, 261.63, 329.63, 392],// C   C3+C4+E4+G4
+      [98, 196, 246.94, 329.63],    // G   G2+G3+B3+E4
+    ];
+    this._playChord();
+    this.timer = setInterval(() => this._playChord(), 5000);
+  }
+
+  _playChord() {
+    const ctx = this.ctx; if (!ctx) return;
+    // Fade out old nodes
+    this.nodes.forEach(({ gain }) => {
+      try { gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.2); } catch(e){}
+    });
+    const old = this.nodes; this.nodes = [];
+    setTimeout(() => old.forEach(({ osc }) => { try { osc.stop(); } catch(e){} }), 1400);
+
+    // Play new chord
+    const chord = this.progressions[this.step % this.progressions.length];
+    this.step++;
+
+    // Master gain with soft attack
+    const master = ctx.createGain();
+    master.gain.value = 0;
+    master.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 1.5);
+    master.connect(ctx.destination);
+
+    chord.forEach((freq, i) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      // Slight detuning for warmth
+      osc.detune.value = (i % 2 === 0 ? -3 : 3);
+      // Volume shape: quieter at extremes
+      gain.gain.value = i === 0 ? 0.12 : i === chord.length-1 ? 0.07 : 0.09;
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start();
+      this.nodes.push({ osc, gain });
+    });
+  }
+
+  stop() {
+    if (this.timer) { clearInterval(this.timer); this.timer = null; }
+    const ctx = this.ctx;
+    if (!ctx) return;
+    this.nodes.forEach(({ osc, gain }) => {
+      try { gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.6); } catch(e){}
+    });
+    const old = this.nodes; this.nodes = [];
+    setTimeout(() => {
+      old.forEach(({ osc }) => { try { osc.stop(); } catch(e){} });
+      try { ctx.close(); } catch(e){}
+    }, 800);
+    this.ctx = null;
+  }
+}
+
+let ambientPlayer = null;
 </script>
 </body>
 </html>
