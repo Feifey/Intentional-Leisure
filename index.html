@@ -1127,8 +1127,8 @@
 
         <!-- NOTIFICATION -->
         <div class="phone-state hidden" id="ps-notif">
-          <div class="phone-status" style="background:#F0EDE8">
-            <span>5:03</span>
+          <div class="phone-status" style="background:var(--ph-bg)">
+            <span class="ph-time">5:03</span>
             <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
           </div>
           <div style="flex:1;padding-top:8px">
@@ -1150,8 +1150,8 @@
 
         <!-- THINKING -->
         <div class="phone-state hidden" id="ps-thinking">
-          <div class="phone-status" style="background:#F0EDE8">
-            <span>5:03</span>
+          <div class="phone-status" style="background:var(--ph-bg)">
+            <span class="ph-time">5:03</span>
             <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
           </div>
           <div class="pb-wrap">
@@ -1164,14 +1164,14 @@
 
         <!-- SUGGESTIONS -->
         <div class="phone-state hidden" id="ps-suggestions" style="overflow-y:auto">
-          <div class="phone-status" style="background:#F0EDE8;position:sticky;top:0;z-index:5">
-            <span>5:03</span>
+          <div class="phone-status" style="background:var(--ph-bg);position:sticky;top:0;z-index:5">
+            <span class="ph-time">5:03</span>
             <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
           </div>
           <div style="padding:0 11px 11px;flex:1;overflow-y:auto" id="sug-wrap">
             <div class="p-hdr">
               <span class="hlabel" style="top:-8px;right:0">Memory Awareness</span>
-              <div class="p-hdr-time">5:03 PM · WEDNESDAY</div>
+              <div class="p-hdr-time ph-time-full">5:03 PM · WEDNESDAY</div>
               <h3>You just finished work.</h3>
               <p class="p-ctx" id="p-ctx-text">You've closed everything. This is the window.</p>
             </div>
@@ -1185,8 +1185,8 @@
 
         <!-- ACTIVITY -->
         <div class="phone-state hidden" id="ps-activity">
-          <div class="phone-status" style="background:#F0EDE8;flex-shrink:0;z-index:5">
-            <span>5:03</span>
+          <div class="phone-status" style="background:var(--ph-bg);flex-shrink:0;z-index:5">
+            <span class="ph-time">5:03</span>
             <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
           </div>
           <div class="act-scroll"><div id="activity-content"></div></div>
@@ -1197,8 +1197,8 @@
 
         <!-- SCROLL-CHECK (intervention before scrolling) -->
         <div class="phone-state hidden" id="ps-scroll-check">
-          <div class="phone-status" style="background:#FDF8F2;flex-shrink:0">
-            <span>5:03</span>
+          <div class="phone-status" style="background:var(--ph-bg);flex-shrink:0">
+            <span class="ph-time">5:03</span>
             <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
           </div>
           <div class="sc-body">
@@ -1216,7 +1216,7 @@
         <!-- WORK INTERRUPT -->
         <div class="phone-state hidden" id="ps-work-interrupt">
           <div class="phone-status" style="background:#FDF8F2;flex-shrink:0">
-            <span>5:03</span>
+            <span class="ph-time">5:03</span>
             <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
           </div>
           <div class="wi-body">
@@ -1429,11 +1429,23 @@ function startDemo() {
 
 /* ─── CLOCK ─────────────────────────────────────── */
 function updateClock() {
-  const t = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  const s = t.replace(/ AM| PM/,'');
+  const t   = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const s   = t.replace(/ AM| PM/,'');
+  const day = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}).toUpperCase();
+
   document.getElementById('tb-time').textContent    = t;
   document.getElementById('idle-clock').textContent = s;
   document.getElementById('ps-clock').textContent   = s;
+
+  // Sync all phone status clocks
+  document.querySelectorAll('.ph-time').forEach(el => el.textContent = s);
+
+  // Sync the suggestions header time (e.g. "5:03 PM · WEDNESDAY")
+  document.querySelectorAll('.ph-time-full').forEach(el => {
+    const hour = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    const dow  = new Date().toLocaleDateString('en-US',{weekday:'long'}).toUpperCase();
+    el.textContent = hour + ' · ' + dow;
+  });
 }
 
 /* ─── CLOSE APP ─────────────────────────────────── */
@@ -1630,10 +1642,16 @@ function renderSuggestions(sugs) {
 
   // AI / demo mode badge
   const badge = document.createElement('div');
-  badge.style.cssText = `display:flex;align-items:center;gap:5px;margin-bottom:10px;font-size:0.62rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;`;
+  badge.style.cssText = lastSugsWereLive
+    ? `display:inline-flex;align-items:center;gap:6px;margin-bottom:12px;
+       background:#E8F2E4;border:1px solid #B0D4A8;border-radius:100px;
+       padding:5px 12px;font-size:0.7rem;font-weight:700;letter-spacing:.04em;`
+    : `display:inline-flex;align-items:center;gap:6px;margin-bottom:12px;
+       background:#F5F2EE;border:1px solid #E0D8D0;border-radius:100px;
+       padding:5px 12px;font-size:0.7rem;font-weight:600;letter-spacing:.04em;`;
   badge.innerHTML = lastSugsWereLive
-    ? `<span style="width:6px;height:6px;border-radius:50%;background:#5A8A5A;flex-shrink:0"></span><span style="color:#5A8A5A">Generated by AI for you</span>`
-    : `<span style="width:6px;height:6px;border-radius:50%;background:#aaa;flex-shrink:0"></span><span style="color:#aaa">Example suggestions — add a Groq key for live AI</span>`;
+    ? `<span style="width:7px;height:7px;border-radius:50%;background:#5A8A5A;flex-shrink:0;animation:blink-dot 1.5s ease-in-out infinite"></span><span style="color:#3A6A3A">AI generated for you</span>`
+    : `<span style="width:7px;height:7px;border-radius:50%;background:#C0B0A0;flex-shrink:0"></span><span style="color:#8A7A6A">Example mode — enter Groq key for live AI</span>`;
   list.appendChild(badge);
 
   sugs.forEach(s => {
