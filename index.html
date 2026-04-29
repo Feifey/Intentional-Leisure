@@ -590,8 +590,8 @@
     .dock-icon.clickable:hover { transform:translateY(-4px) scale(1.1); }
 
     /* ── ACTIVITY SCROLL FIX ──────────────────────── */
-    #ps-activity { overflow: hidden; }
-    .act-scroll  { flex:1; overflow-y:auto; padding:0 11px 6px; }
+    #ps-activity { padding:0 !important; align-items:stretch !important; overflow:hidden !important; }
+    .act-scroll  { flex:1; overflow-y:auto; padding:0 11px 6px; min-height:0; }
     .act-footer  { flex-shrink:0; padding:0 11px 11px; }
 
     /* ── WALK ──────────────────────────────────────── */
@@ -1712,6 +1712,7 @@ const DRAW_PROMPTS = [
 
 function renderDrawing(wrap) {
   const prompt = DRAW_PROMPTS[Math.floor(Math.random() * DRAW_PROMPTS.length)];
+  window._drawPrompt = prompt;
   const log    = JSON.parse(localStorage.getItem('draw_log') || '[]');
 
   wrap.innerHTML = `
@@ -1728,7 +1729,7 @@ function renderDrawing(wrap) {
       <button class="ct-btn"        id="ct-clear"  onclick="clearCanvas()">✕ Clear</button>
     </div>
     <textarea class="draw-note" id="draw-note" placeholder="What did you make? (optional note)"></textarea>
-    <button class="save-log-btn" onclick="saveDrawLog('${esc(prompt).replace(/'/g,"&#39;")}')">Save to my log →</button>
+    <button class="save-log-btn" onclick="saveDrawLog(window._drawPrompt)">Save to my log →</button>
     <button class="log-toggle" onclick="toggleDrawLog(this)">▸ Past entries (${log.length})</button>
     <div id="draw-log-list" style="display:none">
       ${log.length ? log.slice(-3).reverse().map(e=>`
@@ -1818,6 +1819,7 @@ const JOURNAL_PROMPTS = [
 function renderJournal(wrap) {
   wrap.innerHTML = purposeBanner('journal');
   const prompt = JOURNAL_PROMPTS[Math.floor(Math.random() * JOURNAL_PROMPTS.length)];
+  window._journalPrompt = prompt;
   const log    = JSON.parse(localStorage.getItem('journal_log') || '[]');
 
   wrap.innerHTML = `
@@ -1827,7 +1829,7 @@ function renderJournal(wrap) {
     </div>
     <textarea class="j-ta" id="j-ta" placeholder="Write here — no one reads this but you."></textarea>
     <div class="j-footer">
-      <button class="j-save" onclick="saveJournal('${esc(prompt).replace(/'/g,"&#39;")}')">Save entry →</button>
+      <button class="j-save" onclick="saveJournal(window._journalPrompt)">Save entry →</button>
       <button class="j-log-btn" onclick="showJournalLog()">Past (${log.length})</button>
     </div>
     <div id="j-log" style="display:none;margin-top:10px"></div>
