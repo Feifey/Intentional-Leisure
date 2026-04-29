@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #F0EDE8;
+      --surface:      #FFFFFF;
+      --fg:           #1A1917;
+      --muted:        #6B6560;
+      --border:       #E0DAD4;
+      --accent:       #4472A8;
+      --accent-light: #EBF2FA;
+      --accent-mid:   #C8DCEF;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+    }
+
+    /* ── VIEWS ──────────────────────────────────── */
+    .view { display: none; min-height: 100vh; flex-direction: column; }
+    .view.active { display: flex; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes breathe {
+      0%,100% { transform: scale(1);    opacity: 0.18; }
+      50%     { transform: scale(1.55); opacity: 0.45; }
+    }
+    @keyframes breathe-mid {
+      0%,100% { transform: scale(1);    opacity: 0.35; }
+      50%     { transform: scale(1.35); opacity: 0.65; }
+    }
+    @keyframes breathe-core {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.12); }
+    }
+
+    .anim { animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+
+    /* ── SETUP ──────────────────────────────────── */
+    #setup { align-items: center; justify-content: center; padding: 32px 20px; }
+
+    .setup-card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 32px 28px 28px;
+      max-width: 430px; width: 100%;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.04);
+      animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .setup-eyebrow {
+      font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 7px;
+    }
+
+    .setup-card h2 {
+      font-size: 1.25rem; font-weight: 600;
+      letter-spacing: -0.02em; margin-bottom: 5px;
+    }
+
+    .setup-card .desc {
+      font-size: 0.82rem; color: var(--muted);
+      line-height: 1.6; margin-bottom: 24px;
+    }
+
+    .q-label {
+      font-size: 0.77rem; font-weight: 500;
+      color: var(--fg); margin-bottom: 9px;
+    }
+    .q-label span { font-weight: 300; color: var(--muted); }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+
+    .chip {
+      padding: 6px 13px;
+      background: #F5F2EE; border: 1px solid var(--border);
+      border-radius: 100px;
+      font-family: 'Inter', sans-serif; font-size: 0.78rem;
+      color: var(--fg); cursor: pointer;
+      transition: all 0.13s; user-select: none;
+    }
+    .chip:hover  { border-color: var(--accent); background: var(--accent-light); }
+    .chip.on     { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .chip.single.on { background: var(--accent); }
+
+    .field-input {
+      width: 100%; padding: 9px 12px;
+      border: 1px solid var(--border); border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 0.83rem;
+      color: var(--fg); background: #FAFAF8;
+      outline: none; transition: border-color 0.15s; margin-top: 4px;
+    }
+    .field-input:focus { border-color: var(--accent); background: #fff; }
+    .field-input::placeholder { color: #C4BCBA; }
+
+    .divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+    /* memory preview box */
+    .mem-preview {
+      background: var(--accent-light);
+      border: 1px solid var(--accent-mid);
+      border-radius: 8px;
+      padding: 11px 14px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .mem-preview-label {
+      font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 5px;
+    }
+    .mem-preview p { font-size: 0.77rem; color: var(--muted); line-height: 1.55; }
+
+    .api-label {
+      font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px; display: block;
+    }
+    .key-note { font-size: 0.67rem; color: #bbb; margin-top: 5px; }
+    .key-note a { color: var(--muted); }
+
+    .btn-primary {
+      width: 100%; padding: 12px;
+      background: var(--fg); color: #fff;
+      border: none; border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 500;
+      cursor: pointer; transition: opacity 0.15s; margin-top: 6px;
+    }
+    .btn-primary:hover { opacity: 0.82; }
+
+    /* ── HOME ───────────────────────────────────── */
+    #home { align-items: center; justify-content: center; padding: 40px 24px; text-align: center; }
+    .home-inner { max-width: 340px; width: 100%; animation: fadeUp 0.6s ease both; }
+
+    .home-eyebrow {
+      font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--muted); opacity: 0.55; margin-bottom: 14px;
+    }
+
+    .home-inner h1 {
+      font-size: 2rem; font-weight: 300;
+      letter-spacing: -0.04em; line-height: 1.1;
+      color: var(--fg); margin-bottom: 8px;
+    }
+
+    .home-inner .sub {
+      font-size: 0.83rem; color: var(--muted);
+      margin-bottom: 36px; line-height: 1.6;
+    }
+
+    .big-btn {
+      width: 100%; padding: 17px;
+      background: var(--fg); color: #fff;
+      border: none; border-radius: 12px;
+      font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 500;
+      cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+      letter-spacing: -0.01em; margin-bottom: 18px;
+    }
+    .big-btn:hover  { opacity: 0.88; transform: translateY(-1px); }
+    .big-btn:active { transform: translateY(0); }
+
+    .home-links { display: flex; justify-content: center; gap: 18px; }
+
+    .ghost-btn {
+      background: none; border: none;
+      font-family: 'Inter', sans-serif; font-size: 0.76rem;
+      color: var(--muted); cursor: pointer;
+      text-decoration: underline; text-underline-offset: 2px; opacity: 0.55;
+    }
+    .ghost-btn:hover { opacity: 1; }
+
+    /* ── INTERSTITIAL ───────────────────────────── */
+    #interstitial {
+      align-items: center; padding: 36px 20px 80px;
+      overflow-y: auto; justify-content: flex-start;
+    }
+
+    .intl-inner { max-width: 430px; width: 100%; margin: 0 auto; }
+
+    /* breathing animation */
+    #thinking {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 62vh; gap: 22px;
+    }
+
+    .breath-wrap { position: relative; width: 88px; height: 88px; }
+
+    .b-outer {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: var(--accent); animation: breathe 3.5s ease-in-out infinite;
+    }
+    .b-mid {
+      position: absolute; inset: 14px; border-radius: 50%;
+      background: var(--accent); animation: breathe-mid 3.5s ease-in-out infinite;
+    }
+    .b-core {
+      position: absolute; inset: 28px; border-radius: 50%;
+      background: var(--accent); animation: breathe-core 3.5s ease-in-out infinite;
+    }
+
+    .thinking-label {
+      font-size: 0.8rem; color: var(--muted); letter-spacing: 0.04em;
+    }
+
+    /* suggestions */
+    #results { display: none; }
+
+    .intl-header { margin-bottom: 22px; animation: fadeUp 0.5s ease both; position: relative; }
+
+    .intl-time {
+      font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 5px;
+    }
+
+    .intl-header h2 {
+      font-size: 1.2rem; font-weight: 500;
+      letter-spacing: -0.02em; margin-bottom: 4px;
+    }
+
+    .intl-context {
+      font-size: 0.8rem; color: var(--muted); line-height: 1.5;
+    }
+
+    .suggestions { display: flex; flex-direction: column; gap: 11px; margin-bottom: 22px; }
+
+    .sug-card {
+      background: var(--surface);
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px 16px 13px;
+      cursor: pointer; position: relative;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .sug-card:nth-child(2) { animation-delay: 0.07s; }
+    .sug-card:nth-child(3) { animation-delay: 0.14s; }
+    .sug-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 2px 14px rgba(68,114,168,0.12);
+      transform: translateY(-1px);
+    }
+
+    .sug-activity {
+      font-size: 0.93rem; font-weight: 600;
+      letter-spacing: -0.01em; margin-bottom: 8px;
+    }
+
+    .sug-because {
+      font-size: 0.75rem; line-height: 1.5;
+      color: var(--accent);
+      background: var(--accent-light);
+      border-radius: 6px; padding: 6px 9px;
+      margin-bottom: 9px; position: relative;
+    }
+    .sug-because::before {
+      content: 'because '; font-weight: 700;
+    }
+
+    .sug-start {
+      font-size: 0.74rem; color: var(--muted); line-height: 1.4;
+    }
+    .sug-start::before { content: '→ '; }
+
+    /* escape hatch */
+    .escape {
+      text-align: center; padding: 10px 0 2px;
+      animation: fadeIn 0.5s 0.25s ease both;
+      opacity: 0; animation-fill-mode: forwards;
+      position: relative;
+    }
+    .escape-btn {
+      background: none; border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem; color: var(--muted);
+      cursor: pointer; text-decoration: underline;
+      text-underline-offset: 2px; opacity: 0.55;
+    }
+    .escape-btn:hover { opacity: 1; }
+    .escape-note {
+      font-size: 0.67rem; color: var(--muted);
+      opacity: 0.35; margin-top: 4px;
+    }
+
+    /* chosen state */
+    .chosen-card {
+      background: var(--surface);
+      border: 1px solid var(--accent-mid);
+      border-radius: 12px; padding: 28px 20px;
+      text-align: center;
+      animation: fadeUp 0.4s ease both;
+    }
+    .chosen-check { font-size: 1.5rem; margin-bottom: 10px; }
+    .chosen-title {
+      font-size: 1rem; font-weight: 600;
+      letter-spacing: -0.01em; margin-bottom: 6px;
+    }
+    .chosen-sub { font-size: 0.78rem; color: var(--muted); }
+
+    /* ── MEMORY ─────────────────────────────────── */
+    #memory { align-items: center; padding: 36px 20px; }
+    .mem-inner { max-width: 430px; width: 100%; animation: fadeUp 0.5s ease both; }
+
+    .mem-back {
+      background: none; border: none;
+      font-family: 'Inter', sans-serif; font-size: 0.76rem;
+      color: var(--muted); cursor: pointer; margin-bottom: 16px;
+      display: block; opacity: 0.6;
+    }
+    .mem-back:hover { opacity: 1; }
+
+    .mem-inner h2 {
+      font-size: 1.2rem; font-weight: 600;
+      letter-spacing: -0.02em; margin-bottom: 4px;
+    }
+    .mem-inner .sub {
+      font-size: 0.81rem; color: var(--muted);
+      margin-bottom: 22px; line-height: 1.5;
+    }
+
+    .mem-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 15px 18px; margin-bottom: 10px;
+    }
+    .mem-section-label {
+      font-size: 0.62rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px;
+    }
+    .mem-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 6px 0; border-bottom: 1px solid var(--border);
+    }
+    .mem-row:last-child { border-bottom: none; }
+    .mem-row-text { font-size: 0.83rem; }
+    .mem-del {
+      background: none; border: none;
+      font-size: 0.72rem; color: #C0B9B4;
+      cursor: pointer; padding: 2px 6px;
+      transition: color 0.13s;
+    }
+    .mem-del:hover { color: #C87070; }
+    .mem-empty { font-size: 0.78rem; color: var(--muted); opacity: 0.5; }
+
+    .btn-danger {
+      width: 100%; padding: 11px;
+      background: transparent; color: #B06060;
+      border: 1px solid #E0C8C8; border-radius: 8px;
+      font-family: 'Inter', sans-serif; font-size: 0.81rem;
+      cursor: pointer; transition: background 0.15s; margin-top: 6px;
+    }
+    .btn-danger:hover { background: #FDF2F2; }
+
+    /* ── HEURISTIC ANNOTATIONS (presentation mode) ── */
+    .ann {
+      display: none;
+      position: absolute;
+      background: #1A1917; color: #fff;
+      font-size: 0.58rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 100px;
+      white-space: nowrap; pointer-events: none; z-index: 50;
+    }
+
+    body.show-ann .ann { display: block; }
+
+    .ann-toggle {
+      position: fixed; bottom: 18px; right: 18px;
+      background: var(--fg); color: #fff;
+      border: none; border-radius: 100px;
+      padding: 8px 15px;
+      font-family: 'Inter', sans-serif; font-size: 0.71rem; font-weight: 500;
+      cursor: pointer; letter-spacing: 0.02em;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.18); z-index: 200;
+      transition: opacity 0.15s;
+    }
+    .ann-toggle:hover { opacity: 0.82; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════
+     SETUP VIEW
+════════════════════════════════════════════════ -->
+<div id="setup" class="view">
+  <div class="setup-card" style="margin:auto">
+
+    <div class="setup-eyebrow">Before we begin</div>
+    <h2>What do you know about yourself?</h2>
+    <p class="desc">Your answers shape every suggestion I make. I'll show you exactly what I store — and why.</p>
+
+    <!-- Q1 -->
+    <div class="q-label">What usually helps you decompress after work? <span>(pick all that apply)</span></div>
+    <div class="chips" id="c-decompress"></div>
+    <input class="field-input" id="i-decompress" placeholder="Something else? Add it…" />
+
+    <div class="divider"></div>
+
+    <!-- Q2 -->
+    <div class="q-label">What do you tend to reach for when tired, but regret after?</div>
+    <div class="chips" id="c-regret"></div>
+    <input class="field-input" id="i-regret" placeholder="Something else?" />
+
+    <div class="divider"></div>
+
+    <!-- Q3 -->
+    <div class="q-label">What time do you usually finish work?</div>
+    <div class="chips" id="c-time"></div>
+
+    <div class="divider"></div>
+
+    <!-- Memory preview — Memory Awareness annotation -->
+    <div class="mem-preview" style="position:relative">
+      <span class="ann" style="top:-10px;right:0">↑ Memory Awareness</span>
+      <div class="mem-preview-label">What I'll remember</div>
+      <p id="preview-text">Select answers above to see what gets stored.</p>
+    </div>
+
+    <!-- API key -->
+    <label class="api-label">Groq API Key</label>
+    <input type="password" class="field-input" id="api-key" placeholder="gsk_…" />
+    <p class="key-note">Free at <a href="https://console.groq.com" target="_blank">console.groq.com</a> — stored only in this browser.</p>
+
+    <button class="btn-primary" onclick="saveAndStart()">Save my profile →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     HOME VIEW
+════════════════════════════════════════════════ -->
+<div id="home" class="view">
+  <div class="home-inner" style="margin:auto">
+    <!-- Capability Discovery annotation -->
+    <div style="position:relative;display:inline-block;margin-bottom:14px">
+      <span class="ann" style="top:-8px;right:-8px">Capability Discovery</span>
+      <div class="home-eyebrow">Transition</div>
+    </div>
+
+    <h1>Done for<br>today?</h1>
+    <p class="sub">I help you switch from work mode to rest mode.<br>That's all I do.</p>
+
+    <button class="big-btn" onclick="startTransition()">I just finished work</button>
+
+    <div class="home-links">
+      <!-- Memory Awareness annotation -->
+      <span style="position:relative">
+        <span class="ann" style="top:-18px;left:0">Memory Awareness</span>
+        <button class="ghost-btn" onclick="showView('memory')">What do you know about me?</button>
+      </span>
+      <button class="ghost-btn" onclick="showView('setup')">Edit my profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     INTERSTITIAL VIEW
+════════════════════════════════════════════════ -->
+<div id="interstitial" class="view">
+  <div class="intl-inner">
+
+    <!-- THINKING STATE -->
+    <div id="thinking">
+      <!-- Latency Tolerance annotation -->
+      <div style="position:relative">
+        <span class="ann" style="top:-10px;right:-90px">Latency Tolerance</span>
+        <div class="breath-wrap">
+          <div class="b-outer"></div>
+          <div class="b-mid"></div>
+          <div class="b-core"></div>
+        </div>
+      </div>
+      <p class="thinking-label">Taking a moment…</p>
+    </div>
+
+    <!-- RESULTS STATE -->
+    <div id="results">
+
+      <!-- Context header -->
+      <div class="intl-header">
+        <div class="intl-time" id="r-time"></div>
+        <h2>You just finished work.</h2>
+        <p class="intl-context" id="r-context"></p>
+      </div>
+
+      <!-- Suggestion cards -->
+      <div class="suggestions" id="r-suggestions"></div>
+
+      <!-- Escape hatch — Trust Calibration annotation -->
+      <div class="escape" style="position:relative">
+        <span class="ann" style="top:-10px;right:0">Trust Calibration</span>
+        <button class="escape-btn" onclick="goHome()">I'll scroll anyway</button>
+        <p class="escape-note">That's okay. I'll be here next time.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     MEMORY VIEW
+════════════════════════════════════════════════ -->
+<div id="memory" class="view">
+  <div class="mem-inner">
+    <button class="mem-back" onclick="showView('home')">← Back</button>
+    <h2>What I know about you</h2>
+    <p class="sub">Everything I use when making suggestions.<br>Edit or delete anything — your call.</p>
+    <div id="mem-content"></div>
+    <button class="btn-danger" onclick="clearAll()">Clear everything and start over</button>
+  </div>
+</div>
+
+<!-- Presentation toggle -->
+<button class="ann-toggle" id="ann-btn" onclick="toggleAnns()">⚑ Design notes</button>
+
+<script>
+/* ─── DATA ───────────────────────────────────────────── */
+const D_OPTS  = ['A walk','Reading','Music','Tea or coffee','Stretching','Drawing','Journaling','A bath'];
+const R_OPTS  = ['Instagram','TikTok','YouTube Shorts','Twitter / X','Reddit','News sites'];
+const T_OPTS  = ['4pm','5pm','6pm','7pm','8pm+','It varies'];
+
+let profile = { decompress:[], regret:[], finishTime:'', extraDecompress:'', extraRegret:'' };
+let apiKey  = '';
+let annsOn  = false;
+
+/* ─── INIT ───────────────────────────────────────────── */
+window.addEventListener('load', () => {
+  buildChips('c-decompress', D_OPTS, 'multi', v => toggleArr(profile.decompress, v));
+  buildChips('c-regret',     R_OPTS, 'multi', v => toggleArr(profile.regret, v));
+  buildChips('c-time',       T_OPTS, 'single', v => { profile.finishTime = v; });
+
+  const k = localStorage.getItem('il_key') || '';
+  if (k) document.getElementById('api-key').value = k;
+
+  document.getElementById('i-decompress').oninput = updatePreview;
+  document.getElementById('i-regret').oninput     = updatePreview;
+
+  const saved = localStorage.getItem('tr_profile');
+  if (saved) {
+    profile = JSON.parse(saved);
+    apiKey  = localStorage.getItem('il_key') || '';
+    showView('home');
+  } else {
+    showView('setup');
+  }
+});
+
+/* ─── CHIP BUILDER ───────────────────────────────────── */
+function buildChips(id, opts, mode, onToggle) {
+  const wrap = document.getElementById(id);
+  opts.forEach(opt => {
+    const b = document.createElement('button');
+    b.className   = 'chip' + (mode === 'single' ? ' single' : '');
+    b.textContent = opt;
+    // Re-highlight if previously saved
+    if (mode === 'multi'   && profile.decompress?.includes(opt)) b.classList.add('on');
+    if (mode === 'multi'   && profile.regret?.includes(opt))     b.classList.add('on');
+    if (mode === 'single'  && profile.finishTime === opt)        b.classList.add('on');
+
+    b.onclick = () => {
+      if (mode === 'single') {
+        wrap.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+        b.classList.toggle('on');
+        profile.finishTime = b.classList.contains('on') ? opt : '';
+      } else {
+        b.classList.toggle('on');
+        onToggle(opt);
+      }
+      updatePreview();
+    };
+    wrap.appendChild(b);
+  });
+}
+
+function toggleArr(arr, val) {
+  const i = arr.indexOf(val);
+  i > -1 ? arr.splice(i, 1) : arr.push(val);
+}
+
+/* ─── MEMORY PREVIEW ─────────────────────────────────── */
+function updatePreview() {
+  const d = [...profile.decompress, ...document.getElementById('i-decompress').value.trim().split(',').map(s=>s.trim()).filter(Boolean)];
+  const r = [...profile.regret,     ...document.getElementById('i-regret').value.trim().split(',').map(s=>s.trim()).filter(Boolean)];
+  const t = profile.finishTime;
+  const parts = [];
+  if (d.length) parts.push(`Helps: ${d.join(', ')}`);
+  if (r.length) parts.push(`Avoid: ${r.join(', ')}`);
+  if (t)        parts.push(`Finish: ${t}`);
+  document.getElementById('preview-text').textContent =
+    parts.length ? parts.join(' · ') : 'Select answers above to see what gets stored.';
+}
+
+/* ─── SAVE ───────────────────────────────────────────── */
+function saveAndStart() {
+  const ed = document.getElementById('i-decompress').value.trim();
+  const er = document.getElementById('i-regret').value.trim();
+  if (ed) ed.split(',').map(s=>s.trim()).filter(Boolean).forEach(v => { if (!profile.decompress.includes(v)) profile.decompress.push(v); });
+  if (er) er.split(',').map(s=>s.trim()).filter(Boolean).forEach(v => { if (!profile.regret.includes(v)) profile.regret.push(v); });
+
+  apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) { alert('Please enter your Groq API key.'); return; }
+
+  localStorage.setItem('il_key', apiKey);
+  localStorage.setItem('tr_profile', JSON.stringify(profile));
+  showView('home');
+}
+
+/* ─── VIEWS ──────────────────────────────────────────── */
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  if (name === 'memory') renderMemory();
+  window.scrollTo(0, 0);
+}
+
+function goHome() { showView('home'); }
+
+/* ─── TRANSITION ─────────────────────────────────────── */
+async function startTransition() {
+  showView('interstitial');
+  document.getElementById('thinking').style.display = 'flex';
+  document.getElementById('results').style.display  = 'none';
+
+  const timeStr = new Date().toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+
+  try {
+    const data = await fetchSuggestions(timeStr);
+    showResults(data, timeStr);
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+/* ─── GROQ API ───────────────────────────────────────── */
+async function fetchSuggestions(timeStr) {
+  const profileContext = buildProfileContext();
+
+  const system = `You are a calm, perceptive guide helping someone transition from work to rest right now.
+
+User profile:
+${profileContext}
+
+Generate 2-3 transition suggestions. Rules:
+- Each must be immediately startable — under 10 seconds to begin
+- Each must reference something specific from the user's profile
+- Never suggest anything from their "regret" list
+- Require no planning, no other people, no setup
+
+Respond ONLY in valid JSON, nothing else before or after:
+{
+  "context": "One warm sentence (under 15 words) acknowledging this specific transition moment",
+  "suggestions": [
+    {
+      "activity": "Specific activity name, 5–8 words max",
+      "because": "One sentence citing exactly what from their profile makes this right now",
+      "start": "The single first physical action to take"
+    }
+  ]
+}`;
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role:'system', content: system },
+        { role:'user',   content: `It's ${timeStr}. I just finished work. What should I do right now instead of scrolling?` }
+      ],
+      temperature: 0.75,
+      max_tokens: 500
+    })
+  });
+
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    throw new Error(e.error?.message || `HTTP ${res.status}`);
+  }
+
+  const data  = await res.json();
+  const reply = data.choices?.[0]?.message?.content?.trim() || '';
+  const match = reply.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('Response was not valid JSON');
+  return JSON.parse(match[0]);
+}
+
+function buildProfileContext() {
+  const lines = [];
+  if (profile.decompress?.length) lines.push(`What helps them decompress: ${profile.decompress.join(', ')}`);
+  if (profile.regret?.length)     lines.push(`What they regret reaching for: ${profile.regret.join(', ')}`);
+  if (profile.finishTime)         lines.push(`Usual finish time: ${profile.finishTime}`);
+  return lines.length ? lines.join('\n') : '(No profile data — make general suggestions)';
+}
+
+/* ─── RENDER RESULTS ─────────────────────────────────── */
+function showResults(data, timeStr) {
+  document.getElementById('thinking').style.display = 'none';
+  document.getElementById('results').style.display  = 'block';
+
+  document.getElementById('r-time').textContent    = timeStr;
+  document.getElementById('r-context').textContent = data.context || '';
+
+  const list = document.getElementById('r-suggestions');
+  list.innerHTML = '';
+
+  (data.suggestions || []).forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'sug-card';
+    card.style.animationDelay = `${i * 0.09}s`;
+    card.innerHTML = `
+      <span class="ann" style="top:-9px;right:0">Transparency</span>
+      <div class="sug-activity">${escHtml(s.activity)}</div>
+      <div class="sug-because">${escHtml(s.because)}</div>
+      <div class="sug-start">${escHtml(s.start)}</div>`;
+    card.onclick = () => chooseActivity(s.activity);
+    list.appendChild(card);
+  });
+}
+
+function showError(msg) {
+  document.getElementById('thinking').style.display = 'none';
+  document.getElementById('results').style.display  = 'block';
+  document.getElementById('r-context').textContent  = `Something went wrong: ${msg}`;
+}
+
+function chooseActivity(name) {
+  const list = document.getElementById('r-suggestions');
+  list.innerHTML = `
+    <div class="chosen-card">
+      <div class="chosen-check">✓</div>
+      <div class="chosen-title">Enjoy your ${escHtml(name.toLowerCase())}.</div>
+      <div class="chosen-sub">Come back tomorrow.</div>
+    </div>`;
+  document.querySelector('.escape').style.display = 'none';
+  setTimeout(goHome, 2800);
+}
+
+function escHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ─── MEMORY VIEW ────────────────────────────────────── */
+function renderMemory() {
+  const el = document.getElementById('mem-content');
+  el.innerHTML = '';
+
+  [
+    { label:'What helps you decompress', key:'decompress' },
+    { label:'What you tend to regret',   key:'regret'    },
+  ].forEach(({ label, key }) => {
+    const sec  = document.createElement('div');
+    sec.className = 'mem-section';
+    sec.innerHTML = `<div class="mem-section-label">${label}</div>`;
+    const items = profile[key] || [];
+    if (!items.length) {
+      sec.innerHTML += `<p class="mem-empty">Nothing stored yet.</p>`;
+    } else {
+      items.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'mem-row';
+        row.innerHTML = `
+          <span class="mem-row-text">${escHtml(item)}</span>
+          <button class="mem-del" onclick="deleteMemItem('${key}',${idx})">remove</button>`;
+        sec.appendChild(row);
+      });
+    }
+    el.appendChild(sec);
+  });
+
+  if (profile.finishTime) {
+    const sec = document.createElement('div');
+    sec.className = 'mem-section';
+    sec.innerHTML = `
+      <div class="mem-section-label">Usual finish time</div>
+      <div class="mem-row">
+        <span class="mem-row-text">${escHtml(profile.finishTime)}</span>
+        <button class="mem-del" onclick="deleteMemItem('finishTime')">remove</button>
+      </div>`;
+    el.appendChild(sec);
+  }
+}
+
+function deleteMemItem(key, idx) {
+  if (key === 'finishTime') profile.finishTime = '';
+  else profile[key].splice(idx, 1);
+  localStorage.setItem('tr_profile', JSON.stringify(profile));
+  renderMemory();
+}
+
+function clearAll() {
+  if (!confirm('Clear everything and start over?')) return;
+  localStorage.removeItem('tr_profile');
+  profile = { decompress:[], regret:[], finishTime:'' };
+  showView('setup');
+}
+
+/* ─── ANNOTATIONS ────────────────────────────────────── */
+function toggleAnns() {
+  annsOn = !annsOn;
+  document.body.classList.toggle('show-ann', annsOn);
+  document.getElementById('ann-btn').textContent = annsOn ? '✕ Hide notes' : '⚑ Design notes';
+}
+</script>
+</body>
+</html>
