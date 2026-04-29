@@ -1282,9 +1282,11 @@ async function fetchLiveSuggestions() {
     return buildSuggestions(); // fallback to pre-set
   }
 
+  const chosen = demoProfile.decompress.length ? demoProfile.decompress : ['A walk','Music','Tea'];
+  const count  = chosen.length;
   const profile = [
-    demoProfile.decompress.length ? `What helps them decompress: ${demoProfile.decompress.join(', ')}` : '',
-    demoProfile.regret.length     ? `What they tend to regret: ${demoProfile.regret.join(', ')}`       : '',
+    `What YOU said helps you decompress (generate one for EACH): ${chosen.join(', ')}`,
+    demoProfile.regret.length ? `What YOU regret reaching for (never suggest): ${demoProfile.regret.join(', ')}` : '',
   ].filter(Boolean).join('\n') || 'No profile provided — make 3 general suggestions.';
 
   const VALID_TYPES = ['walk','music','podcast','drawing','journal','reading','stretch','tea','bath'];
@@ -1294,18 +1296,24 @@ async function fetchLiveSuggestions() {
 User profile:
 ${profile}
 
-Generate exactly 3 personalized transition suggestions. Rules:
-- Each must be specific and immediately startable (under 10 seconds to begin)
-- Each "because" must quote something from their profile using their exact words
-- Never suggest anything from their regret list
-- Pick the most fitting type for each from this exact list: ${VALID_TYPES.join(', ')}
+Generate exactly ${count} suggestions — one for each activity in their decompress list. Do not skip any.
+
+Rules:
+- Be specific and immediately startable (under 10 seconds to begin)
+- Write "because" in second person: use "you said" or "you listed", NEVER "they" or "them"
+- The because must use the user's own words, not paraphrase them
+- Do not suggest anything from the regret list
+- Choose type from: ${VALID_TYPES.join(', ')}
+
+Good because: "you said walks help you decompress — and this gets you away from your screen"
+Bad because: "A walk helps them decompress" — too generic, wrong person
 
 Respond ONLY in valid JSON, no other text:
 {
   "suggestions": [
     {
       "activity": "Short specific activity name, 6 words max",
-      "because": "One sentence quoting their exact profile words",
+      "because": "One sentence using you/your, quoting their exact words from the profile",
       "start": "Single first physical action to take",
       "type": "one of: ${VALID_TYPES.join('|')}"
     }
@@ -1326,7 +1334,7 @@ Respond ONLY in valid JSON, no other text:
           { role: 'user',   content: `It's ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}. I just finished work.` }
         ],
         temperature: 0.8,
-        max_tokens:  500
+        max_tokens:  1000
       })
     });
 
