@@ -526,6 +526,55 @@
     .bath-chip.on { background:#4472A8; border-color:#4472A8; color:#fff; }
     .bath-no-phone { background:#1A1917; color:#fff; border:none; border-radius:10px; padding:12px; width:100%; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; margin-top:4px; }
 
+    /* ── TEA ANIMATION ──────────────────────────── */
+    .tea-scene      { display:flex; flex-direction:column; align-items:center; margin:10px 0 6px; position:relative; }
+    .steam-row      { display:flex; gap:8px; height:36px; align-items:flex-end; margin-bottom:2px; }
+    .wisp           { width:5px; border-radius:10px; background:linear-gradient(to top,rgba(180,160,140,.55),transparent); animation:wisp-up 2.2s ease-in-out infinite; transform-origin:bottom center; }
+    .wisp.w1        { height:22px; animation-delay:0s; }
+    .wisp.w2        { height:30px; animation-delay:.55s; }
+    .wisp.w3        { height:18px; animation-delay:1.1s; }
+    .wisp.w4        { height:26px; animation-delay:1.65s; }
+    @keyframes wisp-up {
+      0%   { opacity:0;   transform:translateY(0) scaleX(1); }
+      20%  { opacity:.65; }
+      60%  { opacity:.28; transform:translateY(-16px) scaleX(1.9); }
+      100% { opacity:0;   transform:translateY(-32px) scaleX(.5); }
+    }
+    .tea-mug        { width:68px; height:60px; background:#fff; border:2.5px solid #C4A882; border-radius:5px 5px 16px 16px; position:relative; overflow:hidden; box-shadow:0 3px 10px rgba(180,140,100,.14); }
+    .mug-handle     { position:absolute; right:-14px; top:11px; width:14px; height:24px; border:2.5px solid #C4A882; border-left:none; border-radius:0 10px 10px 0; }
+    .tea-liquid     { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top,#A8521C,#C87830,#E0A040); height:0%; transition:height 2.8s cubic-bezier(.4,0,.2,1); border-radius:0 0 13px 13px; }
+    .mug-bubbles    { position:absolute; bottom:0; left:0; right:0; height:10px; }
+    .mbubble        { position:absolute; bottom:2px; border-radius:50%; background:rgba(255,255,255,.45); animation:mbub 2.8s ease-in-out infinite; }
+    .mb1            { width:5px; height:5px; left:10px; animation-delay:.2s; }
+    .mb2            { width:4px; height:4px; left:26px; animation-delay:.9s; }
+    .mb3            { width:6px; height:6px; left:44px; animation-delay:1.7s; }
+    @keyframes mbub { 0%,100%{opacity:.45;transform:scale(1)} 50%{opacity:.8;transform:scale(1.15) translateY(-1px)} }
+    .tea-saucer     { width:90px; height:11px; background:linear-gradient(to bottom,#C4A882,#A88860); border-radius:50%; margin-top:2px; box-shadow:0 3px 8px rgba(0,0,0,.09); }
+    .tea-phase-text { font-size:0.67rem; color:#8B7B70; font-style:italic; margin-top:7px; letter-spacing:.03em; min-height:16px; animation:fadeIn .4s ease; }
+    .step-row       { display:flex; gap:8px; align-items:flex-start; margin-bottom:7px; cursor:pointer; transition:opacity .2s; }
+    .step-row:hover { opacity:.8; }
+    .step-circle    { width:18px; height:18px; border-radius:50%; border:1.5px solid #C4A882; display:flex; align-items:center; justify-content:center; font-size:.6rem; color:#C4A882; flex-shrink:0; margin-top:1px; transition:all .2s; }
+    .step-circle.done { background:#4472A8; border-color:#4472A8; color:#fff; }
+
+    /* ── BATH ANIMATION ──────────────────────────── */
+    .bath-scene     { position:relative; display:flex; flex-direction:column; align-items:center; margin:8px 0 10px; }
+    .bath-steam-row { display:flex; gap:6px; height:28px; align-items:flex-end; margin-bottom:2px; }
+    .bath-tub-wrap  { position:relative; }
+    .bath-tub-body  { width:130px; height:58px; border:2.5px solid #C4A882; border-top:none; border-radius:0 0 50px 50px; background:#fff; position:relative; overflow:hidden; }
+    .bath-water-fill{ position:absolute; bottom:0; left:0; right:0; height:0%; background:linear-gradient(to top,#5B9EC4,#7BBCE0,#A0D4F0); transition:height 3s cubic-bezier(.4,0,.2,1); border-radius:0 0 48px 48px; }
+    .bath-wave      { position:absolute; top:0; left:-20px; right:-20px; height:12px; animation:wave-move 2.5s linear infinite; }
+    .bath-wave svg  { width:100%; height:100%; }
+    @keyframes wave-move { 0%{transform:translateX(0)} 100%{transform:translateX(20px)} }
+    .bath-duck      { position:absolute; font-size:1.1rem; bottom:28%; right:22px; animation:duck-bob 2s ease-in-out infinite; z-index:2; }
+    @keyframes duck-bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+    .bath-tub-legs  { display:flex; justify-content:space-between; width:100px; margin-top:2px; padding:0 10px; }
+    .bath-leg       { width:6px; height:10px; background:#C4A882; border-radius:0 0 3px 3px; }
+    .bath-add-row   { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .bath-add-chip  { padding:5px 10px; border:1px solid #E0DAD4; border-radius:100px; font-size:0.7rem; background:#fff; cursor:pointer; transition:all .13s; color:#555; display:flex; gap:4px; align-items:center; }
+    .bath-add-chip.on  { background:#4472A8; border-color:#4472A8; color:#fff; }
+    .bath-add-chip:hover:not(.on) { border-color:#4472A8; }
+    .scent-note     { font-size:0.68rem; color:#4472A8; background:#EBF2FA; border-radius:6px; padding:5px 9px; margin-bottom:10px; font-style:italic; min-height:20px; animation:fadeIn .3s ease; }
+
     /* completion moment */
     .completion-card { text-align:center; padding:20px 14px; }
     .completion-check { font-size:2rem; margin-bottom:10px; }
@@ -1821,52 +1870,141 @@ function nextStretch() {
 }
 
 /* ── BATH ──────────────────────────────────────────── */
+const SCENT_NOTES = {
+  'Lavender':    'Calming. Lowers heart rate. Best for nights when your brain won\'t stop.',
+  'Eucalyptus':  'Opens the airways. Feels like a spa reset. Good after a heavy day.',
+  'Rose':        'Warm and grounding. Signals your nervous system that the day is done.',
+  'Citrus':      'Gently uplifting without being stimulating. Good for a slow unwind.',
+  'Unscented':   'Sometimes simplicity is the whole point. Just warm water.',
+};
+
+const BATH_LISTEN = [
+  { label:'🎵 Ambient playlist', sub:'Low tempo, no lyrics' },
+  { label:'🎙 One podcast ep.',  sub:'Put it on, set the phone down' },
+  { label:'🔇 Total silence',    sub:'The water is enough' },
+  { label:'🌧 Rain sounds',      sub:'Background noise without stimulation' },
+];
+
 function renderBath(wrap) {
   wrap.innerHTML = purposeBanner('bath');
   const card = document.createElement('div');
   card.className = 'activity-card';
   card.innerHTML = `
-    <div style="padding:16px 14px 14px">
-      <div style="text-align:center;font-size:2.4rem;margin-bottom:8px">🛁</div>
-      <div class="walk-title" style="text-align:center;margin-bottom:12px">Warm bath ritual</div>
-      <div class="bath-opts">
-        <div class="bath-opt-row"><span class="bath-opt-label">Temperature</span>
-          <div class="bath-chips">
-            <button class="bath-chip on" onclick="bathPick(this)">Warm</button>
-            <button class="bath-chip"    onclick="bathPick(this)">Hot</button>
-            <button class="bath-chip"    onclick="bathPick(this)">Very hot</button>
-          </div>
+    <div style="padding:14px 14px 14px">
+
+      <!-- Animated bathtub -->
+      <div class="bath-scene">
+        <div class="bath-steam-row">
+          <div class="wisp w2" style="height:18px;animation-delay:.3s"></div>
+          <div class="wisp w1" style="height:24px;animation-delay:.0s"></div>
+          <div class="wisp w3" style="height:16px;animation-delay:.9s"></div>
         </div>
-        <div class="bath-opt-row"><span class="bath-opt-label">Scent</span>
-          <div class="bath-chips">
-            <button class="bath-chip on" onclick="bathPick(this)">Lavender</button>
-            <button class="bath-chip"    onclick="bathPick(this)">Eucalyptus</button>
-            <button class="bath-chip"    onclick="bathPick(this)">None</button>
+        <div class="bath-tub-wrap">
+          <div class="bath-tub-body">
+            <div class="bath-water-fill" id="bath-water"></div>
+            <div class="bath-wave">
+              <svg viewBox="0 0 160 12" preserveAspectRatio="none">
+                <path d="M0 6 Q20 0 40 6 Q60 12 80 6 Q100 0 120 6 Q140 12 160 6 L160 12 L0 12 Z"
+                  fill="rgba(123,188,224,0.45)"/>
+              </svg>
+            </div>
+            <div class="bath-duck">🦆</div>
           </div>
-        </div>
-        <div class="bath-opt-row"><span class="bath-opt-label">Duration</span>
-          <div class="bath-chips">
-            <button class="bath-chip"    onclick="bathPick(this);startBathTimer(15)">15 min</button>
-            <button class="bath-chip on" onclick="bathPick(this);startBathTimer(20)">20 min</button>
-            <button class="bath-chip"    onclick="bathPick(this);startBathTimer(30)">30 min</button>
+          <div class="bath-tub-legs">
+            <div class="bath-leg"></div>
+            <div class="bath-leg"></div>
           </div>
         </div>
       </div>
-      <div class="walk-timer" id="bath-timer" style="text-align:center;color:#4472A8;font-size:2rem;font-weight:200;margin-bottom:4px">20:00</div>
-      <div class="walk-lbl"   style="text-align:center;margin-bottom:10px">REMAINING</div>
+
+      <!-- Scent picker -->
+      <div style="margin-bottom:8px">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-bottom:7px">Aromatherapy</div>
+        <div class="bath-add-row">
+          ${Object.keys(SCENT_NOTES).map((s,i)=>
+            `<button class="bath-add-chip${i===0?' on':''}" onclick="pickScent(this,'${s}')">${s}</button>`
+          ).join('')}
+        </div>
+        <div class="scent-note" id="scent-note">${SCENT_NOTES['Lavender']}</div>
+      </div>
+
+      <!-- What to listen to -->
+      <div style="margin-bottom:10px">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-bottom:7px">While you soak</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${BATH_LISTEN.map((l,i)=>`
+            <div class="step-row" onclick="pickListen(this)" style="border:1px solid #E0DAD4;border-radius:8px;padding:7px 10px;${i===0?'border-color:#4472A8;background:#EBF2FA;':''}">
+              <div style="flex:1">
+                <div style="font-size:0.78rem;font-weight:600;color:#1A1917">${l.label}</div>
+                <div style="font-size:0.67rem;color:#aaa">${l.sub}</div>
+              </div>
+              <div class="step-circle${i===0?' done':''}" style="margin-top:4px;flex-shrink:0"></div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Duration + timer -->
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:10px">
+        <button class="bath-chip"    onclick="bathDur(this,15)">15 min</button>
+        <button class="bath-chip on" onclick="bathDur(this,20)">20 min</button>
+        <button class="bath-chip"    onclick="bathDur(this,30)">30 min</button>
+      </div>
+      <div class="walk-timer" id="bath-timer"
+        style="text-align:center;color:#4472A8;font-size:2.2rem;font-weight:200;letter-spacing:-.04em;margin-bottom:3px">20:00</div>
+      <div class="walk-lbl" style="text-align:center;margin-bottom:10px">REMAINING</div>
+
       <div class="walk-intent">"Phone stays out here. The only job right now is to be somewhere warm."</div>
-      <button class="bath-no-phone" onclick="showCompletion('Warm bath ritual')">✓ Done — phone stayed out</button>
+      <button class="bath-no-phone" style="margin-top:10px"
+        onclick="showCompletion('Warm bath ritual')">Done — phone stayed out ✓</button>
     </div>`;
   wrap.appendChild(card);
+
+  // Fill water animation
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      const w = document.getElementById('bath-water');
+      if (w) w.style.height = '68%';
+    }, 300);
+  });
+
   startBathTimer(20);
 }
+
+function pickScent(btn, name) {
+  btn.closest('.bath-add-row').querySelectorAll('.bath-add-chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  const note = document.getElementById('scent-note');
+  if (note) {
+    note.style.opacity = '0';
+    setTimeout(() => { note.textContent = SCENT_NOTES[name] || ''; note.style.opacity = '1'; }, 200);
+  }
+}
+
+function pickListen(row) {
+  const rows = row.parentElement.querySelectorAll('.step-row');
+  rows.forEach(r => {
+    r.style.borderColor = '#E0DAD4'; r.style.background = '';
+    r.querySelector('.step-circle')?.classList.remove('done');
+  });
+  row.style.borderColor = '#4472A8'; row.style.background = '#EBF2FA';
+  row.querySelector('.step-circle')?.classList.add('done');
+}
+
+function bathDur(btn, mins) {
+  btn.closest('div').querySelectorAll('.bath-chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  startBathTimer(mins);
+}
+
 function bathPick(btn) {
   btn.closest('.bath-chips').querySelectorAll('.bath-chip').forEach(c => c.classList.remove('on'));
   btn.classList.add('on');
 }
+
 function startBathTimer(mins) {
   clearInterval(teaInt);
   let secs = mins * 60;
+  const total = secs;
   teaInt = setInterval(() => {
     secs--; if (secs<0){clearInterval(teaInt);return;}
     const el = document.getElementById('bath-timer');
@@ -1875,38 +2013,117 @@ function startBathTimer(mins) {
   }, 1000);
 }
 
-/* ── TEA (keep existing) ──────────────────────────── */
+/* ── TEA ──────────────────────────────────────────── */
+
+const TEA_PHASES = [
+  { at:0,     text:'filling the kettle...' },
+  { at:8000,  text:'heating up...' },
+  { at:22000, text:'steeping ☕' },
+  { at:42000, text:'ready to sip 🍵' },
+];
+
+const TEA_STEPS = [
+  'Put your phone face-down on the counter',
+  'Fill the kettle and switch it on',
+  'Pick your favourite mug',
+  'Sit down before the water\'s even ready',
+];
 
 function renderTea(wrap) {
+  wrap.innerHTML = purposeBanner('tea');
   const circ = 2 * Math.PI * 38;
   const card = document.createElement('div');
   card.className = 'activity-card';
   card.innerHTML = `
-    <div class="tea-card">
-      <div class="tea-icon">🍵</div>
-      <div class="tea-title">Tea time</div>
-      <div class="tea-sub">Phone is face-down. Kettle's on.</div>
-      <div class="ring-wrap">
-        <svg class="ring-svg" width="88" height="88" viewBox="0 0 88 88">
+    <div style="padding:14px 14px 14px">
+
+      <!-- Animated mug -->
+      <div class="tea-scene">
+        <div class="steam-row">
+          <div class="wisp w1"></div>
+          <div class="wisp w2"></div>
+          <div class="wisp w3"></div>
+          <div class="wisp w4"></div>
+        </div>
+        <div class="tea-mug">
+          <div class="mug-handle"></div>
+          <div class="tea-liquid" id="tea-fill"></div>
+          <div class="mug-bubbles">
+            <div class="mbubble mb1"></div>
+            <div class="mbubble mb2"></div>
+            <div class="mbubble mb3"></div>
+          </div>
+        </div>
+        <div class="tea-saucer"></div>
+        <div class="tea-phase-text" id="tea-phase">filling the kettle...</div>
+      </div>
+
+      <!-- Ritual checklist -->
+      <div style="margin-bottom:12px">
+        <div style="font-size:0.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#aaa;margin-bottom:8px">Your ritual</div>
+        ${TEA_STEPS.map((s,i)=>`
+          <div class="step-row" onclick="checkTeaStep(this)">
+            <div class="step-circle" id="sc${i}"></div>
+            <span style="font-size:0.77rem;color:#555;line-height:1.4">${s}</span>
+          </div>`).join('')}
+      </div>
+
+      <!-- Ring timer -->
+      <div class="ring-wrap" style="margin:0 auto 6px">
+        <svg class="ring-svg" width="80" height="80" viewBox="0 0 88 88">
           <circle class="ring-bg"   cx="44" cy="44" r="38"/>
-          <circle class="ring-fill" id="tea-ring" cx="44" cy="44" r="38" style="stroke-dasharray:${circ};stroke-dashoffset:${circ}"/>
+          <circle class="ring-fill" id="tea-ring" cx="44" cy="44" r="38"
+            style="stroke-dasharray:${circ};stroke-dashoffset:${circ}"/>
         </svg>
         <div class="ring-text" id="tea-text">10:00</div>
       </div>
-      <div class="walk-lbl">UNTIL KETTLE BOILS</div>
+      <div class="walk-lbl" style="margin-bottom:10px">STEEPING</div>
+
+      <div class="walk-intent">"No decisions in here. Just warmth."</div>
+      <button class="bath-no-phone" style="margin-top:10px"
+        onclick="showCompletion('Tea ritual')">Tea is ready ✓</button>
     </div>`;
   wrap.appendChild(card);
+
+  // Animate fill after paint
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      const fill = document.getElementById('tea-fill');
+      if (fill) fill.style.height = '62%';
+    }, 200);
+  });
+
+  // Phase text transitions
+  TEA_PHASES.forEach(({at, text}) => {
+    setTimeout(() => {
+      const el = document.getElementById('tea-phase');
+      if (el) { el.style.opacity='0'; setTimeout(()=>{ if(el){el.textContent=text;el.style.opacity='1';} },300); }
+    }, at);
+  });
+
+  // Ring countdown
   let secs = 600;
   teaInt = setInterval(() => {
     secs--;
+    if (secs < 0) { clearInterval(teaInt); return; }
     const pct  = secs / 600;
     const ring = document.getElementById('tea-ring');
     const txt  = document.getElementById('tea-text');
     if (ring) ring.style.strokeDashoffset = circ * (1 - pct);
-    if (txt)  txt.textContent = Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
+    if (txt)  txt.textContent = Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
     else clearInterval(teaInt);
   }, 1000);
 }
+
+function checkTeaStep(row) {
+  const circle = row.querySelector('.step-circle');
+  const label  = row.querySelector('span');
+  const done   = circle.classList.toggle('done');
+  label.style.textDecoration = done ? 'line-through' : '';
+  label.style.color          = done ? '#bbb' : '#555';
+}
+
+/* ── BATH ─────────────────────────────────────────── */
 
 function renderGenericTimer(wrap, name) {
   const card = document.createElement('div');
