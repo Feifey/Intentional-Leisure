@@ -385,90 +385,17 @@
 
     /* HEURISTIC LABELS */
     /* ── DESIGN NOTES PANEL ──────────────────────── */
-    #notes-panel {
-      position: fixed; top: 36px; right: 0; bottom: 0;
-      width: 300px; z-index: 400;
-      background: rgba(14,18,32,0.97);
-      border-left: 1px solid rgba(255,255,255,0.1);
-      display: flex; flex-direction: column;
-      transform: translateX(100%);
-      transition: transform 0.38s cubic-bezier(0.16,1,0.3,1);
-      overflow: hidden;
-    }
-    #notes-panel.open { transform: translateX(0); }
 
-    .np-header {
-      padding: 16px 18px 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      display: flex; align-items: center; justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .np-title {
-      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em;
-      text-transform: uppercase; color: #C47050;
-    }
-    .np-close {
-      background: none; border: none; color: rgba(255,255,255,0.35);
-      cursor: pointer; font-size: 1rem; line-height: 1;
-      transition: color 0.14s;
-    }
-    .np-close:hover { color: #fff; }
 
-    .np-body { flex: 1; overflow-y: auto; padding: 14px 18px 20px; }
 
-    .np-vs {
-      background: rgba(255,255,255,0.05); border-radius: 10px;
-      padding: 10px 12px; margin-bottom: 16px;
-    }
-    .np-vs-label {
-      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 5px;
-    }
-    .np-vs-row {
-      display: flex; gap: 8px; font-size: 0.72rem; line-height: 1.4;
-    }
-    .np-vs-bad  { color: #FF7B72; flex: 1; }
-    .np-vs-good { color: #7EE787; flex: 1; }
-    .np-vs-row .label { font-weight: 700; display: block; margin-bottom: 2px; font-size: 0.62rem; opacity: 0.7; }
 
-    .np-h {
-      margin-bottom: 14px; padding-bottom: 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-    }
-    .np-h:last-child { border-bottom: none; margin-bottom: 0; }
 
-    .np-h-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
-    .np-h-num {
-      width: 20px; height: 20px; border-radius: 50%;
-      background: #C47050; color: #fff;
-      font-size: 0.62rem; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-top: 1px;
-    }
-    .np-h-name {
-      font-size: 0.78rem; font-weight: 700; color: #fff; line-height: 1.3;
-    }
-    .np-h-q    { font-size: 0.68rem; color: rgba(255,255,255,0.38); margin-bottom: 4px; font-style: italic; padding-left: 30px; }
-    .np-h-desc { font-size: 0.72rem; color: rgba(255,255,255,0.55); line-height: 1.5; padding-left: 30px; }
-    .np-h-tag  {
       display: inline-block; font-size: 0.58rem; font-weight: 700;
       letter-spacing: 0.06em; text-transform: uppercase;
       background: rgba(196,112,80,.2); color: #D4906A;
       padding: 2px 7px; border-radius: 100px; margin-top: 5px; margin-left: 30px;
     }
 
-    .ann-toggle {
-      position: fixed; bottom: 14px; right: 14px;
-      background: rgba(255,255,255,0.13); color: #fff;
-      border: 1px solid rgba(255,255,255,0.18); border-radius: 100px;
-      padding: 7px 14px; font-family: 'Inter', sans-serif;
-      font-size: 0.68rem; font-weight: 500; cursor: pointer; z-index: 500;
-      transition: background 0.14s, right 0.38s cubic-bezier(0.16,1,0.3,1);
-    }
-    .ann-toggle:hover { background: rgba(255,255,255,0.22); }
-    .ann-toggle.shifted { right: 314px; }
-
-    .hlabel { display: none; }
 
     /* ── SCROLL-CHECK STATE ───────────────────────── */
     #ps-scroll-check { background: #FDF8F2; }
@@ -933,6 +860,29 @@
     /* Bath listen rows */
     .step-row { border-radius:10px!important; }
 
+
+    #compare-overlay{display:none;position:absolute;inset:0;z-index:50;background:rgba(14,10,6,.97);padding:24px 28px;overflow-y:auto;gap:24px;animation:fadeIn .3s ease both}
+    #compare-overlay.open{display:flex}
+    .cmp-col{flex:1;display:flex;flex-direction:column;gap:12px}
+    .cmp-hd{font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
+    .cmp-hd.bad{color:#E07060}.cmp-hd.good{color:#C47050}
+    .cmp-src{font-size:.58rem;color:rgba(255,255,255,.22);font-style:italic;margin-bottom:10px}
+    .cmp-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 16px}
+    .cmp-card.bad{border-color:rgba(224,112,96,.2)}.cmp-card.good{border-color:rgba(196,112,80,.25)}
+    .cmp-lbl{font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+    .cmp-lbl.bad{color:#E07060}.cmp-lbl.good{color:#C47050}
+    .cmp-txt{font-size:.76rem;line-height:1.65;color:rgba(255,255,255,.55)}
+    .cmp-txt strong{color:rgba(255,255,255,.88)}
+    .cmp-row{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+    .cmp-row:last-child{border-bottom:none}
+    .cmp-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0;margin-top:1px}
+    .cmp-num.fail{background:rgba(224,112,96,.18);color:#E07060}.cmp-num.pass{background:rgba(196,112,80,.22);color:#C47050}
+    .cmp-row-title{font-size:.73rem;font-weight:700;color:rgba(255,255,255,.78);margin-bottom:2px}
+    .cmp-row-bad{font-size:.67rem;color:#E07060;margin-bottom:2px}
+    .cmp-row-good{font-size:.67rem;color:#B8905A}
+    .cmp-close{position:absolute;top:16px;right:20px;background:none;border:none;color:rgba(255,255,255,.28);font-size:1.1rem;cursor:pointer}
+    .cmp-close:hover{color:#fff}
+    .cmp-hi{color:#C47050;font-weight:600}
   </style>
 </head>
 <body>
@@ -980,7 +930,7 @@
   <div class="tb-dot tb-green"></div>
   <span class="tb-title">Feifey's MacBook Pro</span>
   <span class="tb-time" id="tb-time">5:03 PM</span>
-  <button class="tb-reset" onclick="resetDemo()">↺ Reset demo</button>
+  <button class="tb-reset" onclick="resetDemo()">↺ Reset</button>
 </div>
 
 <div class="stage">
@@ -1076,6 +1026,47 @@
       </div>
       <div class="dock-icon">📝</div>
       <div class="dock-icon">⚙️</div>
+    </div>
+
+    <!-- COMPARE OVERLAY -->
+    <div id="compare-overlay">
+      <button class="cmp-close" onclick="toggleCompare()">&#215;</button>
+      <div class="cmp-col">
+        <div class="cmp-hd bad">&#10006;  What the LLM gave us</div>
+        <div class="cmp-src">Gemini 1.5 Pro &middot; Prompt 2 &middot; verbatim from our documentation</div>
+        <div class="cmp-card bad">
+          <div class="cmp-lbl bad">The suggestion</div>
+          <div class="cmp-txt">"The system intercepts and shows: <strong>'You just finished working. You are likely tired. Do you want to scroll, or do you want to [Listen to your acoustic playlist / Do a 2-minute stretch]?'</strong>"</div>
+        </div>
+        <div class="cmp-card bad">
+          <div class="cmp-lbl bad">What it missed</div>
+          <div class="cmp-txt" style="line-height:1.9">
+            <del>No reasoning &mdash; why those two activities?</del><br>
+            <del>Same options for every person, every time</del><br>
+            <del>No thinking state &mdash; response appeared instantly</del><br>
+            <del>No escape path if suggestions feel wrong</del><br>
+            <del>No declared scope &mdash; what even is this?</del><br>
+            <del>No memory &mdash; forgot everything next session</del>
+          </div>
+        </div>
+        <div class="cmp-card bad"><div class="cmp-lbl bad">Heuristic score</div><div class="cmp-txt"><strong>Failed all five.</strong> The concept was right. The design was absent.</div></div>
+      </div>
+      <div class="cmp-col">
+        <div class="cmp-hd good">&#10003;  What we designed</div>
+        <div class="cmp-src">Each decision addresses a specific failure on the left</div>
+        <div class="cmp-card good">
+          <div class="cmp-lbl good">5 heuristics &rarr; 5 decisions</div>
+          <div class="cmp-row"><div class="cmp-num pass">1</div><div><div class="cmp-row-title">Latency Tolerance</div><div class="cmp-row-bad">LLM: instant &mdash; user thinks it crashed</div><div class="cmp-row-good">&rarr; Breathing animation covers the live API call</div></div></div>
+          <div class="cmp-row"><div class="cmp-num pass">2</div><div><div class="cmp-row-title">Capability Discovery</div><div class="cmp-row-bad">LLM: no scope &mdash; what even is this?</div><div class="cmp-row-good">&rarr; "I help you switch modes. That's all I do."</div></div></div>
+          <div class="cmp-row"><div class="cmp-num pass">3</div><div><div class="cmp-row-title">Transparency</div><div class="cmp-row-bad">LLM: "listen to your acoustic playlist" &mdash; no reason given</div><div class="cmp-row-good">&rarr; Every suggestion has a because line in your own words</div></div></div>
+          <div class="cmp-row"><div class="cmp-num pass">4</div><div><div class="cmp-row-title">Trust Calibration</div><div class="cmp-row-bad">LLM: no escape path if suggestions are wrong</div><div class="cmp-row-good">&rarr; Escape hatch always visible, names your exact regret app</div></div></div>
+          <div class="cmp-row"><div class="cmp-num pass">5</div><div><div class="cmp-row-title">Memory Awareness</div><div class="cmp-row-bad">LLM: same generic options for everyone, forever</div><div class="cmp-row-good">&rarr; Setup shows what is stored, suggestions cite your words</div></div></div>
+        </div>
+        <div class="cmp-card" style="background:rgba(196,112,80,.07);border-color:rgba(196,112,80,.28)">
+          <div class="cmp-lbl good">The argument</div>
+          <div class="cmp-txt" style="color:rgba(255,255,255,.7)">The LLM gave us the <span class="cmp-hi">concept of interception.</span><br>The heuristics gave us the <span class="cmp-hi">design of trust.</span><br><br>Without trust, a tired person will not act on the suggestion.</div>
+        </div>
+      </div>
     </div>
 
     <!-- Desktop notification -->
@@ -1251,77 +1242,6 @@
 
 </div><!-- /stage -->
 
-<button class="ann-toggle" id="ann-btn" onclick="toggleAnns()">⚑ Design notes</button>
-
-<!-- ════ DESIGN NOTES PANEL ════════════════════════ -->
-<div id="notes-panel">
-  <div class="np-header">
-    <span class="np-title">Design Decisions</span>
-    <button class="np-close" onclick="toggleAnns()">✕</button>
-  </div>
-  <div class="np-body">
-
-    <!-- vs. original LLM -->
-    <div class="np-vs">
-      <div class="np-vs-label">vs. original LLM output (Gemini Prompt 2)</div>
-      <div class="np-vs-row">
-        <div class="np-vs-bad"><span class="label">❌ LLM gave</span>Generic alternatives. No personalization. No reasoning shown. No escape hatch.</div>
-        <div class="np-vs-good"><span class="label">✓ We designed</span>Every decision below addresses a specific failure in that output.</div>
-      </div>
-    </div>
-
-    <div class="np-h">
-      <div class="np-h-row">
-        <div class="np-h-num">1</div>
-        <div class="np-h-name">Latency Tolerance</div>
-      </div>
-      <div class="np-h-q">Does the user know it's working?</div>
-      <div class="np-h-desc">The 3-second breathing circle isn't loading — it's a designed pause. The LLM's version had zero thinking state; a response appeared from nowhere.</div>
-      <span class="np-h-tag">→ breathing circle on phone</span>
-    </div>
-
-    <div class="np-h">
-      <div class="np-h-row">
-        <div class="np-h-num">2</div>
-        <div class="np-h-name">Capability Discovery</div>
-      </div>
-      <div class="np-h-q">Does a new user know what this can and can't do?</div>
-      <div class="np-h-desc">Scope is stated on first launch: "I help you switch from work mode to rest mode. That's all I do." The LLM generated 6+ unrelated concepts with no declared scope.</div>
-      <span class="np-h-tag">→ home screen subtitle</span>
-    </div>
-
-    <div class="np-h">
-      <div class="np-h-row">
-        <div class="np-h-num">3</div>
-        <div class="np-h-name">Transparency</div>
-      </div>
-      <div class="np-h-q">Does the user understand why it said that?</div>
-      <div class="np-h-desc">Every suggestion has a visible "because" line citing the user's own profile words. The LLM offered "listen to your acoustic playlist" with zero explanation of why.</div>
-      <span class="np-h-tag">→ blue "because" line on each suggestion</span>
-    </div>
-
-    <div class="np-h">
-      <div class="np-h-row">
-        <div class="np-h-num">4</div>
-        <div class="np-h-name">Trust Calibration</div>
-      </div>
-      <div class="np-h-q">Can the user tell when to trust or verify the output?</div>
-      <div class="np-h-desc">"I'll scroll anyway" is never hidden. The user always owns the choice. A gentle re-engagement fires after 6 seconds — not a nag, just a reminder. The LLM had no escape path.</div>
-      <span class="np-h-tag">→ escape hatch + gentle follow-up</span>
-    </div>
-
-    <div class="np-h">
-      <div class="np-h-row">
-        <div class="np-h-num">5</div>
-        <div class="np-h-name">Memory Awareness</div>
-      </div>
-      <div class="np-h-q">Does the user know what the agent remembers or forgets?</div>
-      <div class="np-h-desc">The setup screen shows exactly what will be stored before committing. The notification body uses the user's exact words ("before you open Instagram"). The LLM had no memory at all — same generic options every time.</div>
-      <span class="np-h-tag">→ setup preview + personalised suggestions</span>
-    </div>
-
-  </div>
-</div>
 
 <script>
 /* ─── DEMO PROFILE ─────────────────────────────── */
@@ -1373,7 +1293,6 @@ function buildSuggestions() {
 
 /* ─── STATE ────────────────────────────────────── */
 let appsOpen     = ['slack','gmail'];
-let annsOn       = false;
 let genTimer     = null;
 let walkInt      = null;
 let teaInt       = null;
@@ -2693,14 +2612,15 @@ function resetDemo() {
   setPhoneState('idle');
 }
 
-/* ─── DESIGN NOTES PANEL ────────────────────────── */
-function toggleAnns() {
-  annsOn = !annsOn;
-  document.getElementById('notes-panel').classList.toggle('open', annsOn);
-  const btn = document.getElementById('ann-btn');
-  btn.textContent = annsOn ? '✕ Close notes' : '⚑ Design notes';
-  btn.classList.toggle('shifted', annsOn);
+/* ─── COMPARE VIEW */
+function toggleCompare() {
+  const ov  = document.getElementById('compare-overlay');
+  const btn = document.getElementById('compare-btn');
+  const on  = ov.classList.toggle('open');
+  btn.textContent = on ? 'x Close' : 'LLM vs Design';
+  btn.style.background = on ? 'rgba(224,112,96,.3)' : 'rgba(196,112,80,.2)';
 }
+
 
 /* ─── WEB AUDIO AMBIENT PLAYER ──────────────────── */
 class AmbientPlayer {
