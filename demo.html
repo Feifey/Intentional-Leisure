@@ -942,8 +942,7 @@
 
     <!-- SLACK -->
     <div class="win" id="win-slack">
-      <span class="hlabel" style="top:-10px;right:0">← LLM had no trigger point</span>
-      <div class="win-chrome slack-chrome">
+            <div class="win-chrome slack-chrome">
         <button class="wc-btn wc-close" onclick="closeApp('slack')" title="Close Slack"></button>
         <button class="wc-btn wc-min"></button>
         <button class="wc-btn wc-max"></button>
@@ -1056,11 +1055,11 @@
         <div class="cmp-src">Each decision addresses a specific failure on the left</div>
         <div class="cmp-card good">
           <div class="cmp-lbl good">5 heuristics &rarr; 5 decisions</div>
-          <div class="cmp-row"><div class="cmp-num pass">1</div><div><div class="cmp-row-title">Latency Tolerance</div><div class="cmp-row-bad">LLM: instant &mdash; user thinks it crashed</div><div class="cmp-row-good">&rarr; Breathing animation covers the live API call</div></div></div>
-          <div class="cmp-row"><div class="cmp-num pass">2</div><div><div class="cmp-row-title">Capability Discovery</div><div class="cmp-row-bad">LLM: no scope &mdash; what even is this?</div><div class="cmp-row-good">&rarr; "I help you switch modes. That's all I do."</div></div></div>
-          <div class="cmp-row"><div class="cmp-num pass">3</div><div><div class="cmp-row-title">Transparency</div><div class="cmp-row-bad">LLM: "listen to your acoustic playlist" &mdash; no reason given</div><div class="cmp-row-good">&rarr; Every suggestion has a because line in your own words</div></div></div>
-          <div class="cmp-row"><div class="cmp-num pass">4</div><div><div class="cmp-row-title">Trust Calibration</div><div class="cmp-row-bad">LLM: no escape path if suggestions are wrong</div><div class="cmp-row-good">&rarr; Escape hatch always visible, names your exact regret app</div></div></div>
-          <div class="cmp-row"><div class="cmp-num pass">5</div><div><div class="cmp-row-title">Memory Awareness</div><div class="cmp-row-bad">LLM: same generic options for everyone, forever</div><div class="cmp-row-good">&rarr; Setup shows what is stored, suggestions cite your words</div></div></div>
+          <div class="cmp-row"><div class="cmp-num pass">1</div><div><div class="cmp-row-bad">LLM: instant &mdash; user thinks it crashed</div><div class="cmp-row-good">&rarr; Breathing animation covers the live API call</div></div></div>
+          <div class="cmp-row"><div class="cmp-num pass">2</div><div><div class="cmp-row-bad">LLM: no scope &mdash; what even is this?</div><div class="cmp-row-good">&rarr; "I help you switch modes. That's all I do."</div></div></div>
+          <div class="cmp-row"><div class="cmp-num pass">3</div><div><div class="cmp-row-bad">LLM: "listen to your acoustic playlist" &mdash; no reason given</div><div class="cmp-row-good">&rarr; Every suggestion has a because line in your own words</div></div></div>
+          <div class="cmp-row"><div class="cmp-num pass">4</div><div><div class="cmp-row-bad">LLM: no escape path if suggestions are wrong</div><div class="cmp-row-good">&rarr; Escape hatch always visible, names your exact regret app</div></div></div>
+          <div class="cmp-row"><div class="cmp-num pass">5</div><div><div class="cmp-row-bad">LLM: same generic options for everyone, forever</div><div class="cmp-row-good">&rarr; Setup shows what is stored, suggestions cite your words</div></div></div>
         </div>
         <div class="cmp-card" style="background:rgba(196,112,80,.07);border-color:rgba(196,112,80,.28)">
           <div class="cmp-lbl good">The argument</div>
@@ -1071,8 +1070,7 @@
 
     <!-- Desktop notification -->
     <div id="desktop-notif">
-      <span class="hlabel" style="bottom:-10px;left:0">Latency Tolerance →</span>
-      <div class="dn-header">
+            <div class="dn-header">
         <div class="dn-icon">T</div>
         <span class="dn-app">TRANSITION</span>
         <span class="dn-time" id="dn-time">now</span>
@@ -1161,15 +1159,13 @@
           </div>
           <div style="padding:0 11px 11px;flex:1;overflow-y:auto" id="sug-wrap">
             <div class="p-hdr">
-              <span class="hlabel" style="top:-8px;right:0">Memory Awareness</span>
-              <div class="p-hdr-time ph-time-full">5:03 PM · WEDNESDAY</div>
+                            <div class="p-hdr-time ph-time-full">5:03 PM · WEDNESDAY</div>
               <h3>You just finished work.</h3>
               <p class="p-ctx" id="p-ctx-text">You've closed everything. This is the window.</p>
             </div>
             <div id="sug-list"></div>
             <div class="p-escape" style="position:relative">
-              <span class="hlabel" style="top:-8px;right:0">Trust Calibration</span>
-              <button class="p-escape-btn" onclick="scrollAnyway()">I'll scroll anyway</button>
+                            <button class="p-escape-btn" onclick="scrollAnyway()">I'll scroll anyway</button>
             </div>
           </div>
         </div>
@@ -1577,8 +1573,7 @@ function renderSuggestions(sugs) {
     const card = document.createElement('div');
     card.className = 'p-sug';
     card.innerHTML = `
-      <span class="hlabel" style="top:-8px;left:0">Transparency</span>
-      <div class="p-sug-title">${esc(s.activity)}</div>
+            <div class="p-sug-title">${esc(s.activity)}</div>
       <div class="p-sug-because">${esc(s.because || '')}</div>
       <div class="p-sug-start">${esc(s.start)}</div>`;
     card.onclick = () => startActivity(s);
