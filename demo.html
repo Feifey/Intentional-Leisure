@@ -384,24 +384,182 @@
     .back-to-sug:hover { border-color: #4472A8; background: #EBF2FA; color: #4472A8; }
 
     /* HEURISTIC LABELS */
-    .hlabel {
-      display: none; position: absolute;
-      background: #FFDD57; color: #1A1917;
-      font-size: 0.57rem; font-weight: 700; letter-spacing: 0.06em;
-      text-transform: uppercase; padding: 3px 8px; border-radius: 100px;
-      white-space: nowrap; pointer-events: none; z-index: 200;
+    /* ── DESIGN NOTES PANEL ──────────────────────── */
+    #notes-panel {
+      position: fixed; top: 36px; right: 0; bottom: 0;
+      width: 300px; z-index: 400;
+      background: rgba(14,18,32,0.97);
+      border-left: 1px solid rgba(255,255,255,0.1);
+      display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.38s cubic-bezier(0.16,1,0.3,1);
+      overflow: hidden;
     }
-    body.show-ann .hlabel { display: block; }
+    #notes-panel.open { transform: translateX(0); }
+
+    .np-header {
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .np-title {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: #5B8FD4;
+    }
+    .np-close {
+      background: none; border: none; color: rgba(255,255,255,0.35);
+      cursor: pointer; font-size: 1rem; line-height: 1;
+      transition: color 0.14s;
+    }
+    .np-close:hover { color: #fff; }
+
+    .np-body { flex: 1; overflow-y: auto; padding: 14px 18px 20px; }
+
+    .np-vs {
+      background: rgba(255,255,255,0.05); border-radius: 10px;
+      padding: 10px 12px; margin-bottom: 16px;
+    }
+    .np-vs-label {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 5px;
+    }
+    .np-vs-row {
+      display: flex; gap: 8px; font-size: 0.72rem; line-height: 1.4;
+    }
+    .np-vs-bad  { color: #FF7B72; flex: 1; }
+    .np-vs-good { color: #7EE787; flex: 1; }
+    .np-vs-row .label { font-weight: 700; display: block; margin-bottom: 2px; font-size: 0.62rem; opacity: 0.7; }
+
+    .np-h {
+      margin-bottom: 14px; padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .np-h:last-child { border-bottom: none; margin-bottom: 0; }
+
+    .np-h-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+    .np-h-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #4472A8; color: #fff;
+      font-size: 0.62rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .np-h-name {
+      font-size: 0.78rem; font-weight: 700; color: #fff; line-height: 1.3;
+    }
+    .np-h-q    { font-size: 0.68rem; color: rgba(255,255,255,0.38); margin-bottom: 4px; font-style: italic; padding-left: 30px; }
+    .np-h-desc { font-size: 0.72rem; color: rgba(255,255,255,0.55); line-height: 1.5; padding-left: 30px; }
+    .np-h-tag  {
+      display: inline-block; font-size: 0.58rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      background: rgba(68,114,168,0.25); color: #88B4E0;
+      padding: 2px 7px; border-radius: 100px; margin-top: 5px; margin-left: 30px;
+    }
 
     .ann-toggle {
       position: fixed; bottom: 14px; right: 14px;
       background: rgba(255,255,255,0.13); color: #fff;
       border: 1px solid rgba(255,255,255,0.18); border-radius: 100px;
       padding: 7px 14px; font-family: 'Inter', sans-serif;
-      font-size: 0.68rem; font-weight: 500; cursor: pointer; z-index: 300;
-      transition: background 0.14s;
+      font-size: 0.68rem; font-weight: 500; cursor: pointer; z-index: 500;
+      transition: background 0.14s, right 0.38s cubic-bezier(0.16,1,0.3,1);
     }
-    .ann-toggle:hover { background: rgba(255,255,255,0.2); }
+    .ann-toggle:hover { background: rgba(255,255,255,0.22); }
+    .ann-toggle.shifted { right: 314px; }
+
+    /* keep hlabel class but only use it outside overflow:hidden containers */
+    .hlabel { display: none; }
+
+    /* ── ACTIVITY SCROLL FIX ──────────────────────── */
+    #ps-activity { overflow: hidden; }
+    .act-scroll  { flex:1; overflow-y:auto; padding:0 11px 6px; }
+    .act-footer  { flex-shrink:0; padding:0 11px 11px; }
+
+    /* ── WALK ──────────────────────────────────────── */
+    .walk-stats  { display:flex; gap:14px; justify-content:center; margin:4px 0 10px; }
+    .walk-stat   { font-size:0.8rem; color:#4472A8; font-weight:600; }
+    .walk-stat span { font-weight:300; color:#aaa; font-size:0.7rem; margin-right:3px; }
+    .walk-turns  { text-align:left; margin-bottom:10px; }
+    .walk-turn   { display:flex; gap:8px; font-size:0.74rem; color:#555; margin-bottom:6px; align-items:flex-start; line-height:1.4; }
+    .turn-num    { width:18px; height:18px; border-radius:50%; background:#4472A8; color:#fff; font-size:0.6rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+    .walk-intent { font-size:0.72rem; color:#6B6560; font-style:italic; line-height:1.55; border-top:1px solid #E0DAD4; padding-top:9px; margin-top:4px; margin-bottom:10px; }
+    .walk-new-route { background:none; border:1px solid #E0DAD4; color:#8B7B70; font-family:'Inter',sans-serif; font-size:0.72rem; padding:7px 12px; border-radius:8px; cursor:pointer; width:100%; transition:all .14s; }
+    .walk-new-route:hover { border-color:#4472A8; color:#4472A8; }
+
+    /* ── MUSIC QUEUE ───────────────────────────────── */
+    .song-queue  { border-top:1px solid #E0DAD4; padding:8px 14px 6px; }
+    .queue-label { font-size:0.58rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#ccc; margin-bottom:6px; }
+    .queue-row   { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid #F5F5F5; }
+    .queue-row:last-child { border-bottom:none; }
+    .queue-row.playing .queue-name { font-weight:700; color:#4472A8; }
+    .queue-name  { font-size:0.75rem; color:#555; flex:1; }
+    .queue-name .qa { color:#aaa; font-weight:400; }
+    .queue-dur   { font-size:0.68rem; color:#ccc; }
+    .playing-dot { width:6px; height:6px; border-radius:50%; background:#4472A8; flex-shrink:0; animation:blink-dot 1.2s ease-in-out infinite; }
+    @keyframes blink-dot { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+    /* ── DRAWING ───────────────────────────────────── */
+    .draw-prompt  { font-size:0.74rem; color:#4472A8; background:#EBF2FA; border-radius:8px; padding:9px 11px; margin-bottom:8px; line-height:1.5; }
+    .draw-prompt strong { font-weight:700; display:block; font-size:0.6rem; letter-spacing:.08em; text-transform:uppercase; color:#aaa; margin-bottom:2px; }
+    .canvas-wrap  { border:1px solid #E0DAD4; border-radius:8px; overflow:hidden; background:#fff; margin-bottom:7px; }
+    canvas        { display:block; cursor:crosshair; touch-action:none; }
+    .canvas-tools { display:flex; gap:5px; margin-bottom:7px; }
+    .ct-btn       { flex:1; padding:6px 0; border:1px solid #E0DAD4; border-radius:7px; font-family:'Inter',sans-serif; font-size:0.72rem; background:#fff; cursor:pointer; transition:all .13s; text-align:center; }
+    .ct-btn.active  { background:#4472A8; color:#fff; border-color:#4472A8; }
+    .ct-btn:hover:not(.active) { border-color:#4472A8; }
+    .draw-note    { width:100%; padding:7px 10px; border:1px solid #E0DAD4; border-radius:7px; font-family:'Inter',sans-serif; font-size:0.78rem; resize:none; outline:none; height:44px; display:block; }
+    .draw-note:focus { border-color:#4472A8; }
+    .log-toggle   { background:none; border:none; font-family:'Inter',sans-serif; font-size:0.72rem; color:#4472A8; cursor:pointer; padding:7px 0 2px; width:100%; text-align:left; }
+    .log-entry    { background:#F8F6F4; border-radius:6px; padding:8px 10px; margin-bottom:5px; animation:fadeUp .3s ease both; }
+    .log-entry-meta { font-size:0.62rem; color:#bbb; margin-bottom:3px; }
+    .log-entry-prompt { font-size:0.69rem; color:#aaa; font-style:italic; margin-bottom:2px; }
+    .log-entry-note { font-size:0.75rem; color:#444; }
+    .log-empty { font-size:0.72rem; color:#ccc; font-style:italic; }
+
+    /* ── PODCAST ───────────────────────────────────── */
+    .pod-art      { width:100%; height:110px; display:flex; align-items:center; justify-content:center; font-size:2.8rem; }
+    .pod-info     { padding:10px 14px 4px; }
+    .pod-show     { font-size:0.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#4472A8; margin-bottom:3px; }
+    .pod-title    { font-size:0.86rem; font-weight:700; margin-bottom:4px; letter-spacing:-.01em; line-height:1.3; }
+    .pod-desc     { font-size:0.71rem; color:#888; line-height:1.4; margin-bottom:8px; }
+    .pod-ctrls    { display:flex; align-items:center; justify-content:center; gap:12px; padding:0 14px 10px; }
+    .pod-skip-btn { background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; }
+    .pod-skip-btn .sk-icon { font-size:1.1rem; }
+    .pod-skip-btn .sk-label { font-size:0.58rem; font-weight:600; color:#aaa; letter-spacing:.04em; }
+    .pod-queue    { border-top:1px solid #E0DAD4; padding:8px 14px 4px; }
+
+    /* ── JOURNAL ───────────────────────────────────── */
+    .j-prompt     { font-size:0.74rem; color:#4472A8; background:#EBF2FA; border-radius:8px; padding:9px 11px; margin-bottom:8px; line-height:1.5; }
+    .j-prompt strong { font-weight:700; display:block; font-size:0.6rem; letter-spacing:.08em; text-transform:uppercase; color:#aaa; margin-bottom:2px; }
+    .j-ta         { width:100%; padding:10px 11px; border:1px solid #E0DAD4; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.82rem; line-height:1.65; resize:none; outline:none; min-height:110px; color:#1A1917; display:block; }
+    .j-ta:focus   { border-color:#4472A8; }
+    .j-footer     { display:flex; gap:7px; margin-top:7px; }
+    .j-save       { flex:1; padding:8px; background:#4472A8; color:#fff; border:none; border-radius:7px; font-family:'Inter',sans-serif; font-size:0.76rem; font-weight:500; cursor:pointer; transition:opacity .14s; }
+    .j-save:hover { opacity:.82; }
+    .j-log-btn    { padding:8px 12px; background:transparent; border:1px solid #E0DAD4; border-radius:7px; font-family:'Inter',sans-serif; font-size:0.76rem; color:#888; cursor:pointer; }
+
+    /* ── READING ───────────────────────────────────── */
+    .read-book    { background:#EBF2FA; border-radius:8px; padding:10px 12px; margin-bottom:10px; display:flex; gap:10px; align-items:center; }
+    .book-spine   { width:36px; height:52px; border-radius:3px 5px 5px 3px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; box-shadow:2px 2px 4px rgba(0,0,0,.1); }
+    .book-title   { font-size:0.84rem; font-weight:700; color:#1A1917; margin-bottom:2px; }
+    .book-author  { font-size:0.7rem; color:#888; }
+    .read-purpose { font-size:0.72rem; color:#6B6560; font-style:italic; line-height:1.5; margin-bottom:10px; }
+    .read-fact    { font-size:0.69rem; color:#aaa; line-height:1.5; border-top:1px solid #E0DAD4; padding-top:8px; margin-top:4px; font-style:italic; }
+
+    /* ── STRETCHING ────────────────────────────────── */
+    .stretch-seq  { text-align:center; }
+    .stretch-pose { font-size:2.8rem; margin-bottom:8px; }
+    .stretch-name { font-size:0.96rem; font-weight:700; letter-spacing:-.01em; margin-bottom:4px; }
+    .stretch-inst { font-size:0.74rem; color:#8B7B70; line-height:1.55; margin-bottom:12px; }
+    .stretch-prog { display:flex; gap:5px; justify-content:center; margin-bottom:12px; }
+    .sp-dot       { width:7px; height:7px; border-radius:50%; background:#E0DAD4; transition:all .3s; }
+    .sp-dot.done  { background:#4472A8; }
+    .sp-dot.current { background:#4472A8; transform:scale(1.4); }
+    .stretch-timer-num { font-size:2.2rem; font-weight:200; letter-spacing:-.04em; color:#4472A8; margin-bottom:4px; }
+    .stretch-next-btn  { width:100%; padding:10px; background:#4472A8; color:#fff; border:none; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; transition:opacity .14s; }
+    .stretch-next-btn:hover { opacity:.82; }
+    .stretch-next-label { font-size:0.67rem; color:#ccc; margin-top:5px; }
   </style>
 </head>
 <body>
@@ -639,12 +797,12 @@
 
         <!-- ACTIVITY -->
         <div class="phone-state hidden" id="ps-activity">
-          <div class="phone-status" style="background:#F0EDE8;position:sticky;top:0;z-index:5">
+          <div class="phone-status" style="background:#F0EDE8;flex-shrink:0;z-index:5">
             <span>5:03</span>
             <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
           </div>
-          <div style="padding:0 11px 11px;display:flex;flex-direction:column;gap:9px;flex:1">
-            <div id="activity-content"></div>
+          <div class="act-scroll"><div id="activity-content"></div></div>
+          <div class="act-footer">
             <button class="back-to-sug" onclick="setPhoneState('suggestions')">← Try a different one</button>
           </div>
         </div>
@@ -657,59 +815,122 @@
 
 <button class="ann-toggle" id="ann-btn" onclick="toggleAnns()">⚑ Design notes</button>
 
+<!-- ════ DESIGN NOTES PANEL ════════════════════════ -->
+<div id="notes-panel">
+  <div class="np-header">
+    <span class="np-title">Design Decisions</span>
+    <button class="np-close" onclick="toggleAnns()">✕</button>
+  </div>
+  <div class="np-body">
+
+    <!-- vs. original LLM -->
+    <div class="np-vs">
+      <div class="np-vs-label">vs. original LLM output (Gemini Prompt 2)</div>
+      <div class="np-vs-row">
+        <div class="np-vs-bad"><span class="label">❌ LLM gave</span>Generic alternatives. No personalization. No reasoning shown. No escape hatch.</div>
+        <div class="np-vs-good"><span class="label">✓ We designed</span>Every decision below addresses a specific failure in that output.</div>
+      </div>
+    </div>
+
+    <div class="np-h">
+      <div class="np-h-row">
+        <div class="np-h-num">1</div>
+        <div class="np-h-name">Latency Tolerance</div>
+      </div>
+      <div class="np-h-q">Does the user know it's working?</div>
+      <div class="np-h-desc">The 3-second breathing circle isn't loading — it's a designed pause. The LLM's version had zero thinking state; a response appeared from nowhere.</div>
+      <span class="np-h-tag">→ breathing circle on phone</span>
+    </div>
+
+    <div class="np-h">
+      <div class="np-h-row">
+        <div class="np-h-num">2</div>
+        <div class="np-h-name">Capability Discovery</div>
+      </div>
+      <div class="np-h-q">Does a new user know what this can and can't do?</div>
+      <div class="np-h-desc">Scope is stated on first launch: "I help you switch from work mode to rest mode. That's all I do." The LLM generated 6+ unrelated concepts with no declared scope.</div>
+      <span class="np-h-tag">→ home screen subtitle</span>
+    </div>
+
+    <div class="np-h">
+      <div class="np-h-row">
+        <div class="np-h-num">3</div>
+        <div class="np-h-name">Transparency</div>
+      </div>
+      <div class="np-h-q">Does the user understand why it said that?</div>
+      <div class="np-h-desc">Every suggestion has a visible "because" line citing the user's own profile words. The LLM offered "listen to your acoustic playlist" with zero explanation of why.</div>
+      <span class="np-h-tag">→ blue "because" line on each suggestion</span>
+    </div>
+
+    <div class="np-h">
+      <div class="np-h-row">
+        <div class="np-h-num">4</div>
+        <div class="np-h-name">Trust Calibration</div>
+      </div>
+      <div class="np-h-q">Can the user tell when to trust or verify the output?</div>
+      <div class="np-h-desc">"I'll scroll anyway" is never hidden. The user always owns the choice. A gentle re-engagement fires after 6 seconds — not a nag, just a reminder. The LLM had no escape path.</div>
+      <span class="np-h-tag">→ escape hatch + gentle follow-up</span>
+    </div>
+
+    <div class="np-h">
+      <div class="np-h-row">
+        <div class="np-h-num">5</div>
+        <div class="np-h-name">Memory Awareness</div>
+      </div>
+      <div class="np-h-q">Does the user know what the agent remembers or forgets?</div>
+      <div class="np-h-desc">The setup screen shows exactly what will be stored before committing. The notification body uses the user's exact words ("before you open Instagram"). The LLM had no memory at all — same generic options every time.</div>
+      <span class="np-h-tag">→ setup preview + personalised suggestions</span>
+    </div>
+
+  </div>
+</div>
+
 <script>
 /* ─── DEMO PROFILE ─────────────────────────────── */
-const DECOMPRESS_OPTS = ['A walk','Music','Reading','Tea','Stretching','Drawing','Journaling','A bath'];
+const DECOMPRESS_OPTS = ['A walk','Music','Reading','Tea','Stretching','Drawing','Journaling','A bath','Podcast'];
 const REGRET_OPTS     = ['Instagram','TikTok','YouTube Shorts','Twitter / X','Reddit','News sites'];
 
 let demoProfile = { decompress: [], regret: [] };
 
 /* ─── SUGGESTION TEMPLATES ─────────────────────── */
 const SUG_LIBRARY = {
-  'A walk':    { activity: 'A 20-minute walk around the block',  type: 'walk',  start: 'Put on your shoes. Leave your phone at home.' },
-  'Music':     { activity: 'Put on your evening playlist',        type: 'music', start: 'Open Spotify. Hit play on whatever\'s saved.' },
-  'Reading':   { activity: 'Read one chapter of your book',       type: 'timer', start: 'Pick up the book. Read one page — that\'s enough.' },
-  'Tea':       { activity: 'Brew tea, phone face-down',           type: 'tea',   start: 'Fill the kettle. Put your phone face-down.' },
-  'Stretching':{ activity: '10 minutes of stretching on the floor', type: 'timer', start: 'Lie on your back and reach your arms up.' },
-  'Drawing':   { activity: 'Sketch something nearby for 10 min',  type: 'timer', start: 'Open your sketchbook to any blank page.' },
-  'Journaling':{ activity: 'Write 3 lines in your journal',       type: 'timer', start: 'Open to today\'s date. Write one sentence.' },
-  'A bath':    { activity: 'Run a warm bath, no phone',           type: 'tea',   start: 'Turn on the tap. Set your phone in the other room.' },
+  'A walk':    { activity: 'A route walk near you',                type: 'walk',     start: 'Put on your shoes. Leave your phone at home.' },
+  'Music':     { activity: 'Evening wind-down playlist',           type: 'music',    start: 'Open Spotify. Hit play on whatever\'s saved.' },
+  'Reading':   { activity: 'One chapter of your book',             type: 'reading',  start: 'Pick up the book. Read one page — that\'s enough.' },
+  'Tea':       { activity: 'Brew tea, phone face-down',            type: 'tea',      start: 'Fill the kettle. Put your phone face-down.' },
+  'Stretching':{ activity: 'Guided 10-min stretch sequence',       type: 'stretch',  start: 'Lie on your back and reach your arms up.' },
+  'Drawing':   { activity: 'Sketch from today\'s prompt',          type: 'drawing',  start: 'Open your sketchbook to any blank page.' },
+  'Journaling':{ activity: '3-line journal entry',                 type: 'journal',  start: 'Open to today\'s date. Write one sentence.' },
+  'A bath':    { activity: 'Warm bath, no phone',                  type: 'tea',      start: 'Turn on the tap. Set your phone in the other room.' },
+  'Podcast':   { activity: 'One podcast episode',                  type: 'podcast',  start: 'Pick an episode. Set the phone down and just listen.' },
 };
 
 const FALLBACK_SUGS = [
-  { activity: 'A 20-minute walk', type: 'walk', start: 'Put on your shoes. Step outside.' },
-  { activity: 'Put on a playlist', type: 'music', start: 'Open Spotify. Press play.' },
-  { activity: 'Brew tea, phone down', type: 'tea', start: 'Fill the kettle. Phone face-down.' },
+  { activity: 'A route walk near you',       type: 'walk',    start: 'Put on your shoes. Step outside.' },
+  { activity: 'Evening wind-down playlist',  type: 'music',   start: 'Open Spotify. Press play.' },
+  { activity: 'Brew tea, phone face-down',   type: 'tea',     start: 'Fill the kettle. Phone face-down.' },
 ];
 
 function buildSuggestions() {
-  const chosen = demoProfile.decompress.slice(0, 3);
-  const regret = demoProfile.regret[0] || 'scrolling';
-  const becauseFor = (key) => {
-    const map = {
-      'A walk':    `you said walking helps you decompress — and it gets you away from ${regret}`,
-      'Music':     `you listed music as something that restores you — no decisions, just press play`,
-      'Reading':   `you said reading helps you wind down — one chapter is all you need`,
-      'Tea':       `you said you reach for ${regret} after work — making tea breaks that reflex`,
-      'Stretching':`you listed stretching as restorative — your body's been still all day`,
-      'Drawing':   `you said drawing helps you decompress — and it keeps your hands busy`,
-      'Journaling':`you listed journaling as something that helps — just 3 lines is enough`,
-      'A bath':    `you said a bath helps you transition — and it has zero ${regret} risk`,
-    };
-    return map[key] || `you chose this as something that helps you decompress`;
-  };
+  const chosen = demoProfile.decompress.length ? demoProfile.decompress : ['A walk','Music','Tea'];
+  const regret  = demoProfile.regret[0] || 'scrolling';
 
-  if (chosen.length === 0) return FALLBACK_SUGS;
+  const becauseFor = k => ({
+    'A walk':    `you said walking helps you decompress — new route generated every time`,
+    'Music':     `you listed music as restorative — skip through songs, no scrolling needed`,
+    'Reading':   `you said reading helps you wind down — one chapter is all you need to start`,
+    'Tea':       `you said you reach for ${regret} after work — making tea interrupts that reflex`,
+    'Stretching':`you listed stretching as restorative — your body has been still all day`,
+    'Drawing':   `you said drawing helps you decompress — today's prompt is already waiting`,
+    'Journaling':`you listed journaling as something that helps — 3 lines, that's the whole ask`,
+    'A bath':    `you said a bath helps you transition — and it has zero ${regret} risk`,
+    'Podcast':   `you said listening helps you decompress — episode queued, no browsing needed`,
+  }[k] || `you chose this as something that helps you decompress`);
 
-  const base = chosen.map(k => SUG_LIBRARY[k] ? { ...SUG_LIBRARY[k], because: becauseFor(k) } : null).filter(Boolean);
-
-  // Always pad to at least 2 suggestions from fallback
-  while (base.length < 2) {
-    const fb = FALLBACK_SUGS.find(f => !base.find(b => b.type === f.type));
-    if (fb) base.push({ ...fb, because: `you said ${regret} doesn't feel good after — this is the alternative` });
-    else break;
-  }
-  return base.slice(0, 3);
+  return chosen
+    .map(k => SUG_LIBRARY[k] ? { ...SUG_LIBRARY[k], because: becauseFor(k) } : null)
+    .filter(Boolean)
+    .slice(0, 5); // show all chosen, up to 5
 }
 
 /* ─── STATE ────────────────────────────────────── */
@@ -875,59 +1096,547 @@ function startActivity(s) {
   setPhoneState('activity');
   const wrap = document.getElementById('activity-content');
   wrap.innerHTML = '';
-
   clearTimers();
 
-  if (s.type === 'music') renderMusic(wrap);
-  else if (s.type === 'walk')  renderWalk(wrap);
-  else if (s.type === 'tea')   renderTea(wrap);
-  else renderGenericTimer(wrap, s.activity);
+  const map = {
+    walk:    renderWalk,
+    music:   renderMusic,
+    podcast: renderPodcast,
+    drawing: renderDrawing,
+    journal: renderJournal,
+    reading: renderReading,
+    stretch: renderStretch,
+    tea:     renderTea,
+  };
+  (map[s.type] || ((w) => renderGenericTimer(w, s.activity)))(wrap);
 }
 
-function renderMusic(wrap) {
-  const card = document.createElement('div');
-  card.className = 'activity-card';
-  card.innerHTML = `
-    <div class="player-art" style="background:linear-gradient(135deg,#2D3A8C,#8B5CF6)">🎵</div>
-    <div class="player-info">
-      <div class="player-title">Evening Wind-Down</div>
-      <div class="player-sub">Your saved playlist · 47 songs</div>
-      <div class="pbar-wrap"><div class="pbar-fill" id="pbar"></div></div>
-    </div>
-    <div class="player-ctrls">
-      <button class="pc-btn">⏮</button>
-      <button class="pc-play">▶</button>
-      <button class="pc-btn">⏭</button>
-    </div>`;
-  wrap.appendChild(card);
-  let p = 0;
-  playerInt = setInterval(() => {
-    p = Math.min(p + 0.25, 100);
-    const el = document.getElementById('pbar');
-    if (el) el.style.width = p + '%'; else clearInterval(playerInt);
-  }, 100);
-}
+/* ══════════════════════════════════════════════════
+   ACTIVITY RENDERERS
+══════════════════════════════════════════════════ */
+
+/* ── WALK ──────────────────────────────────────── */
+const WALK_ROUTES = [
+  { name:'The Neighborhood Loop',   dist:'1.4 mi', eta:'28 min', turns:['Out your door, turn left','Right at the main street','Left through the side streets','Straight back home'] },
+  { name:'Green Space Route',       dist:'1.8 mi', eta:'36 min', turns:['Head toward the nearest park','Full loop inside the park','Exit the far gate','Back home via a different street'] },
+  { name:'The Short Reset',         dist:'0.8 mi', eta:'16 min', turns:['One block forward','Right, one block','Right, one block back','Right — you\'re home'] },
+  { name:'The Long Exhale',         dist:'2.4 mi', eta:'48 min', turns:['Head in the direction of downtown','Loop around the main block','Quieter streets back','Home from the far side'] },
+  { name:'The Dusk Circuit',        dist:'1.2 mi', eta:'24 min', turns:['Left out the door','Follow the long street down','Circle the block at the end','Back the way you came'] },
+];
+const WALK_PURPOSES = [
+  'This walk has one job: give your thoughts somewhere to go that isn\'t a screen.',
+  'Cortisol drops within 20 minutes of walking. No music needed — just feet on ground.',
+  'Decision fatigue is real. The only choice you need to make: left, or right.',
+  'This isn\'t exercise. It\'s a system reset. Your body already knows how to do this.',
+  'Walking at dusk activates your parasympathetic nervous system. It\'s not a luxury — it\'s recovery.',
+];
 
 function renderWalk(wrap) {
+  const route   = WALK_ROUTES[Math.floor(Math.random() * WALK_ROUTES.length)];
+  const purpose = WALK_PURPOSES[Math.floor(Math.random() * WALK_PURPOSES.length)];
+  _drawWalkCard(wrap, route, purpose);
+}
+
+function _drawWalkCard(wrap, route, purpose) {
+  wrap.innerHTML = '';
   const card = document.createElement('div');
   card.className = 'activity-card';
   card.innerHTML = `
     <div class="walk-card">
-      <div class="walk-icon">🚶</div>
-      <div class="walk-title">20-minute walk</div>
-      <div class="walk-sub">Phone is staying home. Back by 5:23.</div>
-      <div class="walk-timer" id="walk-timer">20:00</div>
-      <div class="walk-lbl">MINUTES REMAINING</div>
+      <div class="walk-icon">🗺</div>
+      <div class="walk-title">${esc(route.name)}</div>
+      <div class="walk-stats">
+        <span class="walk-stat"><span>📍</span>${route.dist}</span>
+        <span class="walk-stat"><span>⏱</span>~${route.eta}</span>
+      </div>
+      <div class="walk-turns">
+        ${route.turns.map((t,i)=>`<div class="walk-turn"><span class="turn-num">${i+1}</span><span>${t}</span></div>`).join('')}
+      </div>
+      <div class="walk-intent">"${purpose}"</div>
+      <button class="walk-new-route" onclick="rerollWalk(this)">↺ Generate a different route</button>
     </div>`;
   wrap.appendChild(card);
+
+  let secs = parseInt(route.eta) * 60;
+  walkInt = setInterval(() => {
+    secs--; if (secs < 0) { clearInterval(walkInt); return; }
+    const el = document.getElementById('walk-timer');
+    if (el) el.textContent = Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
+  }, 1000);
+}
+
+function rerollWalk(btn) {
+  clearInterval(walkInt);
+  const wrap = btn.closest('#activity-content');
+  const route   = WALK_ROUTES[Math.floor(Math.random() * WALK_ROUTES.length)];
+  const purpose = WALK_PURPOSES[Math.floor(Math.random() * WALK_PURPOSES.length)];
+  _drawWalkCard(wrap, route, purpose);
+}
+
+/* ── MUSIC ─────────────────────────────────────── */
+const PLAYLIST = [
+  { title:'Sycamore',            artist:'Bill Frisell',         dur:'4:32', gradient:'linear-gradient(135deg,#1a3a5c,#2d6a8c)' },
+  { title:'Stars',               artist:'Nils Frahm',           dur:'5:14', gradient:'linear-gradient(135deg,#2c1654,#6b4fa0)' },
+  { title:'Gymnopédie No.1',     artist:'Erik Satie',           dur:'3:41', gradient:'linear-gradient(135deg,#1a4a2e,#3a8a5c)' },
+  { title:'Re: Stacks',          artist:'Bon Iver',             dur:'5:15', gradient:'linear-gradient(135deg,#4a2c1a,#8a5c3a)' },
+  { title:'Comptine d\'un autre été', artist:'Yann Tiersen',   dur:'2:32', gradient:'linear-gradient(135deg,#1a2a4a,#3a5a8a)' },
+  { title:'Blue Ridge Mountains', artist:'Fleet Foxes',         dur:'4:45', gradient:'linear-gradient(135deg,#1a3a1a,#3a6a3a)' },
+  { title:'Slow Burn',           artist:'Kacey Musgraves',      dur:'3:52', gradient:'linear-gradient(135deg,#4a1a3a,#8a3a6a)' },
+];
+
+let musicIdx = 0;
+
+function renderMusic(wrap) {
+  musicIdx = 0;
+  _drawMusicCard(wrap);
+
+  if (ambientPlayer) ambientPlayer.stop();
+  ambientPlayer = new AmbientPlayer();
+  ambientPlayer.start();
+}
+
+function _drawMusicCard(wrap) {
+  wrap.innerHTML = '';
+  const song = PLAYLIST[musicIdx];
+  const next1 = PLAYLIST[(musicIdx+1) % PLAYLIST.length];
+  const next2 = PLAYLIST[(musicIdx+2) % PLAYLIST.length];
+
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div class="player-art" style="background:${song.gradient}">🎵</div>
+    <div class="player-info">
+      <div class="player-title" id="song-title">${esc(song.title)}</div>
+      <div class="player-sub"   id="song-artist">${esc(song.artist)}</div>
+      <div class="pbar-wrap"><div class="pbar-fill" id="pbar"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.62rem;color:#ccc;margin-top:3px">
+        <span id="ptime">0:00</span><span>${song.dur}</span>
+      </div>
+    </div>
+    <div class="player-ctrls">
+      <button class="pc-btn" onclick="prevSong()">⏮</button>
+      <button class="pc-play" id="play-btn" onclick="togglePlayback(this)">⏸</button>
+      <button class="pc-btn" onclick="nextSong()">⏭</button>
+    </div>
+    <div style="text-align:center;padding:0 14px 6px;font-size:0.62rem;color:#bbb">♪ ambient audio playing</div>
+    <div class="song-queue">
+      <div class="queue-label">Up next</div>
+      <div class="queue-row playing">
+        <div class="playing-dot"></div>
+        <span class="queue-name">${esc(song.title)} <span class="qa">— ${esc(song.artist)}</span></span>
+        <span class="queue-dur">${song.dur}</span>
+      </div>
+      <div class="queue-row">
+        <span style="width:6px"></span>
+        <span class="queue-name">${esc(next1.title)} <span class="qa">— ${esc(next1.artist)}</span></span>
+        <span class="queue-dur">${next1.dur}</span>
+      </div>
+      <div class="queue-row">
+        <span style="width:6px"></span>
+        <span class="queue-name">${esc(next2.title)} <span class="qa">— ${esc(next2.artist)}</span></span>
+        <span class="queue-dur">${next2.dur}</span>
+      </div>
+    </div>`;
+  wrap.appendChild(card);
+
+  // Animated progress
+  let p = 0;
+  playerInt = setInterval(() => {
+    p = Math.min(p + 0.15, 100);
+    const pb = document.getElementById('pbar');
+    const pt = document.getElementById('ptime');
+    if (pb) pb.style.width = p + '%';
+    if (pt) {
+      const totalSecs = parseInt(song.dur.split(':')[0])*60 + parseInt(song.dur.split(':')[1]);
+      const elapsed = Math.round(p/100 * totalSecs);
+      pt.textContent = Math.floor(elapsed/60)+':'+String(elapsed%60).padStart(2,'0');
+    }
+    if (!pb) clearInterval(playerInt);
+  }, 120);
+}
+
+function nextSong() {
+  clearInterval(playerInt);
+  musicIdx = (musicIdx + 1) % PLAYLIST.length;
+  const wrap = document.getElementById('activity-content');
+  _drawMusicCard(wrap);
+  if (ambientPlayer) ambientPlayer._playChord();
+}
+
+function prevSong() {
+  clearInterval(playerInt);
+  musicIdx = (musicIdx - 1 + PLAYLIST.length) % PLAYLIST.length;
+  const wrap = document.getElementById('activity-content');
+  _drawMusicCard(wrap);
+  if (ambientPlayer) ambientPlayer._playChord();
+}
+
+function togglePlayback(btn) {
+  if (!ambientPlayer || !ambientPlayer.ctx) {
+    ambientPlayer = new AmbientPlayer(); ambientPlayer.start(); btn.textContent = '⏸';
+  } else { ambientPlayer.stop(); ambientPlayer = null; btn.textContent = '▶'; }
+}
+
+/* ── PODCAST ────────────────────────────────────── */
+const PODCASTS = [
+  { show:'Design Matters',      title:'On Making Things That Last', desc:'Debbie Millman talks with designers about creative longevity, resilience, and the long game of making.', art:'🎙', gradient:'linear-gradient(135deg,#1a2a4a,#2a4a6a)', dur:'52:14' },
+  { show:'99% Invisible',       title:'The Landlord\'s Dilemma',    desc:'A story about architecture, power, and the invisible systems that shape where we live and how we rest.', art:'🏛', gradient:'linear-gradient(135deg,#2a1a4a,#4a2a6a)', dur:'31:07' },
+  { show:'The Moth Radio Hour', title:'Strangers at the Table',     desc:'Five true, first-person stories about unexpected connections — and the moments that shift everything.', art:'🦋', gradient:'linear-gradient(135deg,#1a3a2a,#2a6a4a)', dur:'58:22' },
+  { show:'How I Built This',    title:'Patagonia\'s Yvon Chouinard', desc:'The founder of Patagonia on building a company you\'re not embarrassed by — and then giving it away.', art:'🏔', gradient:'linear-gradient(135deg,#2a1a1a,#6a3a2a)', dur:'45:18' },
+];
+
+let podIdx = 0;
+
+function renderPodcast(wrap) {
+  podIdx = 0;
+  _drawPodcastCard(wrap);
+  if (ambientPlayer) ambientPlayer.stop();
+  ambientPlayer = new AmbientPlayer();
+  ambientPlayer.start();
+}
+
+function _drawPodcastCard(wrap) {
+  wrap.innerHTML = '';
+  const ep   = PODCASTS[podIdx];
+  const next = PODCASTS[(podIdx+1) % PODCASTS.length];
+
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div class="pod-art" style="background:${ep.gradient}">${ep.art}</div>
+    <div class="pod-info">
+      <div class="pod-show">${esc(ep.show)}</div>
+      <div class="pod-title">${esc(ep.title)}</div>
+      <div class="pod-desc">${esc(ep.desc)}</div>
+      <div class="pbar-wrap"><div class="pbar-fill" id="ppbar"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.62rem;color:#ccc;margin-top:3px;margin-bottom:8px">
+        <span id="pod-time">0:00</span><span>${ep.dur}</span>
+      </div>
+    </div>
+    <div class="pod-ctrls">
+      <button class="pod-skip-btn" onclick="podSkip(-30)">
+        <span class="sk-icon">⏪</span><span class="sk-label">30s</span>
+      </button>
+      <button class="pc-play" onclick="togglePlayback(this)">⏸</button>
+      <button class="pod-skip-btn" onclick="podSkip(30)">
+        <span class="sk-icon">⏩</span><span class="sk-label">30s</span>
+      </button>
+    </div>
+    <div class="pod-queue">
+      <div class="queue-label">Next episode</div>
+      <div class="queue-row" style="cursor:pointer" onclick="nextPod()">
+        <span class="queue-name">${esc(next.title)} <span class="qa">— ${esc(next.show)}</span></span>
+        <span class="queue-dur">${next.dur}</span>
+      </div>
+    </div>`;
+  wrap.appendChild(card);
+
+  let secs = 0;
+  const totalSecs = parseInt(ep.dur.split(':')[0])*60 + parseInt(ep.dur.split(':')[1]);
+  playerInt = setInterval(() => {
+    secs = Math.min(secs + 1, totalSecs);
+    const pb = document.getElementById('ppbar');
+    const pt = document.getElementById('pod-time');
+    if (pb) pb.style.width = (secs/totalSecs*100) + '%';
+    if (pt) pt.textContent = Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
+    if (!pb) clearInterval(playerInt);
+  }, 500);
+}
+
+function nextPod() {
+  clearInterval(playerInt);
+  podIdx = (podIdx+1) % PODCASTS.length;
+  _drawPodcastCard(document.getElementById('activity-content'));
+  if (ambientPlayer) ambientPlayer._playChord();
+}
+
+let podSeek = 0;
+function podSkip(delta) {
+  podSeek = Math.max(0, podSeek + delta);
+  const pt = document.getElementById('pod-time');
+  if (pt) pt.textContent = Math.floor(podSeek/60)+':'+String(podSeek%60).padStart(2,'0');
+}
+
+/* ── DRAWING ────────────────────────────────────── */
+const DRAW_PROMPTS = [
+  'Sketch the thing nearest to your right hand — but make it look like it\'s from the future.',
+  'Draw the view from the closest window. You have exactly 5 minutes.',
+  'Sketch your own hand holding something you use every day.',
+  'Draw what "tired" looks like, if it were a shape or creature.',
+  'Sketch one object from your desk that you never actually think about.',
+  'Draw the room you\'re in from the perspective of the ceiling.',
+  'Sketch what today felt like, without using words or numbers.',
+];
+
+function renderDrawing(wrap) {
+  const prompt = DRAW_PROMPTS[Math.floor(Math.random() * DRAW_PROMPTS.length)];
+  const log    = JSON.parse(localStorage.getItem('draw_log') || '[]');
+
+  wrap.innerHTML = `
+    <div class="draw-prompt">
+      <strong>Today's sketch prompt</strong>
+      ${esc(prompt)}
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="sketch-canvas" width="278" height="180"></canvas>
+    </div>
+    <div class="canvas-tools">
+      <button class="ct-btn active" id="ct-pen"    onclick="setTool('pen',this)">✏ Pencil</button>
+      <button class="ct-btn"        id="ct-eraser" onclick="setTool('eraser',this)">◻ Erase</button>
+      <button class="ct-btn"        id="ct-clear"  onclick="clearCanvas()">✕ Clear</button>
+    </div>
+    <textarea class="draw-note" id="draw-note" placeholder="What did you make? (optional note)"></textarea>
+    <button class="save-log-btn" onclick="saveDrawLog('${esc(prompt).replace(/'/g,"&#39;")}')">Save to my log →</button>
+    <button class="log-toggle" onclick="toggleDrawLog(this)">▸ Past entries (${log.length})</button>
+    <div id="draw-log-list" style="display:none">
+      ${log.length ? log.slice(-3).reverse().map(e=>`
+        <div class="log-entry">
+          <div class="log-entry-meta">${e.date}</div>
+          <div class="log-entry-prompt">${esc(e.prompt)}</div>
+          ${e.note ? `<div class="log-entry-note">${esc(e.note)}</div>` : ''}
+        </div>`).join('') : '<p class="log-empty">No entries yet.</p>'}
+    </div>`;
+
+  // Init canvas
+  setTimeout(() => {
+    const canvas = document.getElementById('sketch-canvas');
+    if (!canvas) return;
+    const ctx2  = canvas.getContext('2d');
+    let drawing = false, tool = 'pen';
+
+    window._drawTool = t => { tool = t; };
+
+    const getPos = e => {
+      const r = canvas.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      return [src.clientX - r.left, src.clientY - r.top];
+    };
+    const start = e => { drawing = true; ctx2.beginPath(); const [x,y] = getPos(e); ctx2.moveTo(x,y); e.preventDefault(); };
+    const draw  = e => {
+      if (!drawing) return;
+      const [x,y] = getPos(e);
+      ctx2.lineWidth   = tool==='eraser' ? 18 : 2;
+      ctx2.strokeStyle = tool==='eraser' ? '#fff' : '#1A1917';
+      ctx2.lineCap = 'round'; ctx2.lineJoin = 'round';
+      ctx2.lineTo(x,y); ctx2.stroke(); ctx2.beginPath(); ctx2.moveTo(x,y);
+      e.preventDefault();
+    };
+    const stop  = () => drawing = false;
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup',   stop);
+    canvas.addEventListener('mouseleave',stop);
+    canvas.addEventListener('touchstart', start, {passive:false});
+    canvas.addEventListener('touchmove',  draw,  {passive:false});
+    canvas.addEventListener('touchend',   stop);
+  }, 50);
+}
+
+function setTool(t, btn) {
+  document.querySelectorAll('.ct-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window._drawTool && window._drawTool(t);
+}
+
+function clearCanvas() {
+  const canvas = document.getElementById('sketch-canvas');
+  if (canvas) canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+}
+
+function saveDrawLog(prompt) {
+  const note = document.getElementById('draw-note')?.value?.trim() || '';
+  const log  = JSON.parse(localStorage.getItem('draw_log') || '[]');
+  log.push({ date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}), prompt, note });
+  localStorage.setItem('draw_log', JSON.stringify(log));
+  const btn = document.querySelector('.save-log-btn');
+  if (btn) { btn.textContent = '✓ Saved to log'; btn.style.background = '#5A8A5A'; }
+  const toggle = document.querySelector('.log-toggle');
+  if (toggle) toggle.textContent = `▸ Past entries (${log.length})`;
+}
+
+function toggleDrawLog(btn) {
+  const list = document.getElementById('draw-log-list');
+  if (!list) return;
+  const open = list.style.display !== 'none';
+  list.style.display = open ? 'none' : 'block';
+  btn.textContent = (open ? '▸' : '▾') + btn.textContent.slice(1);
+}
+
+/* ── JOURNAL ────────────────────────────────────── */
+const JOURNAL_PROMPTS = [
+  'What\'s one thing from today you don\'t want to forget?',
+  'What drained you today, and what, if anything, refilled you?',
+  'If today had a title, what would it be?',
+  'What\'s one thing you\'re carrying that you could put down tonight?',
+  'What would "enough" look like for you today?',
+  'Write three sentences about what happened. Then one about how it felt.',
+];
+
+function renderJournal(wrap) {
+  const prompt = JOURNAL_PROMPTS[Math.floor(Math.random() * JOURNAL_PROMPTS.length)];
+  const log    = JSON.parse(localStorage.getItem('journal_log') || '[]');
+
+  wrap.innerHTML = `
+    <div class="j-prompt">
+      <strong>Today's prompt</strong>
+      ${esc(prompt)}
+    </div>
+    <textarea class="j-ta" id="j-ta" placeholder="Write here — no one reads this but you."></textarea>
+    <div class="j-footer">
+      <button class="j-save" onclick="saveJournal('${esc(prompt).replace(/'/g,"&#39;")}')">Save entry →</button>
+      <button class="j-log-btn" onclick="showJournalLog()">Past (${log.length})</button>
+    </div>
+    <div id="j-log" style="display:none;margin-top:10px"></div>
+    <div class="read-fact" style="margin-top:10px">
+      "3 minutes of reflection produces similar cortisol reduction to 30 minutes of passive distraction — with lasting effect." — Journal of Experimental Psychology, 2014
+    </div>`;
+}
+
+function saveJournal(prompt) {
+  const text = document.getElementById('j-ta')?.value?.trim();
+  if (!text) return;
+  const log = JSON.parse(localStorage.getItem('journal_log') || '[]');
+  log.push({ date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}), prompt, text });
+  localStorage.setItem('journal_log', JSON.stringify(log));
+  const btn = document.querySelector('.j-save');
+  if (btn) { btn.textContent = '✓ Saved'; btn.style.background = '#5A8A5A'; }
+}
+
+function showJournalLog() {
+  const log  = JSON.parse(localStorage.getItem('journal_log') || '[]');
+  const wrap = document.getElementById('j-log');
+  if (!wrap) return;
+  if (wrap.style.display !== 'none') { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  wrap.innerHTML = log.length ? log.slice(-5).reverse().map(e=>`
+    <div class="log-entry">
+      <div class="log-entry-meta">${esc(e.date)}</div>
+      <div class="log-entry-prompt">${esc(e.prompt)}</div>
+      <div class="log-entry-note">${esc(e.text?.slice(0,120))}${e.text?.length>120?'…':''}</div>
+    </div>`).join('') : '<p class="log-empty">No entries yet.</p>';
+}
+
+/* ── READING ────────────────────────────────────── */
+const BOOKS = [
+  { title:'Bewilderment',           author:'Richard Powers',       emoji:'🌿', bg:'#2a4a2a' },
+  { title:'The Midnight Library',   author:'Matt Haig',            emoji:'📚', bg:'#1a2a4a' },
+  { title:'Crying in H Mart',       author:'Michelle Zauner',      emoji:'🌸', bg:'#4a2a3a' },
+  { title:'Tomorrow, and Tomorrow', author:'Gabrielle Zevin',      emoji:'🎮', bg:'#2a2a4a' },
+  { title:'Braiding Sweetgrass',    author:'Robin Wall Kimmerer',  emoji:'🌱', bg:'#2a3a2a' },
+];
+
+function renderReading(wrap) {
+  const book = BOOKS[Math.floor(Math.random() * BOOKS.length)];
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div style="padding:16px 14px 14px">
+      <div class="read-book">
+        <div class="book-spine" style="background:${book.bg}">${book.emoji}</div>
+        <div class="book-info">
+          <div class="book-title">${esc(book.title)}</div>
+          <div class="book-author">${esc(book.author)}</div>
+        </div>
+      </div>
+      <div class="read-purpose">
+        Reading fiction reduces stress by up to 68% within 6 minutes — faster than walking or music. One chapter is exactly enough to start.
+      </div>
+      <div class="walk-timer" id="read-timer" style="color:#4472A8;font-size:2rem;text-align:center;font-weight:200;letter-spacing:-0.04em">20:00</div>
+      <div class="walk-lbl" style="text-align:center;margin-bottom:14px">READING WINDOW</div>
+      <textarea class="j-ta" id="read-note" placeholder="One sentence about what you read…" style="min-height:50px"></textarea>
+      <button class="j-save" style="margin-top:7px" onclick="saveReadLog()">Save note →</button>
+      <div class="read-fact">
+        You don't need to finish. You just need to start. Pick up wherever you left off.
+      </div>
+    </div>`;
+  wrap.appendChild(card);
+
   let secs = 1200;
   walkInt = setInterval(() => {
-    secs--;
-    const el = document.getElementById('walk-timer');
-    if (el) el.textContent = Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
+    secs--; if (secs<0) { clearInterval(walkInt); return; }
+    const el = document.getElementById('read-timer');
+    if (el) el.textContent = Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
     else clearInterval(walkInt);
   }, 1000);
 }
+
+function saveReadLog() {
+  const note = document.getElementById('read-note')?.value?.trim();
+  if (!note) return;
+  const btn = document.querySelector('#activity-content .j-save');
+  if (btn) { btn.textContent = '✓ Saved'; btn.style.background = '#5A8A5A'; }
+}
+
+/* ── STRETCHING ─────────────────────────────────── */
+const STRETCHES = [
+  { name:'Neck rolls',        pose:'🔄', inst:'Slowly roll your head in a circle, 4x each direction. Keep your shoulders down.',       secs:45 },
+  { name:'Shoulder cross',    pose:'🤝', inst:'Bring one arm across your chest and hold it with the other. 30 seconds per side.',      secs:60 },
+  { name:'Forward fold',      pose:'🙇', inst:'Stand or sit. Slowly fold forward and let your head hang completely. Breathe.',          secs:60 },
+  { name:'Hip flexor stretch',pose:'🦵', inst:'Step one foot forward into a lunge, drop the back knee. Hold and breathe. 30 sec each.', secs:60 },
+  { name:'Seated twist',      pose:'🌀', inst:'Sit upright, place one hand behind you and twist gently. Hold 30 seconds per side.',    secs:60 },
+  { name:'Savasana',          pose:'🧘', inst:'Lie flat on your back, arms slightly apart, palms up. Close your eyes. Just breathe.',   secs:90 },
+];
+
+let stretchStep = 0;
+let stretchIntv = null;
+
+function renderStretch(wrap) {
+  stretchStep = 0;
+  _drawStretchCard(wrap);
+}
+
+function _drawStretchCard(wrap) {
+  clearInterval(stretchIntv);
+  const s    = STRETCHES[stretchStep];
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div style="padding:18px 14px 16px">
+      <div class="stretch-seq">
+        <div class="stretch-pose">${s.pose}</div>
+        <div class="stretch-name">${s.name}</div>
+        <div class="stretch-inst">${s.inst}</div>
+        <div class="stretch-prog">
+          ${STRETCHES.map((_,i)=>`<div class="sp-dot ${i<stretchStep?'done':i===stretchStep?'current':''}"></div>`).join('')}
+        </div>
+        <div style="font-size:0.68rem;color:#aaa;margin-bottom:8px">${stretchStep+1} of ${STRETCHES.length}</div>
+        <div class="stretch-timer-num" id="stretch-num">${s.secs}</div>
+        <div class="walk-lbl" style="margin-bottom:14px">SECONDS</div>
+        <button class="stretch-next-btn" onclick="nextStretch()" id="stretch-next-btn">
+          ${stretchStep < STRETCHES.length-1 ? 'Next →' : 'Finish ✓'}
+        </button>
+        ${stretchStep < STRETCHES.length-1 ? `<div class="stretch-next-label">Next: ${STRETCHES[stretchStep+1].name}</div>` : ''}
+      </div>
+    </div>`;
+  wrap.innerHTML = '';
+  wrap.appendChild(card);
+
+  let rem = s.secs;
+  stretchIntv = setInterval(() => {
+    rem--;
+    const el = document.getElementById('stretch-num');
+    if (el) el.textContent = rem;
+    else clearInterval(stretchIntv);
+    if (rem <= 0) {
+      clearInterval(stretchIntv);
+      const btn = document.getElementById('stretch-next-btn');
+      if (btn) { btn.style.animation = 'fadeIn .3s ease both'; btn.style.background = '#5A8A5A'; }
+    }
+  }, 1000);
+}
+
+function nextStretch() {
+  clearInterval(stretchIntv);
+  stretchStep = Math.min(stretchStep+1, STRETCHES.length-1);
+  if (stretchStep === STRETCHES.length-1 && STRETCHES[stretchStep].secs === 90) {
+    // Last pose — play ambient
+    if (!ambientPlayer) { ambientPlayer = new AmbientPlayer(); ambientPlayer.start(); }
+  }
+  _drawStretchCard(document.getElementById('activity-content'));
+}
+
+/* ── TEA (keep existing) ──────────────────────────── */
 
 function renderTea(wrap) {
   const circ = 2 * Math.PI * 38;
@@ -993,6 +1702,7 @@ function setPhoneState(name) {
 function clearTimers() {
   [walkInt, teaInt, playerInt, genTimer].forEach(t => t && clearInterval(t));
   walkInt = teaInt = playerInt = genTimer = null;
+  if (ambientPlayer) { ambientPlayer.stop(); ambientPlayer = null; }
 }
 
 function esc(s) {
@@ -1001,7 +1711,7 @@ function esc(s) {
 
 /* ─── RESET ─────────────────────────────────────── */
 function resetDemo() {
-  clearTimers();
+  clearTimers(); // also stops audio
   if (gentleTimer) { clearTimeout(gentleTimer); gentleTimer = null; }
   appsOpen = ['slack','gmail'];
   ['slack','gmail'].forEach(a => {
@@ -1025,12 +1735,86 @@ function resetDemo() {
   setPhoneState('idle');
 }
 
-/* ─── ANNOTATIONS ───────────────────────────────── */
+/* ─── DESIGN NOTES PANEL ────────────────────────── */
 function toggleAnns() {
   annsOn = !annsOn;
-  document.body.classList.toggle('show-ann', annsOn);
-  document.getElementById('ann-btn').textContent = annsOn ? '✕ Hide notes' : '⚑ Design notes';
+  document.getElementById('notes-panel').classList.toggle('open', annsOn);
+  const btn = document.getElementById('ann-btn');
+  btn.textContent = annsOn ? '✕ Close notes' : '⚑ Design notes';
+  btn.classList.toggle('shifted', annsOn);
 }
+
+/* ─── WEB AUDIO AMBIENT PLAYER ──────────────────── */
+class AmbientPlayer {
+  constructor() { this.ctx = null; this.nodes = []; this.timer = null; this.step = 0; }
+
+  start() {
+    try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { console.warn('Web Audio not supported'); return; }
+
+    // Am pentatonic chord progression (relaxing, no tension)
+    this.progressions = [
+      [110, 220, 261.63, 329.63],   // Am  A2+A3+C4+E4
+      [87.31, 174.61, 220, 261.63], // F   F2+F3+A3+C4
+      [130.81, 261.63, 329.63, 392],// C   C3+C4+E4+G4
+      [98, 196, 246.94, 329.63],    // G   G2+G3+B3+E4
+    ];
+    this._playChord();
+    this.timer = setInterval(() => this._playChord(), 5000);
+  }
+
+  _playChord() {
+    const ctx = this.ctx; if (!ctx) return;
+    // Fade out old nodes
+    this.nodes.forEach(({ gain }) => {
+      try { gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.2); } catch(e){}
+    });
+    const old = this.nodes; this.nodes = [];
+    setTimeout(() => old.forEach(({ osc }) => { try { osc.stop(); } catch(e){} }), 1400);
+
+    // Play new chord
+    const chord = this.progressions[this.step % this.progressions.length];
+    this.step++;
+
+    // Master gain with soft attack
+    const master = ctx.createGain();
+    master.gain.value = 0;
+    master.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 1.5);
+    master.connect(ctx.destination);
+
+    chord.forEach((freq, i) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      // Slight detuning for warmth
+      osc.detune.value = (i % 2 === 0 ? -3 : 3);
+      // Volume shape: quieter at extremes
+      gain.gain.value = i === 0 ? 0.12 : i === chord.length-1 ? 0.07 : 0.09;
+      osc.connect(gain);
+      gain.connect(master);
+      osc.start();
+      this.nodes.push({ osc, gain });
+    });
+  }
+
+  stop() {
+    if (this.timer) { clearInterval(this.timer); this.timer = null; }
+    const ctx = this.ctx;
+    if (!ctx) return;
+    this.nodes.forEach(({ osc, gain }) => {
+      try { gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.6); } catch(e){}
+    });
+    const old = this.nodes; this.nodes = [];
+    setTimeout(() => {
+      old.forEach(({ osc }) => { try { osc.stop(); } catch(e){} });
+      try { ctx.close(); } catch(e){}
+    }, 800);
+    this.ctx = null;
+  }
+}
+
+let ambientPlayer = null;
 </script>
 </body>
 </html>
