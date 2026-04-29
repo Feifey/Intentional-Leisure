@@ -468,8 +468,77 @@
     .ann-toggle:hover { background: rgba(255,255,255,0.22); }
     .ann-toggle.shifted { right: 314px; }
 
-    /* keep hlabel class but only use it outside overflow:hidden containers */
     .hlabel { display: none; }
+
+    /* ── SCROLL-CHECK STATE ───────────────────────── */
+    #ps-scroll-check { background: #FDF8F2; }
+    .sc-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px 16px; text-align:center; }
+    .sc-emoji { font-size:2.6rem; margin-bottom:12px; }
+    .sc-title { font-size:1rem; font-weight:700; letter-spacing:-.02em; color:#1A1917; margin-bottom:8px; }
+    .sc-body .sc-msg { font-size:0.76rem; color:#8B7B70; line-height:1.6; margin-bottom:22px; }
+    .sc-back { width:100%; padding:12px; background:#4472A8; color:#fff; border:none; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.84rem; font-weight:600; cursor:pointer; margin-bottom:8px; transition:opacity .14s; }
+    .sc-back:hover { opacity:.82; }
+    .sc-through { background:none; border:none; font-family:'Inter',sans-serif; font-size:0.74rem; color:#aaa; cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
+
+    /* ── IDLE FLOATING NUDGE ─────────────────────── */
+    #idle-nudge {
+      display:none; position:absolute; top:58px; left:9px; right:9px; z-index:20;
+      animation: slideDown .5s cubic-bezier(.16,1,.3,1) both;
+    }
+    .nudge-card {
+      background:rgba(255,255,255,.96); backdrop-filter:blur(20px);
+      border-radius:16px; padding:12px 14px 10px;
+      box-shadow:0 4px 20px rgba(0,0,0,.1);
+    }
+    .nudge-header { display:flex; align-items:center; gap:7px; margin-bottom:4px; }
+    .nudge-icon   { width:20px; height:20px; border-radius:5px; background:#4472A8; display:flex; align-items:center; justify-content:center; font-size:0.62rem; font-weight:700; color:#fff; }
+    .nudge-app    { font-size:0.6rem; font-weight:600; color:#aaa; letter-spacing:.06em; }
+    .nudge-dismiss{ background:none; border:none; font-size:0.68rem; color:#ccc; cursor:pointer; margin-left:auto; }
+    .nudge-title  { font-size:0.8rem; font-weight:700; color:#1A1917; margin-bottom:3px; }
+    .nudge-body   { font-size:0.72rem; color:#666; line-height:1.4; margin-bottom:8px; }
+    .nudge-action { background:none; border:1px solid #4472A8; color:#4472A8; border-radius:7px; padding:5px 12px; font-family:'Inter',sans-serif; font-size:0.72rem; cursor:pointer; }
+    .nudge-action:hover { background:#EBF2FA; }
+
+    /* ── WORK INTERRUPT STATE ────────────────────── */
+    #ps-work-interrupt { background:#FDF8F2; }
+    .wi-body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px 16px; text-align:center; }
+    .wi-emoji { font-size:2.4rem; margin-bottom:12px; }
+    .wi-title { font-size:0.96rem; font-weight:700; color:#1A1917; margin-bottom:6px; letter-spacing:-.02em; }
+    .wi-msg   { font-size:0.74rem; color:#8B7B70; line-height:1.55; margin-bottom:20px; }
+    .wi-back  { width:100%; padding:11px; background:#4472A8; color:#fff; border:none; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; margin-bottom:8px; transition:opacity .14s; }
+    .wi-back:hover { opacity:.82; }
+    .wi-accept{ width:100%; padding:10px; background:transparent; border:1px solid #E0DAD4; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.8rem; color:#888; cursor:pointer; }
+
+    /* ── PURPOSE BANNER (activity header) ───────── */
+    .purpose-banner {
+      background:#EBF2FA; border-radius:8px; padding:9px 11px;
+      margin-bottom:10px; border-left:3px solid #4472A8;
+    }
+    .pb-label { font-size:0.58rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#4472A8; margin-bottom:3px; }
+    .pb-text  { font-size:0.72rem; color:#4472A8; line-height:1.5; }
+
+    /* ── BATH ────────────────────────────────────── */
+    .bath-opts { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+    .bath-opt-row { display:flex; align-items:center; justify-content:space-between; }
+    .bath-opt-label { font-size:0.74rem; font-weight:500; color:#555; }
+    .bath-chips { display:flex; gap:5px; }
+    .bath-chip { padding:5px 10px; border:1px solid #E0DAD4; border-radius:100px; font-family:'Inter',sans-serif; font-size:0.7rem; cursor:pointer; transition:all .13s; background:#fff; color:#555; }
+    .bath-chip.on { background:#4472A8; border-color:#4472A8; color:#fff; }
+    .bath-no-phone { background:#1A1917; color:#fff; border:none; border-radius:10px; padding:12px; width:100%; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; margin-top:4px; }
+
+    /* completion moment */
+    .completion-card { text-align:center; padding:20px 14px; }
+    .completion-check { font-size:2rem; margin-bottom:10px; }
+    .completion-title { font-size:0.94rem; font-weight:700; letter-spacing:-.01em; margin-bottom:6px; }
+    .completion-msg   { font-size:0.76rem; color:#8B7B70; line-height:1.55; margin-bottom:14px; }
+    .mood-row  { display:flex; justify-content:center; gap:8px; margin-bottom:12px; }
+    .mood-btn  { font-size:1.3rem; cursor:pointer; transition:transform .12s; border:none; background:none; padding:4px; border-radius:50%; }
+    .mood-btn:hover { transform:scale(1.3); }
+    .mood-btn.picked { background:#EBF2FA; transform:scale(1.2); }
+
+    /* dock clickable */
+    .dock-icon.clickable { cursor:pointer; }
+    .dock-icon.clickable:hover { transform:translateY(-4px) scale(1.1); }
 
     /* ── ACTIVITY SCROLL FIX ──────────────────────── */
     #ps-activity { overflow: hidden; }
@@ -681,8 +750,8 @@
     <div class="dock">
       <div class="dock-icon">🔍</div>
       <div class="dock-icon">📁</div>
-      <div class="dock-icon" style="background:#4A154B;border-radius:10px;font-size:0.8rem;color:#fff;font-weight:800">S</div>
-      <div class="dock-icon" style="background:#fff;border-radius:10px;font-size:0.7rem;font-weight:800;color:#EA4335">M</div>
+      <div class="dock-icon clickable" id="dock-slack" onclick="reopenApp('slack')" title="Reopen Slack" style="background:#4A154B;border-radius:10px;font-size:0.8rem;color:#fff;font-weight:800">S</div>
+      <div class="dock-icon clickable" id="dock-gmail" onclick="reopenApp('gmail')" title="Reopen Gmail" style="background:#fff;border-radius:10px;font-size:0.7rem;font-weight:800;color:#EA4335">M</div>
       <div class="dock-icon" style="background:#1DB954;border-radius:10px;padding:6px">
         <svg viewBox="0 0 24 24" width="26" height="26" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
       </div>
@@ -807,7 +876,57 @@
           </div>
         </div>
 
-      </div>
+        <!-- SCROLL-CHECK (intervention before scrolling) -->
+        <div class="phone-state hidden" id="ps-scroll-check">
+          <div class="phone-status" style="background:#FDF8F2;flex-shrink:0">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div class="sc-body">
+            <div class="sc-emoji">💭</div>
+            <div class="sc-title">Opening <span id="sc-regret-name">Instagram</span>?</div>
+            <p class="sc-msg" id="sc-msg">
+              You told me this makes you feel worse after.<br>
+              That's not a judgment — it's what you said.
+            </p>
+            <button class="sc-back" onclick="setPhoneState('suggestions')">← My rest option instead</button>
+            <button class="sc-through" onclick="actuallyScroll()">Open it anyway</button>
+          </div>
+        </div>
+
+        <!-- WORK INTERRUPT -->
+        <div class="phone-state hidden" id="ps-work-interrupt">
+          <div class="phone-status" style="background:#FDF8F2;flex-shrink:0">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div class="wi-body">
+            <div class="wi-emoji">💼</div>
+            <div class="wi-title">Back to work?</div>
+            <p class="wi-msg" id="wi-msg">
+              <span id="wi-app-name">Slack</span> just reopened.<br>
+              Your rest session is paused — it'll be here when you're done.
+            </p>
+            <button class="wi-back" onclick="resumeRest()">← Back to rest</button>
+            <button class="wi-accept" onclick="acceptWork()">Yeah, just a quick check</button>
+          </div>
+        </div>
+
+        <!-- Floating nudge (overlays idle screen) -->
+        <div id="idle-nudge" style="display:none;position:absolute;top:58px;left:9px;right:9px;z-index:20">
+          <div class="nudge-card">
+            <div class="nudge-header">
+              <div class="nudge-icon">T</div>
+              <span class="nudge-app">TRANSITION</span>
+              <button class="nudge-dismiss" onclick="document.getElementById('idle-nudge').style.display='none'">✕</button>
+            </div>
+            <div class="nudge-title" id="nudge-title">Still scrolling? 💙</div>
+            <div class="nudge-body"  id="nudge-body">Your rest idea is still here whenever you're ready.</div>
+            <button class="nudge-action" onclick="nudgeComeBack()">Take me back →</button>
+          </div>
+        </div>
+
+      </div><!-- /phone-screen -->
     </div>
   </div>
 
@@ -901,7 +1020,7 @@ const SUG_LIBRARY = {
   'Stretching':{ activity: 'Guided 10-min stretch sequence',       type: 'stretch',  start: 'Lie on your back and reach your arms up.' },
   'Drawing':   { activity: 'Sketch from today\'s prompt',          type: 'drawing',  start: 'Open your sketchbook to any blank page.' },
   'Journaling':{ activity: '3-line journal entry',                 type: 'journal',  start: 'Open to today\'s date. Write one sentence.' },
-  'A bath':    { activity: 'Warm bath, no phone',                  type: 'tea',      start: 'Turn on the tap. Set your phone in the other room.' },
+  'A bath':    { activity: 'Warm bath, no phone',                  type: 'bath',     start: 'Turn on the tap. Set your phone in the other room.' },
   'Podcast':   { activity: 'One podcast episode',                  type: 'podcast',  start: 'Pick an episode. Set the phone down and just listen.' },
 };
 
@@ -1018,41 +1137,46 @@ function dismissNotif() {
   setPhoneState('idle');
 }
 
-/* ─── SCROLL ANYWAY ─────────────────────────────── */
+/* ─── SCROLL ANYWAY — shows intervention screen ─── */
 function scrollAnyway() {
   document.getElementById('desktop-notif').style.display = 'none';
+  if (gentleTimer) clearTimeout(gentleTimer);
+
+  const regret = demoProfile.regret[0] || 'social media';
+  const sug    = currentSugs[0]?.activity || 'your rest option';
+
+  // Show the intervention/check screen on the phone
+  document.getElementById('sc-regret-name').textContent = regret;
+  document.getElementById('sc-msg').innerHTML =
+    `You told me <strong>${regret}</strong> makes you feel worse after.<br>That's not a judgment — it's what you said.`;
+  setPhoneState('scroll-check');
+}
+
+/* ─── ACTUALLY SCROLL — confirmed, go to idle ───── */
+function actuallyScroll() {
   setPhoneState('idle');
 
-  // Gentle re-engagement after 6 seconds
+  // After 4 seconds show the floating nudge ON the idle screen
   if (gentleTimer) clearTimeout(gentleTimer);
   gentleTimer = setTimeout(() => {
     const regret = demoProfile.regret[0] || 'Instagram';
     const sug    = currentSugs[0]?.activity || 'your rest idea';
-    showGentleNotif(regret, sug);
-  }, 6000);
+    document.getElementById('nudge-title').textContent = `Still on ${regret}? 💙`;
+    document.getElementById('nudge-body').textContent  =
+      `You said this makes you feel worse after. Your "${sug}" idea is still here.`;
+    const nudge = document.getElementById('idle-nudge');
+    nudge.style.display = 'block';
+    nudge.style.animation = 'none'; nudge.offsetHeight;
+    nudge.style.animation = 'slideDown .5s cubic-bezier(.16,1,.3,1) both';
+    // Auto-dismiss after 8 seconds
+    setTimeout(() => { nudge.style.display = 'none'; }, 8000);
+  }, 4000);
 }
 
-function showGentleNotif(regret, sug) {
-  setPhoneState('notif');
-
-  // Replace notification card with gentle version
-  const notifState = document.getElementById('ps-notif');
-  const existing   = notifState.querySelector('.notif-card');
-  if (existing) {
-    existing.innerHTML = `
-      <div class="nc-header">
-        <div class="nc-icon">T</div>
-        <span class="nc-app">TRANSITION</span>
-        <span class="nc-time">just now</span>
-      </div>
-      <div class="nc-title">Still scrolling? 💙</div>
-      <div class="nc-body">You told me ${regret} makes you feel worse after.
-        No pressure — but your "${sug}" idea is still here whenever you want it.</div>
-      <div class="nc-actions">
-        <button class="nc-btn nc-primary" onclick="openTransition()">Take me back</button>
-        <button class="nc-btn nc-ghost" onclick="setPhoneState('idle')">I'm okay</button>
-      </div>`;
-  }
+function nudgeComeBack() {
+  document.getElementById('idle-nudge').style.display = 'none';
+  if (currentSugs.length) { renderSuggestions(currentSugs); setPhoneState('suggestions'); }
+  else openTransition();
 }
 
 /* ─── OPEN TRANSITION ───────────────────────────── */
@@ -1091,6 +1215,52 @@ function renderSuggestions(sugs) {
   });
 }
 
+/* ─── PURPOSE BANNERS ───────────────────────────── */
+const PURPOSES = {
+  walk:    'Walking for 20 min lowers cortisol directly. Not exercise — a nervous system reset.',
+  music:   'Passive listening is one of the most efficient forms of mental recovery. This is time well spent.',
+  podcast: 'One episode with no second screen. You\'re giving your visual cortex a full rest.',
+  drawing: 'Creative work uses a completely different part of your brain than the work you just finished.',
+  journal: '3 minutes of reflection produces the same stress relief as 30 minutes of passive distraction.',
+  reading: 'Reading fiction reduces stress by up to 68% in 6 minutes — faster than a walk or music.',
+  stretch: 'Each stretch below takes tension you stored today and gives it somewhere to go.',
+  tea:     'Making tea with intention breaks the phone-reflex and gives you 10 minutes of genuine stillness.',
+  bath:    'A warm bath raises, then drops your core temperature — the physical signal your body needs to truly rest.',
+};
+
+function purposeBanner(type) {
+  const text = PURPOSES[type] || '';
+  if (!text) return '';
+  return `<div class="purpose-banner"><div class="pb-label">Why this, right now</div><div class="pb-text">${text}</div></div>`;
+}
+
+/* ─── COMPLETION MOMENT ─────────────────────────── */
+function showCompletion(activityName) {
+  const regret = demoProfile.regret[0] || '';
+  const wrap   = document.getElementById('activity-content');
+  wrap.innerHTML = `
+    <div class="activity-card">
+      <div class="completion-card">
+        <div class="completion-check">✓</div>
+        <div class="completion-title">${esc(activityName)}</div>
+        <div class="completion-msg">
+          ${regret ? `You chose this instead of ${esc(regret)} today. That's intentional.` : 'You showed up for yourself today.'}
+        </div>
+        <div style="font-size:0.72rem;color:#aaa;margin-bottom:8px">How do you feel now?</div>
+        <div class="mood-row">
+          ${['😔','😐','🙂','😊','✨'].map(e=>`<button class="mood-btn" onclick="pickMood(this,'${e}')">${e}</button>`).join('')}
+        </div>
+        <button class="back-to-sug" onclick="setPhoneState('suggestions')" style="margin-top:6px">See all options</button>
+      </div>
+    </div>`;
+  clearTimers();
+}
+
+function pickMood(btn, emoji) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('picked'));
+  btn.classList.add('picked');
+}
+
 /* ─── START ACTIVITY ────────────────────────────── */
 function startActivity(s) {
   setPhoneState('activity');
@@ -1107,6 +1277,7 @@ function startActivity(s) {
     reading: renderReading,
     stretch: renderStretch,
     tea:     renderTea,
+    bath:    renderBath,
   };
   (map[s.type] || ((w) => renderGenericTimer(w, s.activity)))(wrap);
 }
@@ -1138,7 +1309,7 @@ function renderWalk(wrap) {
 }
 
 function _drawWalkCard(wrap, route, purpose) {
-  wrap.innerHTML = '';
+  wrap.innerHTML = purposeBanner('walk');
   const card = document.createElement('div');
   card.className = 'activity-card';
   card.innerHTML = `
@@ -1474,6 +1645,7 @@ const JOURNAL_PROMPTS = [
 ];
 
 function renderJournal(wrap) {
+  wrap.innerHTML = purposeBanner('journal');
   const prompt = JOURNAL_PROMPTS[Math.floor(Math.random() * JOURNAL_PROMPTS.length)];
   const log    = JSON.parse(localStorage.getItem('journal_log') || '[]');
 
@@ -1527,6 +1699,7 @@ const BOOKS = [
 ];
 
 function renderReading(wrap) {
+  wrap.innerHTML = purposeBanner('reading');
   const book = BOOKS[Math.floor(Math.random() * BOOKS.length)];
   const card = document.createElement('div');
   card.className = 'activity-card';
@@ -1588,7 +1761,13 @@ function renderStretch(wrap) {
 
 function _drawStretchCard(wrap) {
   clearInterval(stretchIntv);
-  const s    = STRETCHES[stretchStep];
+  const s = STRETCHES[stretchStep];
+  // On last step finishing → show completion
+  if (stretchStep >= STRETCHES.length) { showCompletion('10-min stretch sequence'); return; }
+
+  const isLast = stretchStep === STRETCHES.length - 1;
+  if (stretchStep === 0) wrap.innerHTML = purposeBanner('stretch');
+
   const card = document.createElement('div');
   card.className = 'activity-card';
   card.innerHTML = `
@@ -1628,12 +1807,72 @@ function _drawStretchCard(wrap) {
 
 function nextStretch() {
   clearInterval(stretchIntv);
-  stretchStep = Math.min(stretchStep+1, STRETCHES.length-1);
-  if (stretchStep === STRETCHES.length-1 && STRETCHES[stretchStep].secs === 90) {
-    // Last pose — play ambient
+  stretchStep++;
+  const wrap = document.getElementById('activity-content');
+  if (stretchStep >= STRETCHES.length) {
+    showCompletion('10-min stretch sequence');
+    return;
+  }
+  // Last pose (savasana) → start ambient audio
+  if (stretchStep === STRETCHES.length - 1) {
     if (!ambientPlayer) { ambientPlayer = new AmbientPlayer(); ambientPlayer.start(); }
   }
-  _drawStretchCard(document.getElementById('activity-content'));
+  _drawStretchCard(wrap);
+}
+
+/* ── BATH ──────────────────────────────────────────── */
+function renderBath(wrap) {
+  wrap.innerHTML = purposeBanner('bath');
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div style="padding:16px 14px 14px">
+      <div style="text-align:center;font-size:2.4rem;margin-bottom:8px">🛁</div>
+      <div class="walk-title" style="text-align:center;margin-bottom:12px">Warm bath ritual</div>
+      <div class="bath-opts">
+        <div class="bath-opt-row"><span class="bath-opt-label">Temperature</span>
+          <div class="bath-chips">
+            <button class="bath-chip on" onclick="bathPick(this)">Warm</button>
+            <button class="bath-chip"    onclick="bathPick(this)">Hot</button>
+            <button class="bath-chip"    onclick="bathPick(this)">Very hot</button>
+          </div>
+        </div>
+        <div class="bath-opt-row"><span class="bath-opt-label">Scent</span>
+          <div class="bath-chips">
+            <button class="bath-chip on" onclick="bathPick(this)">Lavender</button>
+            <button class="bath-chip"    onclick="bathPick(this)">Eucalyptus</button>
+            <button class="bath-chip"    onclick="bathPick(this)">None</button>
+          </div>
+        </div>
+        <div class="bath-opt-row"><span class="bath-opt-label">Duration</span>
+          <div class="bath-chips">
+            <button class="bath-chip"    onclick="bathPick(this);startBathTimer(15)">15 min</button>
+            <button class="bath-chip on" onclick="bathPick(this);startBathTimer(20)">20 min</button>
+            <button class="bath-chip"    onclick="bathPick(this);startBathTimer(30)">30 min</button>
+          </div>
+        </div>
+      </div>
+      <div class="walk-timer" id="bath-timer" style="text-align:center;color:#4472A8;font-size:2rem;font-weight:200;margin-bottom:4px">20:00</div>
+      <div class="walk-lbl"   style="text-align:center;margin-bottom:10px">REMAINING</div>
+      <div class="walk-intent">"Phone stays out here. The only job right now is to be somewhere warm."</div>
+      <button class="bath-no-phone" onclick="showCompletion('Warm bath ritual')">✓ Done — phone stayed out</button>
+    </div>`;
+  wrap.appendChild(card);
+  startBathTimer(20);
+}
+function bathPick(btn) {
+  btn.closest('.bath-chips').querySelectorAll('.bath-chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+}
+function startBathTimer(mins) {
+  clearInterval(teaInt);
+  let secs = mins * 60;
+  teaInt = setInterval(() => {
+    secs--; if (secs<0){clearInterval(teaInt);return;}
+    const el = document.getElementById('bath-timer');
+    if (el) el.textContent = Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
+    else clearInterval(teaInt);
+  }, 1000);
 }
 
 /* ── TEA (keep existing) ──────────────────────────── */
@@ -1692,16 +1931,74 @@ function renderGenericTimer(wrap, name) {
 
 /* ─── PHONE STATE ───────────────────────────────── */
 function setPhoneState(name) {
-  ['idle','notif','thinking','suggestions','activity'].forEach(s => {
+  ['idle','notif','thinking','suggestions','activity','scroll-check','work-interrupt'].forEach(s => {
     const el = document.getElementById('ps-' + s);
     if (el) el.classList.toggle('hidden', s !== name);
   });
+  // Hide idle nudge when leaving idle
+  if (name !== 'idle') {
+    document.getElementById('idle-nudge').style.display = 'none';
+  }
+}
+
+/* ─── REOPEN APP (dock click) ───────────────────── */
+let pausedState = null; // remember what we were doing
+
+function reopenApp(name) {
+  // Ignore if already open
+  if (appsOpen.includes(name)) return;
+
+  const win = document.getElementById('win-' + name);
+  win.classList.remove('closing','closed');
+  win.style.opacity = '0'; win.style.transform = 'translateY(12px) scale(0.96)';
+  requestAnimationFrame(() => {
+    win.style.transition = 'opacity .4s ease, transform .4s ease';
+    win.style.opacity    = '1';
+    win.style.transform  = 'translateY(0) scale(1)';
+  });
+
+  appsOpen.push(name);
+  updateCounter();
+
+  // Pause audio
+  if (ambientPlayer) { ambientPlayer.stop(); ambientPlayer = null; }
+  clearInterval(walkInt); clearInterval(teaInt); clearInterval(playerInt); clearInterval(genTimer);
+
+  // Remember which state we were in
+  const active = ['activity','suggestions','thinking','notif'].find(s =>
+    !document.getElementById('ps-'+s).classList.contains('hidden'));
+  pausedState = active || null;
+
+  // Show work interrupt on phone (unless already idle)
+  if (pausedState) {
+    document.getElementById('wi-app-name').textContent = name === 'slack' ? 'Slack' : 'Gmail';
+    const msgs = { activity: 'Your rest session is paused.', suggestions: 'Your options are still here.', thinking: 'The suggestion is paused.' };
+    document.getElementById('wi-msg').innerHTML =
+      `<span id="wi-app-name">${name === 'slack' ? 'Slack' : 'Gmail'}</span> just reopened.<br>
+       <span style="color:#8B7B70">${msgs[pausedState] || 'Your rest session is paused.'}</span>`;
+    setPhoneState('work-interrupt');
+  }
+}
+
+function resumeRest() {
+  if (pausedState) setPhoneState(pausedState);
+  else setPhoneState('suggestions');
+  // Restart audio if we were on activity
+  if (pausedState === 'activity') {
+    const musicCard = document.getElementById('pbar') || document.getElementById('ppbar');
+    if (musicCard) { ambientPlayer = new AmbientPlayer(); ambientPlayer.start(); }
+  }
+}
+
+function acceptWork() {
+  setPhoneState('idle');
+  pausedState = null;
 }
 
 /* ─── HELPERS ───────────────────────────────────── */
 function clearTimers() {
-  [walkInt, teaInt, playerInt, genTimer].forEach(t => t && clearInterval(t));
-  walkInt = teaInt = playerInt = genTimer = null;
+  [walkInt, teaInt, playerInt, genTimer, stretchIntv].forEach(t => t && clearInterval(t));
+  walkInt = teaInt = playerInt = genTimer = stretchIntv = null;
   if (ambientPlayer) { ambientPlayer.stop(); ambientPlayer = null; }
 }
 
@@ -1714,9 +2011,11 @@ function resetDemo() {
   clearTimers(); // also stops audio
   if (gentleTimer) { clearTimeout(gentleTimer); gentleTimer = null; }
   appsOpen = ['slack','gmail'];
+  pausedState = null;
   ['slack','gmail'].forEach(a => {
     const w = document.getElementById('win-' + a);
     w.classList.remove('closing','closed');
+    w.style.transition = ''; w.style.opacity = ''; w.style.transform = '';
   });
   document.getElementById('desktop-notif').style.display = 'none';
 
