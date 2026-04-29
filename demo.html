@@ -14,7 +14,77 @@
       display: flex; flex-direction: column;
     }
 
-    /* ── TOP BAR ───────────────────────────────── */
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+    @keyframes slideDown{ from{opacity:0;transform:translateY(-18px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
+    @keyframes slideUp  { from{opacity:0;transform:translateY(18px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
+    @keyframes slideInR { from{opacity:0;transform:translateX(18px) scale(0.96)} to{opacity:1;transform:translateX(0) scale(1)} }
+    @keyframes breatheO { 0%,100%{transform:scale(1);opacity:.18} 50%{transform:scale(1.55);opacity:.42} }
+    @keyframes breatheM { 0%,100%{transform:scale(1);opacity:.35} 50%{transform:scale(1.35);opacity:.65} }
+    @keyframes breatheC { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+
+    /* ── SETUP OVERLAY ─────────────────────────────── */
+    #setup-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: #0E1220;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    #setup-overlay.hiding { opacity: 0; transform: scale(1.04); pointer-events: none; }
+    #setup-overlay.gone   { display: none; }
+
+    .so-card {
+      background: #1E2438; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 32px 28px 28px;
+      max-width: 420px; width: 100%;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .so-eyebrow {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: #5B8FD4; margin-bottom: 8px;
+    }
+    .so-card h2 {
+      font-size: 1.35rem; font-weight: 600; color: #fff;
+      letter-spacing: -0.02em; margin-bottom: 6px;
+    }
+    .so-card .so-desc {
+      font-size: 0.82rem; color: rgba(255,255,255,0.45);
+      line-height: 1.6; margin-bottom: 24px;
+    }
+    .so-q {
+      font-size: 0.78rem; font-weight: 500;
+      color: rgba(255,255,255,0.75); margin-bottom: 9px;
+    }
+    .so-q span { font-weight: 300; color: rgba(255,255,255,0.35); }
+
+    .so-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .so-chip {
+      padding: 6px 13px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 100px;
+      font-family: 'Inter', sans-serif; font-size: 0.78rem;
+      color: rgba(255,255,255,0.6); cursor: pointer;
+      transition: all 0.13s; user-select: none;
+    }
+    .so-chip:hover { border-color: #5B8FD4; background: rgba(91,143,212,0.12); color: #fff; }
+    .so-chip.on    { background: #4472A8; border-color: #4472A8; color: #fff; }
+
+    .so-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 16px 0; }
+
+    .so-btn {
+      width: 100%; padding: 13px;
+      background: #4472A8; color: #fff; border: none;
+      border-radius: 10px; font-family: 'Inter', sans-serif;
+      font-size: 0.92rem; font-weight: 600; cursor: pointer;
+      transition: opacity 0.15s; letter-spacing: -0.01em;
+    }
+    .so-btn:hover { opacity: 0.88; }
+
+    /* ── TOP BAR ───────────────────────────────────── */
     .topbar {
       height: 36px; background: rgba(255,255,255,0.06);
       border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -25,577 +95,339 @@
     .tb-red    { background: #FF5F57; }
     .tb-yellow { background: #FFBD2E; }
     .tb-green  { background: #28C840; }
-    .tb-title {
-      font-size: 0.72rem; color: rgba(255,255,255,0.4);
-      margin-left: 8px; letter-spacing: 0.04em;
-    }
-    .tb-time {
-      font-size: 0.72rem; color: rgba(255,255,255,0.35);
-      margin-left: auto; letter-spacing: 0.04em;
-    }
-    .tb-reset {
+    .tb-title  { font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-left: 8px; letter-spacing: 0.04em; }
+    .tb-time   { font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-left: auto; letter-spacing: 0.04em; }
+    .tb-reset  {
       background: rgba(255,255,255,0.1); border: none;
       color: rgba(255,255,255,0.5); font-family: 'Inter', sans-serif;
-      font-size: 0.68rem; padding: 3px 10px; border-radius: 4px;
-      cursor: pointer; transition: background 0.15s;
+      font-size: 0.68rem; padding: 3px 10px; border-radius: 4px; cursor: pointer;
     }
     .tb-reset:hover { background: rgba(255,255,255,0.18); color: #fff; }
 
-    /* ── STAGE ─────────────────────────────────── */
-    .stage {
-      flex: 1; display: flex; gap: 0;
-      overflow: hidden; position: relative;
-    }
+    /* ── STAGE ─────────────────────────────────────── */
+    .stage { flex: 1; display: flex; overflow: hidden; position: relative; }
 
-    /* ── DESKTOP SIDE ───────────────────────────── */
+    /* ── DESKTOP SIDE ──────────────────────────────── */
     .desktop-side {
       flex: 1; position: relative;
       background: linear-gradient(160deg, #2C3550 0%, #1A2035 100%);
-      overflow: hidden;
+      overflow: hidden; min-width: 0;
     }
-
-    /* subtle grid */
     .desktop-side::before {
-      content: '';
-      position: absolute; inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 28px 28px;
-      pointer-events: none;
+      content: ''; position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 28px 28px; pointer-events: none;
     }
-
     .desktop-label {
-      position: absolute; top: 16px; left: 20px;
-      font-size: 0.62rem; font-weight: 600;
-      letter-spacing: 0.14em; text-transform: uppercase;
-      color: rgba(255,255,255,0.2);
+      position: absolute; top: 14px; left: 18px;
+      font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(255,255,255,0.18);
     }
-
     .app-counter {
-      position: absolute; top: 16px; right: 20px;
-      font-size: 0.7rem; color: rgba(255,255,255,0.3);
+      position: absolute; top: 14px; right: 18px;
+      font-size: 0.68rem; color: rgba(255,255,255,0.28);
       transition: color 0.3s;
     }
     .app-counter.warn { color: #FFBD2E; }
 
-    /* ── WINDOWS ────────────────────────────────── */
+    /* ── WINDOWS ───────────────────────────────────── */
     .win {
-      position: absolute;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3);
+      position: absolute; border-radius: 10px; overflow: hidden;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.5), 0 3px 14px rgba(0,0,0,0.3);
       transition: opacity 0.4s ease, transform 0.4s ease;
-      user-select: none;
     }
-    .win.closing {
-      opacity: 0; transform: scale(0.94) translateY(8px);
-      pointer-events: none;
-    }
-    .win.closed { display: none; }
+    .win.closing { opacity: 0; transform: scale(0.94) translateY(8px); pointer-events: none; }
+    .win.closed  { display: none; }
 
-    /* window chrome */
-    .win-chrome {
-      height: 32px; display: flex; align-items: center;
-      padding: 0 12px; gap: 7px; flex-shrink: 0;
-    }
-    .wc-btn {
-      width: 12px; height: 12px; border-radius: 50%;
-      border: none; cursor: pointer; flex-shrink: 0;
-      transition: filter 0.15s;
-    }
-    .wc-btn:hover { filter: brightness(0.85); }
-    .wc-close   { background: #FF5F57; }
-    .wc-min     { background: #FFBD2E; }
-    .wc-max     { background: #28C840; }
-    .win-title  {
-      font-size: 0.72rem; font-weight: 500;
-      color: rgba(255,255,255,0.7); margin-left: 6px;
-    }
+    .win-chrome { height: 32px; display: flex; align-items: center; padding: 0 12px; gap: 7px; flex-shrink: 0; }
+    .wc-btn { width: 12px; height: 12px; border-radius: 50%; border: none; cursor: pointer; flex-shrink: 0; }
+    .wc-btn:hover { filter: brightness(0.82); }
+    .wc-close { background: #FF5F57; }
+    .wc-min   { background: #FFBD2E; }
+    .wc-max   { background: #28C840; }
+    .win-title { font-size: 0.7rem; font-weight: 500; color: rgba(255,255,255,0.65); margin-left: 4px; }
 
-    /* ── SLACK WINDOW ───────────────────────────── */
-    #win-slack {
-      width: 520px; top: 52px; left: 32px;
-    }
-    .slack-chrome { background: #3F0E40; }
-    .slack-body   { display: flex; height: 300px; }
-
-    .slack-sidebar {
-      width: 200px; background: #3F0E40;
-      padding: 10px 0; flex-shrink: 0;
-    }
-    .slack-ws {
-      font-size: 0.8rem; font-weight: 700;
-      color: #fff; padding: 6px 14px 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      margin-bottom: 6px;
-    }
-    .slack-section {
-      font-size: 0.63rem; font-weight: 600;
-      color: rgba(255,255,255,0.4); letter-spacing: 0.06em;
-      text-transform: uppercase; padding: 4px 14px 2px;
-    }
-    .slack-ch {
-      font-size: 0.78rem; color: rgba(255,255,255,0.6);
-      padding: 4px 14px; cursor: default;
-    }
+    /* SLACK */
+    #win-slack { width: 500px; top: 48px; left: 28px; z-index: 10; }
+    .slack-chrome   { background: #3F0E40; }
+    .slack-body     { display: flex; height: 290px; }
+    .slack-sidebar  { width: 190px; background: #3F0E40; padding: 10px 0; flex-shrink: 0; }
+    .slack-ws       { font-size: 0.78rem; font-weight: 700; color: #fff; padding: 6px 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px; }
+    .slack-section  { font-size: 0.6rem; font-weight: 600; color: rgba(255,255,255,0.38); letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 14px 2px; }
+    .slack-ch       { font-size: 0.76rem; color: rgba(255,255,255,0.58); padding: 4px 14px; }
+    .slack-ch::before { content: '# '; opacity: 0.45; }
     .slack-ch.active { background: rgba(255,255,255,0.1); color: #fff; }
-    .slack-ch::before { content: '# '; opacity: 0.5; }
+    .slack-main     { flex: 1; background: #fff; display: flex; flex-direction: column; }
+    .slack-mhead    { height: 42px; border-bottom: 1px solid #eee; display: flex; align-items: center; padding: 0 14px; font-size: 0.8rem; font-weight: 700; color: #1D1C1D; gap: 5px; }
+    .slack-mhead span { font-weight: 400; color: #999; font-size: 0.72rem; }
+    .slack-msgs     { flex: 1; padding: 10px 14px; overflow: hidden; }
+    .slack-msg      { display: flex; gap: 8px; margin-bottom: 10px; }
+    .slack-av       { width: 30px; height: 30px; border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: #fff; }
+    .slack-name     { font-size: 0.75rem; font-weight: 700; color: #1D1C1D; margin-bottom: 1px; }
+    .slack-name span { font-weight: 400; color: #999; font-size: 0.68rem; margin-left: 4px; }
+    .slack-text     { font-size: 0.78rem; color: #1D1C1D; line-height: 1.4; }
+    .slack-inp      { height: 40px; border-top: 1px solid #eee; display: flex; align-items: center; padding: 0 10px; }
+    .slack-inp-box  { flex: 1; height: 26px; border: 1px solid #ddd; border-radius: 4px; padding: 0 10px; font-size: 0.75rem; color: #aaa; background: #fafafa; display: flex; align-items: center; }
 
-    .slack-main {
-      flex: 1; background: #fff; display: flex; flex-direction: column;
-    }
-    .slack-main-header {
-      height: 44px; border-bottom: 1px solid #e8e8e8;
-      display: flex; align-items: center; padding: 0 16px;
-      font-size: 0.83rem; font-weight: 600; color: #1D1C1D;
-      gap: 6px;
-    }
-    .slack-main-header span { font-weight: 400; color: #616061; font-size: 0.75rem; }
-    .slack-msgs { flex: 1; padding: 12px 16px; overflow: hidden; }
-    .slack-msg { display: flex; gap: 8px; margin-bottom: 12px; }
-    .slack-avatar {
-      width: 32px; height: 32px; border-radius: 4px;
-      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-      font-size: 0.72rem; font-weight: 700; color: #fff;
-    }
-    .slack-msg-body { flex: 1; }
-    .slack-msg-name {
-      font-size: 0.78rem; font-weight: 700;
-      color: #1D1C1D; margin-bottom: 2px;
-    }
-    .slack-msg-name span { font-weight: 400; color: #888; font-size: 0.7rem; margin-left: 4px; }
-    .slack-msg-text { font-size: 0.81rem; color: #1D1C1D; line-height: 1.45; }
-    .slack-input {
-      height: 42px; border-top: 1px solid #e8e8e8;
-      display: flex; align-items: center; padding: 0 12px; gap: 8px;
-    }
-    .slack-input-box {
-      flex: 1; height: 28px; border: 1px solid #ddd;
-      border-radius: 4px; padding: 0 10px;
-      font-size: 0.78rem; color: #888; background: #fafafa;
-      display: flex; align-items: center;
-    }
-
-    /* ── GMAIL WINDOW ───────────────────────────── */
-    #win-gmail {
-      width: 440px; top: 80px; left: 300px;
-    }
-    .gmail-chrome { background: #F1F3F4; border-bottom: 1px solid #ddd; }
-    .gmail-body   { display: flex; height: 260px; }
-
-    .gmail-sidebar {
-      width: 160px; background: #F1F3F4;
-      padding: 8px 0; flex-shrink: 0;
-    }
-    .gmail-compose {
-      margin: 0 8px 12px;
-      background: #fff; border: 1px solid #ddd; border-radius: 16px;
-      padding: 10px 16px; font-size: 0.78rem; font-weight: 600;
-      color: #444; cursor: default;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .gmail-nav {
-      font-size: 0.78rem; color: #222;
-      padding: 5px 16px; cursor: default;
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    /* GMAIL */
+    #win-gmail { width: 420px; top: 72px; left: 270px; z-index: 9; }
+    .gmail-chrome  { background: #F1F3F4; border-bottom: 1px solid #ddd; }
+    .gmail-body    { display: flex; height: 250px; }
+    .gmail-sidebar { width: 150px; background: #F1F3F4; padding: 8px 0; flex-shrink: 0; }
+    .gmail-compose { margin: 0 8px 10px; background: #fff; border: 1px solid #ddd; border-radius: 16px; padding: 9px 14px; font-size: 0.75rem; font-weight: 600; color: #444; cursor: default; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .gmail-nav     { font-size: 0.75rem; color: #222; padding: 4px 14px; cursor: default; display: flex; justify-content: space-between; }
     .gmail-nav.active { background: #fce8e6; border-radius: 0 100px 100px 0; margin-right: 8px; font-weight: 600; }
-    .gmail-nav-count  { font-size: 0.72rem; color: #c5221f; font-weight: 500; }
-
-    .gmail-main { flex: 1; background: #fff; }
-    .gmail-toolbar {
-      height: 44px; border-bottom: 1px solid #e8e8e8;
-      display: flex; align-items: center; padding: 0 12px; gap: 6px;
-    }
-    .gmail-search {
-      flex: 1; height: 28px; background: #f1f3f4;
-      border-radius: 20px; border: none;
-      display: flex; align-items: center; padding: 0 14px;
-      font-size: 0.78rem; color: #888;
-    }
-    .gmail-emails { overflow: hidden; }
-    .gmail-row {
-      height: 42px; border-bottom: 1px solid #f1f3f4;
-      display: flex; align-items: center; padding: 0 12px; gap: 10px;
-      cursor: default;
-    }
+    .gmail-count   { font-size: 0.7rem; color: #c5221f; font-weight: 500; }
+    .gmail-main    { flex: 1; background: #fff; }
+    .gmail-toolbar { height: 42px; border-bottom: 1px solid #eee; display: flex; align-items: center; padding: 0 12px; }
+    .gmail-search  { flex: 1; height: 26px; background: #f1f3f4; border-radius: 20px; border: none; display: flex; align-items: center; padding: 0 12px; font-size: 0.75rem; color: #999; }
+    .gmail-row     { height: 40px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; padding: 0 10px; gap: 9px; }
     .gmail-row.unread { background: #fff; }
-    .gmail-row.read   { background: #f5f5f5; }
-    .gmail-star { color: #ccc; font-size: 0.75rem; }
-    .gmail-sender { font-size: 0.78rem; width: 110px; flex-shrink: 0; }
-    .gmail-row.unread .gmail-sender { font-weight: 700; color: #202124; }
-    .gmail-row.read   .gmail-sender { color: #666; }
-    .gmail-subject { font-size: 0.78rem; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-    .gmail-row.unread .gmail-subject { font-weight: 600; color: #202124; }
-    .gmail-row.read   .gmail-subject { color: #888; }
-    .gmail-time { font-size: 0.7rem; color: #888; flex-shrink: 0; }
+    .gmail-row.read   { background: #f6f6f6; }
+    .g-star    { font-size: 0.72rem; color: #ccc; }
+    .g-sender  { font-size: 0.75rem; width: 100px; flex-shrink: 0; }
+    .gmail-row.unread .g-sender { font-weight: 700; color: #202124; }
+    .gmail-row.read   .g-sender { color: #888; }
+    .g-subject { font-size: 0.75rem; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .gmail-row.unread .g-subject { font-weight: 600; color: #202124; }
+    .gmail-row.read   .g-subject { color: #999; }
+    .g-time    { font-size: 0.68rem; color: #999; flex-shrink: 0; }
 
-    /* ── DOCK ───────────────────────────────────── */
+    /* DOCK */
     .dock {
-      position: absolute; bottom: 16px;
-      left: 50%; transform: translateX(-50%);
-      background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 16px;
-      padding: 8px 14px;
-      display: flex; gap: 10px; align-items: flex-end;
+      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.11); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.13); border-radius: 16px;
+      padding: 8px 12px; display: flex; gap: 9px; align-items: flex-end;
     }
-    .dock-icon {
-      width: 44px; height: 44px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; cursor: default;
-      transition: transform 0.15s;
-    }
+    .dock-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: default; transition: transform 0.14s; }
     .dock-icon:hover { transform: translateY(-4px) scale(1.1); }
 
-    /* ── DIVIDER ────────────────────────────────── */
-    .divider-line {
-      width: 1px; background: rgba(255,255,255,0.06); flex-shrink: 0;
+    /* ── DESKTOP NOTIFICATION ──────────────────────── */
+    #desktop-notif {
+      position: absolute; bottom: 76px; right: 16px; width: 290px;
+      background: rgba(28,32,46,0.94); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 14px;
+      padding: 13px 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      display: none; animation: slideInR 0.4s cubic-bezier(0.16,1,0.3,1) both; z-index: 100;
     }
+    .dn-header { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+    .dn-icon   { width: 21px; height: 21px; border-radius: 6px; background: #4472A8; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #fff; font-weight: 700; flex-shrink: 0; }
+    .dn-app    { font-size: 0.62rem; font-weight: 600; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; }
+    .dn-time   { font-size: 0.62rem; color: rgba(255,255,255,0.25); margin-left: auto; }
+    .dn-title  { font-size: 0.86rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .dn-body   { font-size: 0.74rem; color: rgba(255,255,255,0.55); line-height: 1.4; margin-bottom: 11px; }
+    .dn-actions{ display: flex; gap: 7px; }
+    .dn-btn    { flex: 1; padding: 7px; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500; cursor: pointer; }
+    .dn-primary{ background: #4472A8; color: #fff; }
+    .dn-ghost  { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.55); }
+    .dn-btn:hover { opacity: 0.82; }
 
-    /* ── PHONE SIDE ─────────────────────────────── */
+    /* DIVIDER */
+    .divider-line { width: 1px; background: rgba(255,255,255,0.06); flex-shrink: 0; }
+
+    /* ── PHONE SIDE (bigger) ───────────────────────── */
     .phone-side {
-      width: 340px; flex-shrink: 0;
+      width: 420px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      padding: 16px 24px;
+      padding: 12px 20px;
     }
-
-    .phone-wrap { position: relative; }
 
     .phone-shell {
-      width: 260px; height: 520px;
-      background: #1A1917;
-      border-radius: 40px;
+      width: 300px; height: 588px;
+      background: #1A1917; border-radius: 44px;
       border: 3px solid #3A3A3A;
-      box-shadow:
-        0 0 0 1px #111,
-        0 24px 60px rgba(0,0,0,0.6),
-        inset 0 0 0 1px rgba(255,255,255,0.05);
-      overflow: hidden;
-      position: relative;
-      display: flex; flex-direction: column;
+      box-shadow: 0 0 0 1px #111, 0 24px 60px rgba(0,0,0,0.65), inset 0 0 0 1px rgba(255,255,255,0.05);
+      overflow: hidden; position: relative; display: flex; flex-direction: column;
     }
-
-    /* notch */
     .phone-notch {
       position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 90px; height: 26px;
-      background: #1A1917; border-radius: 0 0 16px 16px;
-      z-index: 10;
+      width: 96px; height: 28px; background: #1A1917;
+      border-radius: 0 0 18px 18px; z-index: 10;
     }
+    .phone-screen { flex: 1; overflow: hidden; position: relative; background: #F0EDE8; }
 
-    .phone-screen {
-      flex: 1; overflow: hidden; position: relative;
-      background: #F0EDE8;
-    }
-
-    /* phone status bar */
     .phone-status {
-      height: 44px; display: flex; align-items: flex-end;
-      padding: 0 20px 6px; justify-content: space-between;
-      flex-shrink: 0; font-size: 0.6rem; font-weight: 600;
-      color: var(--screen-fg, #1A1917); background: var(--screen-bg, #F0EDE8);
+      height: 46px; display: flex; align-items: flex-end;
+      padding: 0 22px 7px; justify-content: space-between;
+      flex-shrink: 0; font-size: 0.62rem; font-weight: 600;
+      color: #1A1917; background: #F0EDE8;
       position: relative; z-index: 5;
     }
-    .ps-time { }
-    .ps-icons { display: flex; gap: 4px; opacity: 0.7; }
+    .ps-icons { display: flex; gap: 4px; opacity: 0.65; }
 
-    /* ── PHONE STATES ───────────────────────────── */
+    /* ── PHONE STATES ──────────────────────────────── */
     .phone-state {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      transition: opacity 0.38s ease, transform 0.38s ease;
     }
-    .phone-state.hidden {
-      opacity: 0; pointer-events: none; transform: translateY(10px);
-    }
+    .phone-state.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
 
-    /* State 0: idle home */
-    #ps-idle {
-      background: #F0EDE8;
-      align-items: center; justify-content: center;
-    }
-    .idle-time {
-      font-size: 3rem; font-weight: 200;
-      letter-spacing: -0.04em; color: #1A1917;
-      margin-bottom: 4px;
-    }
-    .idle-date {
-      font-size: 0.75rem; color: #8B7B70;
-      margin-bottom: 32px;
-    }
-    .idle-apps {
-      display: grid; grid-template-columns: repeat(4, 50px);
-      gap: 12px; padding: 0 16px;
-    }
-    .idle-app {
-      width: 50px; height: 50px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem;
-    }
+    /* IDLE */
+    #ps-idle { background: #F0EDE8; align-items: center; justify-content: center; }
+    .idle-time  { font-size: 3.2rem; font-weight: 200; letter-spacing: -0.04em; color: #1A1917; margin-bottom: 4px; }
+    .idle-date  { font-size: 0.78rem; color: #8B7B70; margin-bottom: 28px; }
+    .idle-apps  { display: grid; grid-template-columns: repeat(4, 54px); gap: 12px; }
+    .idle-app   { width: 54px; height: 54px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
 
-    /* State 1: notification */
-    #ps-notif {
-      background: #F0EDE8;
-      padding-top: 44px;
-    }
+    /* NOTIFICATION */
+    #ps-notif { background: #F0EDE8; padding-top: 46px; }
     .notif-card {
       margin: 10px 10px 0;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(20px);
-      border-radius: 16px;
-      padding: 12px 14px 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      background: rgba(255,255,255,0.93); backdrop-filter: blur(20px);
+      border-radius: 18px; padding: 13px 15px 11px;
+      box-shadow: 0 4px 22px rgba(0,0,0,0.1);
       animation: slideDown 0.4s cubic-bezier(0.16,1,0.3,1) both;
     }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-20px) scale(0.95); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .notif-header {
-      display: flex; align-items: center; gap: 7px;
-      margin-bottom: 5px;
-    }
-    .notif-icon {
-      width: 20px; height: 20px; border-radius: 5px;
-      background: #4472A8; display: flex;
-      align-items: center; justify-content: center;
-      font-size: 0.7rem; color: #fff; flex-shrink: 0;
-    }
-    .notif-app-name { font-size: 0.62rem; font-weight: 600; color: #888; letter-spacing: 0.04em; }
-    .notif-time     { font-size: 0.62rem; color: #aaa; margin-left: auto; }
-    .notif-title    { font-size: 0.82rem; font-weight: 700; color: #1A1917; margin-bottom: 3px; }
-    .notif-body     { font-size: 0.75rem; color: #555; line-height: 1.4; margin-bottom: 10px; }
-    .notif-actions  { display: flex; gap: 7px; }
-    .notif-btn {
-      flex: 1; padding: 7px;
-      border: none; border-radius: 8px;
-      font-family: 'Inter', sans-serif; font-size: 0.73rem; font-weight: 500;
-      cursor: pointer; transition: opacity 0.15s;
-    }
-    .notif-btn-primary { background: #4472A8; color: #fff; }
-    .notif-btn-ghost   { background: #F0EDE8; color: #888; }
-    .notif-btn:hover   { opacity: 0.82; }
+    .nc-header    { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+    .nc-icon      { width: 22px; height: 22px; border-radius: 6px; background: #4472A8; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .nc-app       { font-size: 0.62rem; font-weight: 600; color: #999; letter-spacing: 0.04em; }
+    .nc-time      { font-size: 0.62rem; color: #bbb; margin-left: auto; }
+    .nc-title     { font-size: 0.84rem; font-weight: 700; color: #1A1917; margin-bottom: 3px; }
+    .nc-body      { font-size: 0.76rem; color: #666; line-height: 1.4; margin-bottom: 10px; }
+    .nc-actions   { display: flex; gap: 7px; }
+    .nc-btn       { flex: 1; padding: 7px; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.73rem; font-weight: 500; cursor: pointer; }
+    .nc-primary   { background: #4472A8; color: #fff; }
+    .nc-ghost     { background: #F0EDE8; color: #888; }
+    .nc-btn:hover { opacity: 0.82; }
 
-    /* State 2: thinking / breathing */
-    #ps-thinking {
-      background: #F0EDE8;
-      align-items: center; justify-content: center;
-      flex-direction: column; gap: 20px;
-      padding-top: 44px;
+    /* GENTLE RE-ENGAGEMENT notification */
+    .gentle-notif {
+      margin: 0 10px;
+      background: rgba(255,255,255,0.93); backdrop-filter: blur(20px);
+      border-radius: 16px; padding: 12px 14px 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      animation: slideDown 0.4s cubic-bezier(0.16,1,0.3,1) both;
     }
-    .p-breath-wrap { position: relative; width: 72px; height: 72px; }
-    .pb-outer {
-      position: absolute; inset: 0; border-radius: 50%;
-      background: #4472A8; opacity: 0.18;
-      animation: breathe 3.5s ease-in-out infinite;
+    .gentle-notif .nc-title { font-weight: 600; font-size: 0.78rem; }
+    .gentle-notif .nc-body  { font-size: 0.72rem; margin-bottom: 8px; }
+    .gentle-comeback {
+      background: none; border: 1px solid #4472A8; color: #4472A8;
+      border-radius: 8px; padding: 6px 12px; font-family: 'Inter', sans-serif;
+      font-size: 0.72rem; font-weight: 500; cursor: pointer; width: 100%;
+      transition: background 0.14s;
     }
-    .pb-mid {
-      position: absolute; inset: 12px; border-radius: 50%;
-      background: #4472A8; opacity: 0.35;
-      animation: breathe 3.5s ease-in-out infinite 0.2s;
-    }
-    .pb-core {
-      position: absolute; inset: 24px; border-radius: 50%;
-      background: #4472A8;
-      animation: breatheCore 3.5s ease-in-out infinite;
-    }
-    @keyframes breathe     { 0%,100%{transform:scale(1)} 50%{transform:scale(1.5)} }
-    @keyframes breatheCore { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-    .p-thinking-text {
-      font-size: 0.78rem; color: #8B7B70; letter-spacing: 0.04em;
-    }
+    .gentle-comeback:hover { background: #EBF2FA; }
 
-    /* State 3: suggestions */
-    #ps-suggestions {
-      background: #F0EDE8;
-      padding: 44px 12px 12px; overflow-y: auto;
-    }
-    .p-header { margin-bottom: 14px; }
-    .p-header-time {
-      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em;
-      text-transform: uppercase; color: #4472A8; margin-bottom: 3px;
-    }
-    .p-header h3 {
-      font-size: 0.92rem; font-weight: 600;
-      letter-spacing: -0.01em; color: #1A1917; margin-bottom: 3px;
-    }
-    .p-header .p-ctx { font-size: 0.72rem; color: #8B7B70; line-height: 1.4; }
+    /* THINKING */
+    #ps-thinking { background: #F0EDE8; align-items: center; justify-content: center; flex-direction: column; gap: 22px; padding-top: 46px; }
+    .pb-wrap  { position: relative; width: 80px; height: 80px; }
+    .pb-outer { position: absolute; inset: 0; border-radius: 50%; background: #4472A8; animation: breatheO 3.5s ease-in-out infinite; }
+    .pb-mid   { position: absolute; inset: 13px; border-radius: 50%; background: #4472A8; animation: breatheM 3.5s ease-in-out infinite; }
+    .pb-core  { position: absolute; inset: 26px; border-radius: 50%; background: #4472A8; animation: breatheC 3.5s ease-in-out infinite; }
+    .p-thinking-text { font-size: 0.8rem; color: #8B7B70; letter-spacing: 0.04em; }
+
+    /* SUGGESTIONS */
+    #ps-suggestions { background: #F0EDE8; padding: 46px 11px 11px; overflow-y: auto; flex-direction: column; }
+    .p-hdr      { margin-bottom: 12px; flex-shrink: 0; }
+    .p-hdr-time { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #4472A8; margin-bottom: 3px; }
+    .p-hdr h3   { font-size: 0.94rem; font-weight: 600; letter-spacing: -0.01em; color: #1A1917; margin-bottom: 3px; }
+    .p-hdr .p-ctx { font-size: 0.72rem; color: #8B7B70; line-height: 1.4; }
 
     .p-sug {
-      background: #fff; border: 1px solid #E0DAD4;
-      border-radius: 10px; padding: 12px; margin-bottom: 8px;
-      cursor: pointer;
-      transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+      background: #fff; border: 1px solid #E0DAD4; border-radius: 11px;
+      padding: 12px; margin-bottom: 8px; cursor: pointer;
+      transition: border-color 0.14s, box-shadow 0.14s, transform 0.12s;
     }
-    .p-sug:hover {
-      border-color: #4472A8;
-      box-shadow: 0 2px 12px rgba(68,114,168,0.12);
-      transform: translateY(-1px);
-    }
-    .p-sug-title {
-      font-size: 0.82rem; font-weight: 700;
-      color: #1A1917; margin-bottom: 5px; letter-spacing: -0.01em;
-    }
-    .p-sug-because {
-      font-size: 0.68rem; color: #4472A8; line-height: 1.45;
-      background: #EBF2FA; border-radius: 5px; padding: 5px 8px; margin-bottom: 6px;
-    }
+    .p-sug:hover { border-color: #4472A8; box-shadow: 0 2px 14px rgba(68,114,168,0.12); transform: translateY(-1px); }
+    .p-sug-title   { font-size: 0.84rem; font-weight: 700; color: #1A1917; margin-bottom: 5px; letter-spacing: -0.01em; }
+    .p-sug-because { font-size: 0.69rem; color: #4472A8; line-height: 1.45; background: #EBF2FA; border-radius: 5px; padding: 5px 8px; margin-bottom: 6px; }
     .p-sug-because::before { content: 'because '; font-weight: 700; }
-    .p-sug-start {
-      font-size: 0.68rem; color: #8B7B70; line-height: 1.3;
-    }
+    .p-sug-start   { font-size: 0.69rem; color: #8B7B70; line-height: 1.3; }
     .p-sug-start::before { content: '→ '; }
 
-    .p-escape {
-      text-align: center; padding: 6px 0;
-    }
+    .p-escape { text-align: center; padding: 6px 0 2px; flex-shrink: 0; }
     .p-escape-btn {
       background: none; border: none; font-family: 'Inter', sans-serif;
-      font-size: 0.68rem; color: #aaa; cursor: pointer;
+      font-size: 0.7rem; color: #aaa; cursor: pointer;
       text-decoration: underline; text-underline-offset: 2px;
     }
+    .p-escape-btn:hover { color: #888; }
 
-    /* State 4: activity playing */
-    #ps-activity {
-      background: #F0EDE8;
-      padding: 44px 12px 12px;
-      align-items: center; justify-content: center;
-    }
-    .activity-card {
-      width: 100%;
-      background: #fff; border: 1px solid #E0DAD4; border-radius: 14px;
-      overflow: hidden; animation: fadeUp 0.4s ease both;
-    }
-    @keyframes fadeUp {
-      from { opacity:0; transform:translateY(10px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-    /* Spotify-style */
-    .player-art {
-      width: 100%; aspect-ratio: 1;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 3rem;
-    }
-    .player-info { padding: 14px 14px 10px; }
-    .player-title { font-size: 0.88rem; font-weight: 700; margin-bottom: 2px; }
-    .player-sub   { font-size: 0.72rem; color: #888; margin-bottom: 10px; }
-    .player-bar-wrap { height: 3px; background: #E0DAD4; border-radius: 2px; margin-bottom: 8px; }
-    .player-bar-fill { height: 100%; background: #4472A8; border-radius: 2px; width: 0%; transition: width 0.5s linear; }
-    .player-controls {
-      display: flex; align-items: center; justify-content: center; gap: 20px;
-      padding: 0 14px 14px;
-    }
-    .pc-btn {
-      background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.6;
-    }
-    .pc-play {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: #4472A8; border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1rem; color: #fff;
-    }
+    /* ACTIVITY */
+    #ps-activity { background: #F0EDE8; padding: 46px 11px 11px; align-items: center; justify-content: flex-start; flex-direction: column; gap: 10px; }
+    .activity-card { width: 100%; background: #fff; border: 1px solid #E0DAD4; border-radius: 14px; overflow: hidden; animation: fadeUp 0.4s ease both; }
 
-    /* Walk timer style */
-    .walk-card { padding: 20px 14px; text-align: center; }
-    .walk-icon { font-size: 2.5rem; margin-bottom: 10px; }
-    .walk-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
-    .walk-sub   { font-size: 0.72rem; color: #888; margin-bottom: 16px; }
-    .walk-timer {
-      font-size: 2.2rem; font-weight: 200;
-      letter-spacing: -0.04em; color: #4472A8; margin-bottom: 6px;
-    }
-    .walk-timer-label { font-size: 0.65rem; color: #aaa; letter-spacing: 0.08em; }
+    .player-art    { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
+    .player-info   { padding: 14px 14px 8px; }
+    .player-title  { font-size: 0.9rem; font-weight: 700; margin-bottom: 2px; letter-spacing: -0.01em; }
+    .player-sub    { font-size: 0.72rem; color: #888; margin-bottom: 10px; }
+    .pbar-wrap     { height: 3px; background: #E0DAD4; border-radius: 2px; margin-bottom: 10px; }
+    .pbar-fill     { height: 100%; background: #4472A8; border-radius: 2px; width: 0%; transition: width 0.4s linear; }
+    .player-ctrls  { display: flex; align-items: center; justify-content: center; gap: 22px; padding: 0 14px 14px; }
+    .pc-btn   { background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.5; }
+    .pc-play  { width: 42px; height: 42px; border-radius: 50%; background: #4472A8; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #fff; }
 
-    /* Tea timer style */
-    .tea-card { padding: 20px 14px; text-align: center; }
-    .tea-icon  { font-size: 2.5rem; margin-bottom: 10px; }
-    .tea-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
-    .tea-sub   { font-size: 0.72rem; color: #888; margin-bottom: 16px; }
-    .tea-ring-wrap {
-      width: 80px; height: 80px; margin: 0 auto 10px;
-      position: relative;
-    }
-    .tea-ring-svg { transform: rotate(-90deg); }
-    .tea-ring-bg  { fill: none; stroke: #E0DAD4; stroke-width: 5; }
-    .tea-ring-fill {
-      fill: none; stroke: #4472A8; stroke-width: 5;
-      stroke-linecap: round;
-      stroke-dasharray: 220; stroke-dashoffset: 220;
-      transition: stroke-dashoffset 1s linear;
-    }
-    .tea-ring-text {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem; font-weight: 300; color: #4472A8;
-    }
+    .walk-card  { padding: 22px 16px; text-align: center; }
+    .walk-icon  { font-size: 2.8rem; margin-bottom: 10px; }
+    .walk-title { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; }
+    .walk-sub   { font-size: 0.73rem; color: #888; margin-bottom: 18px; }
+    .walk-timer { font-size: 2.4rem; font-weight: 200; letter-spacing: -0.04em; color: #4472A8; margin-bottom: 5px; }
+    .walk-lbl   { font-size: 0.62rem; color: #aaa; letter-spacing: 0.1em; }
 
-    /* ── NOTIFICATION (desktop, bottom right) ──── */
-    #desktop-notif {
-      position: absolute; bottom: 80px; right: 20px;
-      width: 300px;
-      background: rgba(30,30,40,0.92);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 14px; padding: 14px 16px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      display: none;
-      animation: slideInRight 0.4s cubic-bezier(0.16,1,0.3,1) both;
-      z-index: 100;
-    }
-    @keyframes slideInRight {
-      from { opacity:0; transform:translateX(20px) scale(0.96); }
-      to   { opacity:1; transform:translateX(0) scale(1); }
-    }
-    .dn-header {
-      display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
-    }
-    .dn-icon {
-      width: 22px; height: 22px; border-radius: 6px;
-      background: #4472A8; display: flex; align-items: center; justify-content: center;
-      font-size: 0.72rem; color: #fff; flex-shrink: 0;
-    }
-    .dn-app  { font-size: 0.65rem; font-weight: 600; color: rgba(255,255,255,0.5); letter-spacing: 0.05em; }
-    .dn-time { font-size: 0.65rem; color: rgba(255,255,255,0.3); margin-left: auto; }
-    .dn-title { font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
-    .dn-body  { font-size: 0.77rem; color: rgba(255,255,255,0.6); line-height: 1.4; margin-bottom: 12px; }
-    .dn-actions { display: flex; gap: 8px; }
-    .dn-btn {
-      flex: 1; padding: 7px; border: none; border-radius: 8px;
-      font-family: 'Inter', sans-serif; font-size: 0.74rem; font-weight: 500;
-      cursor: pointer; transition: opacity 0.15s;
-    }
-    .dn-btn-primary { background: #4472A8; color: #fff; }
-    .dn-btn-ghost   { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); }
-    .dn-btn:hover   { opacity: 0.82; }
+    .tea-card   { padding: 22px 16px; text-align: center; }
+    .tea-icon   { font-size: 2.8rem; margin-bottom: 10px; }
+    .tea-title  { font-size: 0.92rem; font-weight: 700; margin-bottom: 4px; }
+    .tea-sub    { font-size: 0.73rem; color: #888; margin-bottom: 16px; }
+    .ring-wrap  { width: 88px; height: 88px; margin: 0 auto 10px; position: relative; }
+    .ring-svg   { transform: rotate(-90deg); }
+    .ring-bg    { fill: none; stroke: #E0DAD4; stroke-width: 5; }
+    .ring-fill  { fill: none; stroke: #4472A8; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 245; stroke-dashoffset: 245; transition: stroke-dashoffset 1s linear; }
+    .ring-text  { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 300; color: #4472A8; }
 
-    /* ── HEURISTIC LABELS ───────────────────────── */
+    .back-to-sug {
+      width: 100%; padding: 10px; background: transparent;
+      border: 1px solid #E0DAD4; border-radius: 10px; color: #8B7B70;
+      font-family: 'Inter', sans-serif; font-size: 0.78rem; cursor: pointer;
+      transition: border-color 0.14s, background 0.14s; flex-shrink: 0;
+    }
+    .back-to-sug:hover { border-color: #4472A8; background: #EBF2FA; color: #4472A8; }
+
+    /* HEURISTIC LABELS */
     .hlabel {
-      display: none;
-      position: absolute;
+      display: none; position: absolute;
       background: #FFDD57; color: #1A1917;
-      font-size: 0.58rem; font-weight: 700;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      padding: 3px 8px; border-radius: 100px;
+      font-size: 0.57rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 3px 8px; border-radius: 100px;
       white-space: nowrap; pointer-events: none; z-index: 200;
     }
     body.show-ann .hlabel { display: block; }
 
     .ann-toggle {
       position: fixed; bottom: 14px; right: 14px;
-      background: rgba(255,255,255,0.15); color: #fff;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 100px; padding: 7px 14px;
-      font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 500;
-      cursor: pointer; z-index: 300; letter-spacing: 0.03em;
-      transition: background 0.15s;
+      background: rgba(255,255,255,0.13); color: #fff;
+      border: 1px solid rgba(255,255,255,0.18); border-radius: 100px;
+      padding: 7px 14px; font-family: 'Inter', sans-serif;
+      font-size: 0.68rem; font-weight: 500; cursor: pointer; z-index: 300;
+      transition: background 0.14s;
     }
-    .ann-toggle:hover { background: rgba(255,255,255,0.22); }
+    .ann-toggle:hover { background: rgba(255,255,255,0.2); }
   </style>
 </head>
 <body>
 
-<!-- ── TOP BAR ───────────────────────────────────── -->
+<!-- ════ SETUP OVERLAY ════════════════════════════════ -->
+<div id="setup-overlay">
+  <div class="so-card">
+    <div class="so-eyebrow">Before the demo</div>
+    <h2>Quick — tell me about you.</h2>
+    <p class="so-desc">Your answers make the suggestions personal. This takes 20 seconds.</p>
+
+    <div class="so-q">What usually helps you decompress after work? <span>(pick a few)</span></div>
+    <div class="so-chips" id="so-decompress"></div>
+
+    <div class="so-divider"></div>
+
+    <div class="so-q">What do you tend to reach for when tired, but regret?</div>
+    <div class="so-chips" id="so-regret"></div>
+
+    <div class="so-divider"></div>
+
+    <button class="so-btn" onclick="startDemo()">Start demo →</button>
+  </div>
+</div>
+
+<!-- ════ TOPBAR ══════════════════════════════════════ -->
 <div class="topbar">
   <div class="tb-dot tb-red"></div>
   <div class="tb-dot tb-yellow"></div>
@@ -612,11 +444,9 @@
     <div class="desktop-label">Work in progress</div>
     <div class="app-counter" id="app-counter">2 work apps open</div>
 
-    <!-- SLACK WINDOW -->
-    <div class="win" id="win-slack" style="z-index:10">
-      <!-- Heuristic label -->
-      <span class="hlabel" style="top:-10px;right:0">← Original LLM suggestion: no trigger moment</span>
-
+    <!-- SLACK -->
+    <div class="win" id="win-slack">
+      <span class="hlabel" style="top:-10px;right:0">← LLM had no trigger point</span>
       <div class="win-chrome slack-chrome">
         <button class="wc-btn wc-close" onclick="closeApp('slack')" title="Close Slack"></button>
         <button class="wc-btn wc-min"></button>
@@ -627,87 +457,64 @@
         <div class="slack-sidebar">
           <div class="slack-ws">SVA Design</div>
           <div class="slack-section">Channels</div>
-          <div class="slack-ch active">general</div>
+          <div class="slack-ch active">thesis-2026</div>
           <div class="slack-ch">design-feedback</div>
+          <div class="slack-ch">general</div>
           <div class="slack-ch">random</div>
-          <div class="slack-ch">thesis-2026</div>
-          <div class="slack-section" style="margin-top:8px">DMs</div>
+          <div class="slack-section" style="margin-top:8px">Direct</div>
           <div class="slack-ch" style="color:rgba(255,255,255,0.9)">Yuxuan</div>
         </div>
         <div class="slack-main">
-          <div class="slack-main-header">
-            # thesis-2026 <span>4 members</span>
-          </div>
+          <div class="slack-mhead"># thesis-2026 <span>4 members</span></div>
           <div class="slack-msgs">
             <div class="slack-msg">
-              <div class="slack-avatar" style="background:#E8734A">Y</div>
-              <div class="slack-msg-body">
-                <div class="slack-msg-name">Yuxuan <span>4:44 PM</span></div>
-                <div class="slack-msg-text">reviewed your latest deck — the memory section is really strong 👍</div>
+              <div class="slack-av" style="background:#E8734A">Y</div>
+              <div>
+                <div class="slack-name">Yuxuan <span>4:44 PM</span></div>
+                <div class="slack-text">reviewed your latest deck — the memory section is really strong 👍</div>
               </div>
             </div>
             <div class="slack-msg">
-              <div class="slack-avatar" style="background:#4472A8">F</div>
-              <div class="slack-msg-body">
-                <div class="slack-msg-name">Feifey <span>4:51 PM</span></div>
-                <div class="slack-msg-text">thank you!! still tweaking the interaction demo, almost there</div>
+              <div class="slack-av" style="background:#4472A8">F</div>
+              <div>
+                <div class="slack-name">Feifey <span>4:51 PM</span></div>
+                <div class="slack-text">thank you!! tweaking the interaction demo, almost there</div>
               </div>
             </div>
             <div class="slack-msg">
-              <div class="slack-avatar" style="background:#5A8A5A">A</div>
-              <div class="slack-msg-body">
-                <div class="slack-msg-name">Ada <span>5:00 PM</span></div>
-                <div class="slack-msg-text">presentation starts at 6 — good luck everyone 🎉</div>
+              <div class="slack-av" style="background:#5A8A5A">A</div>
+              <div>
+                <div class="slack-name">Ada <span>5:00 PM</span></div>
+                <div class="slack-text">presentation starts at 6 — good luck everyone 🎉</div>
               </div>
             </div>
           </div>
-          <div class="slack-input">
-            <div class="slack-input-box">Message #thesis-2026</div>
-          </div>
+          <div class="slack-inp"><div class="slack-inp-box">Message #thesis-2026</div></div>
         </div>
       </div>
     </div>
 
-    <!-- GMAIL WINDOW -->
-    <div class="win" id="win-gmail" style="z-index:9">
+    <!-- GMAIL -->
+    <div class="win" id="win-gmail" style="top:72px;left:262px;z-index:9">
       <div class="win-chrome gmail-chrome" style="justify-content:flex-start;gap:7px">
         <button class="wc-btn wc-close" onclick="closeApp('gmail')" style="background:#FF5F57" title="Close Gmail"></button>
         <button class="wc-btn wc-min"   style="background:#FFBD2E"></button>
         <button class="wc-btn wc-max"   style="background:#28C840"></button>
-        <span class="win-title" style="color:#555">Gmail — Inbox (3)</span>
+        <span class="win-title" style="color:#666">Gmail — Inbox (3)</span>
       </div>
       <div class="gmail-body">
         <div class="gmail-sidebar">
           <div class="gmail-compose">✏ Compose</div>
-          <div class="gmail-nav active">Inbox <span class="gmail-nav-count">3</span></div>
+          <div class="gmail-nav active">Inbox <span class="gmail-count">3</span></div>
           <div class="gmail-nav">Starred</div>
           <div class="gmail-nav">Sent</div>
-          <div class="gmail-nav">Drafts <span class="gmail-nav-count">2</span></div>
+          <div class="gmail-nav">Drafts <span class="gmail-count">2</span></div>
         </div>
         <div class="gmail-main">
-          <div class="gmail-toolbar">
-            <div class="gmail-search">Search in mail</div>
-          </div>
-          <div class="gmail-emails">
-            <div class="gmail-row unread">
-              <span class="gmail-star">☆</span>
-              <span class="gmail-sender">Thesis Advisor</span>
-              <span class="gmail-subject">Final feedback on your framing doc — looks great, one small...</span>
-              <span class="gmail-time">5:01 PM</span>
-            </div>
-            <div class="gmail-row unread">
-              <span class="gmail-star">☆</span>
-              <span class="gmail-sender">SVA IxD Program</span>
-              <span class="gmail-subject">Tonight's presentation — room change to Suite 302</span>
-              <span class="gmail-time">4:30 PM</span>
-            </div>
-            <div class="gmail-row read">
-              <span class="gmail-star">★</span>
-              <span class="gmail-sender">Design Weekly</span>
-              <span class="gmail-subject">This week: ambient interfaces, LLM trust patterns, and...</span>
-              <span class="gmail-time">9:14 AM</span>
-            </div>
-          </div>
+          <div class="gmail-toolbar"><div class="gmail-search">Search in mail</div></div>
+          <div class="gmail-row unread"><span class="g-star">☆</span><span class="g-sender">Thesis Advisor</span><span class="g-subject">Final feedback on framing doc — looks great, one small...</span><span class="g-time">5:01 PM</span></div>
+          <div class="gmail-row unread"><span class="g-star">☆</span><span class="g-sender">SVA IxD</span><span class="g-subject">Tonight's presentation — room change to Suite 302</span><span class="g-time">4:30 PM</span></div>
+          <div class="gmail-row read"><span class="g-star">★</span><span class="g-sender">Design Weekly</span><span class="g-subject">LLM trust patterns, ambient interfaces, and this week's...</span><span class="g-time">9:14 AM</span></div>
         </div>
       </div>
     </div>
@@ -716,15 +523,13 @@
     <div class="dock">
       <div class="dock-icon">🔍</div>
       <div class="dock-icon">📁</div>
-      <div class="dock-icon" style="background:#4A154B;border-radius:10px;font-size:1.2rem;color:#fff">S</div>
-      <div class="dock-icon" style="background:#fff;border-radius:10px">
-        <span style="font-size:0.7rem;font-weight:800;color:#EA4335">M</span>
-      </div>
-      <div class="dock-icon">🎵</div>
-      <div class="dock-icon">📝</div>
+      <div class="dock-icon" style="background:#4A154B;border-radius:10px;font-size:0.8rem;color:#fff;font-weight:800">S</div>
+      <div class="dock-icon" style="background:#fff;border-radius:10px;font-size:0.7rem;font-weight:800;color:#EA4335">M</div>
       <div class="dock-icon" style="background:#1DB954;border-radius:10px;padding:6px">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="white"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
       </div>
+      <div class="dock-icon">📝</div>
+      <div class="dock-icon">⚙️</div>
     </div>
 
     <!-- Desktop notification -->
@@ -735,11 +540,11 @@
         <span class="dn-app">TRANSITION</span>
         <span class="dn-time" id="dn-time">now</span>
       </div>
-      <div class="dn-title" id="dn-title">Last work app closed.</div>
-      <div class="dn-body" id="dn-body">You've been in work mode since this morning. Ready to switch?</div>
+      <div class="dn-title">Last work app closed.</div>
+      <div class="dn-body">You've been in work mode all day. Ready to switch?</div>
       <div class="dn-actions">
-        <button class="dn-btn dn-btn-primary" onclick="openTransition()">Let's switch →</button>
-        <button class="dn-btn dn-btn-ghost"   onclick="dismissNotif()">Not yet</button>
+        <button class="dn-btn dn-primary" onclick="openTransition()">Let's switch →</button>
+        <button class="dn-btn dn-ghost"   onclick="dismissNotif()">Not yet</button>
       </div>
     </div>
   </div>
@@ -748,157 +553,213 @@
 
   <!-- ════ PHONE SIDE ════ -->
   <div class="phone-side">
-    <div class="phone-wrap">
-      <div class="phone-shell">
-        <div class="phone-notch"></div>
+    <div class="phone-shell">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
 
-        <div class="phone-screen">
-
-          <!-- State 0: idle -->
-          <div class="phone-state" id="ps-idle">
-            <div class="phone-status">
-              <span class="ps-time" id="ps-clock">5:03</span>
-              <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>100%</span></div>
+        <!-- IDLE -->
+        <div class="phone-state" id="ps-idle">
+          <div class="phone-status">
+            <span id="ps-clock">5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:16px">
+            <div class="idle-time" id="idle-clock">5:03</div>
+            <div class="idle-date">Wednesday, April 29</div>
+            <div class="idle-apps">
+              <div class="idle-app" style="background:#4A154B;font-size:0.78rem;color:#fff;font-weight:800">S</div>
+              <div class="idle-app" style="background:#fff;border:1px solid #eee;font-size:0.74rem;font-weight:800;color:#EA4335">M</div>
+              <div class="idle-app" style="background:#1DB954;font-size:1.1rem">♪</div>
+              <div class="idle-app" style="background:#F5F5F5;font-size:1.2rem">🗓</div>
+              <div class="idle-app" style="background:#4472A8;border-radius:13px;font-size:0.62rem;color:#fff;font-weight:700">T</div>
+              <div class="idle-app" style="background:#F5F5F5">📷</div>
+              <div class="idle-app" style="background:#F5F5F5">🗺</div>
+              <div class="idle-app" style="background:#F5F5F5">⚙️</div>
             </div>
-            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:20px">
-              <div class="idle-time" id="idle-clock">5:03</div>
-              <div class="idle-date">Wednesday, April 29</div>
-              <div class="idle-apps">
-                <div class="idle-app" style="background:#4A154B;font-size:1.4rem">
-                  <span style="color:#fff;font-weight:800;font-size:0.8rem">S</span>
-                </div>
-                <div class="idle-app" style="background:#fff;border:1px solid #eee">
-                  <span style="font-size:0.8rem;font-weight:800;color:#EA4335">M</span>
-                </div>
-                <div class="idle-app" style="background:#1DB954">
-                  <span style="font-size:0.9rem">♪</span>
-                </div>
-                <div class="idle-app" style="background:#F5F5F5;font-size:1.2rem">🗓</div>
-                <div class="idle-app" style="background:#4472A8;border-radius:12px;padding:8px">
-                  <span style="color:#fff;font-size:0.65rem;font-weight:700">T</span>
-                </div>
-                <div class="idle-app" style="background:#F5F5F5;font-size:1.2rem">📷</div>
-                <div class="idle-app" style="background:#F5F5F5;font-size:1.2rem">🗺</div>
-                <div class="idle-app" style="background:#F5F5F5;font-size:1.2rem">⚙️</div>
+          </div>
+        </div>
+
+        <!-- NOTIFICATION -->
+        <div class="phone-state hidden" id="ps-notif">
+          <div class="phone-status" style="background:#F0EDE8">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div style="flex:1;padding-top:8px">
+            <div class="notif-card">
+              <div class="nc-header">
+                <div class="nc-icon">T</div>
+                <span class="nc-app">TRANSITION</span>
+                <span class="nc-time">now</span>
+              </div>
+              <div class="nc-title">Last work app closed.</div>
+              <div class="nc-body" id="notif-body">You've been in work mode all day. Let me help you switch.</div>
+              <div class="nc-actions">
+                <button class="nc-btn nc-primary" onclick="openTransition()">Let's go →</button>
+                <button class="nc-btn nc-ghost"   onclick="scrollAnyway()">Not now</button>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- State 1: notification -->
-          <div class="phone-state hidden" id="ps-notif">
-            <div class="phone-status">
-              <span class="ps-time">5:03</span>
-              <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>100%</span></div>
+        <!-- THINKING -->
+        <div class="phone-state hidden" id="ps-thinking">
+          <div class="phone-status" style="background:#F0EDE8">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div class="pb-wrap">
+            <div class="pb-outer"></div>
+            <div class="pb-mid"></div>
+            <div class="pb-core"></div>
+          </div>
+          <p class="p-thinking-text">Taking a moment…</p>
+        </div>
+
+        <!-- SUGGESTIONS -->
+        <div class="phone-state hidden" id="ps-suggestions" style="overflow-y:auto">
+          <div class="phone-status" style="background:#F0EDE8;position:sticky;top:0;z-index:5">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
+          </div>
+          <div style="padding:0 11px 11px;flex:1;overflow-y:auto" id="sug-wrap">
+            <div class="p-hdr">
+              <span class="hlabel" style="top:-8px;right:0">Memory Awareness</span>
+              <div class="p-hdr-time">5:03 PM · WEDNESDAY</div>
+              <h3>You just finished work.</h3>
+              <p class="p-ctx" id="p-ctx-text">You've closed everything. This is the window.</p>
             </div>
-            <!-- idle wallpaper behind -->
-            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8px">
-              <div class="notif-card">
-                <div class="notif-header">
-                  <div class="notif-icon">T</div>
-                  <span class="notif-app-name">TRANSITION</span>
-                  <span class="notif-time">now</span>
-                </div>
-                <div class="notif-title">Last work app closed.</div>
-                <div class="notif-body">You've been in work mode all day. Let me help you switch.</div>
-                <div class="notif-actions">
-                  <button class="notif-btn notif-btn-primary" onclick="openTransition()">Let's go →</button>
-                  <button class="notif-btn notif-btn-ghost"   onclick="dismissNotif()">Not now</button>
-                </div>
-              </div>
+            <div id="sug-list"></div>
+            <div class="p-escape" style="position:relative">
+              <span class="hlabel" style="top:-8px;right:0">Trust Calibration</span>
+              <button class="p-escape-btn" onclick="scrollAnyway()">I'll scroll anyway</button>
             </div>
           </div>
+        </div>
 
-          <!-- State 2: thinking -->
-          <div class="phone-state hidden" id="ps-thinking">
-            <div class="phone-status">
-              <span class="ps-time">5:03</span>
-              <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>100%</span></div>
-            </div>
-            <div class="p-breath-wrap">
-              <div class="pb-outer"></div>
-              <div class="pb-mid"></div>
-              <div class="pb-core"></div>
-            </div>
-            <p class="p-thinking-text">Taking a moment…</p>
+        <!-- ACTIVITY -->
+        <div class="phone-state hidden" id="ps-activity">
+          <div class="phone-status" style="background:#F0EDE8;position:sticky;top:0;z-index:5">
+            <span>5:03</span>
+            <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>🔋</span></div>
           </div>
-
-          <!-- State 3: suggestions -->
-          <div class="phone-state hidden" id="ps-suggestions">
-            <div class="phone-status">
-              <span class="ps-time">5:03</span>
-              <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>100%</span></div>
-            </div>
-            <div id="ps-sug-content" style="flex:1;overflow-y:auto;padding:0 10px 10px">
-              <div class="p-header">
-                <div class="p-header-time">5:03 PM · WEDNESDAY</div>
-                <h3>You just finished work.</h3>
-                <p class="p-ctx">You've closed everything. This is the window.</p>
-              </div>
-              <!-- Injected by JS -->
-            </div>
+          <div style="padding:0 11px 11px;display:flex;flex-direction:column;gap:9px;flex:1">
+            <div id="activity-content"></div>
+            <button class="back-to-sug" onclick="setPhoneState('suggestions')">← Try a different one</button>
           </div>
+        </div>
 
-          <!-- State 4: activity -->
-          <div class="phone-state hidden" id="ps-activity">
-            <div class="phone-status">
-              <span class="ps-time">5:03</span>
-              <div class="ps-icons"><span>●●●●</span><span>WiFi</span><span>100%</span></div>
-            </div>
-            <div id="activity-content" style="flex:1;display:flex;align-items:center;justify-content:center;padding:10px"></div>
-          </div>
-
-        </div><!-- /phone-screen -->
-      </div><!-- /phone-shell -->
+      </div>
     </div>
   </div>
 
 </div><!-- /stage -->
 
-<!-- Presentation mode -->
 <button class="ann-toggle" id="ann-btn" onclick="toggleAnns()">⚑ Design notes</button>
 
 <script>
-/* ─── DEMO DATA ─────────────────────────────────── */
-const SUGGESTIONS = [
-  {
-    activity: 'Put on your evening playlist',
-    because:  'you said music helps you decompress — no decisions needed',
-    start:    'Open Spotify. Play the first thing in your saved playlists.',
-    type:     'music'
-  },
-  {
-    activity: '20-minute walk around the block',
-    because:  'you close Slack around 5pm — you still have daylight and the energy',
-    start:    'Put on your shoes. Leave your phone at home.',
-    type:     'walk'
-  },
-  {
-    activity: 'Brew tea, phone face-down',
-    because:  'you said you reach for Instagram right after work — this breaks the reflex',
-    start:    'Fill the kettle. Put your phone on the counter, face-down.',
-    type:     'tea'
-  }
+/* ─── DEMO PROFILE ─────────────────────────────── */
+const DECOMPRESS_OPTS = ['A walk','Music','Reading','Tea','Stretching','Drawing','Journaling','A bath'];
+const REGRET_OPTS     = ['Instagram','TikTok','YouTube Shorts','Twitter / X','Reddit','News sites'];
+
+let demoProfile = { decompress: [], regret: [] };
+
+/* ─── SUGGESTION TEMPLATES ─────────────────────── */
+const SUG_LIBRARY = {
+  'A walk':    { activity: 'A 20-minute walk around the block',  type: 'walk',  start: 'Put on your shoes. Leave your phone at home.' },
+  'Music':     { activity: 'Put on your evening playlist',        type: 'music', start: 'Open Spotify. Hit play on whatever\'s saved.' },
+  'Reading':   { activity: 'Read one chapter of your book',       type: 'timer', start: 'Pick up the book. Read one page — that\'s enough.' },
+  'Tea':       { activity: 'Brew tea, phone face-down',           type: 'tea',   start: 'Fill the kettle. Put your phone face-down.' },
+  'Stretching':{ activity: '10 minutes of stretching on the floor', type: 'timer', start: 'Lie on your back and reach your arms up.' },
+  'Drawing':   { activity: 'Sketch something nearby for 10 min',  type: 'timer', start: 'Open your sketchbook to any blank page.' },
+  'Journaling':{ activity: 'Write 3 lines in your journal',       type: 'timer', start: 'Open to today\'s date. Write one sentence.' },
+  'A bath':    { activity: 'Run a warm bath, no phone',           type: 'tea',   start: 'Turn on the tap. Set your phone in the other room.' },
+};
+
+const FALLBACK_SUGS = [
+  { activity: 'A 20-minute walk', type: 'walk', start: 'Put on your shoes. Step outside.' },
+  { activity: 'Put on a playlist', type: 'music', start: 'Open Spotify. Press play.' },
+  { activity: 'Brew tea, phone down', type: 'tea', start: 'Fill the kettle. Phone face-down.' },
 ];
 
-/* ─── STATE ─────────────────────────────────────── */
-let appsOpen  = ['slack', 'gmail'];
-let annsOn    = false;
-let walkTimer = null;
-let teaTimer  = null;
-let playerBar = null;
+function buildSuggestions() {
+  const chosen = demoProfile.decompress.slice(0, 3);
+  const regret = demoProfile.regret[0] || 'scrolling';
+  const becauseFor = (key) => {
+    const map = {
+      'A walk':    `you said walking helps you decompress — and it gets you away from ${regret}`,
+      'Music':     `you listed music as something that restores you — no decisions, just press play`,
+      'Reading':   `you said reading helps you wind down — one chapter is all you need`,
+      'Tea':       `you said you reach for ${regret} after work — making tea breaks that reflex`,
+      'Stretching':`you listed stretching as restorative — your body's been still all day`,
+      'Drawing':   `you said drawing helps you decompress — and it keeps your hands busy`,
+      'Journaling':`you listed journaling as something that helps — just 3 lines is enough`,
+      'A bath':    `you said a bath helps you transition — and it has zero ${regret} risk`,
+    };
+    return map[key] || `you chose this as something that helps you decompress`;
+  };
 
-/* ─── INIT ──────────────────────────────────────── */
+  if (chosen.length === 0) return FALLBACK_SUGS;
+
+  const base = chosen.map(k => SUG_LIBRARY[k] ? { ...SUG_LIBRARY[k], because: becauseFor(k) } : null).filter(Boolean);
+
+  // Always pad to at least 2 suggestions from fallback
+  while (base.length < 2) {
+    const fb = FALLBACK_SUGS.find(f => !base.find(b => b.type === f.type));
+    if (fb) base.push({ ...fb, because: `you said ${regret} doesn't feel good after — this is the alternative` });
+    else break;
+  }
+  return base.slice(0, 3);
+}
+
+/* ─── STATE ────────────────────────────────────── */
+let appsOpen     = ['slack','gmail'];
+let annsOn       = false;
+let genTimer     = null;
+let walkInt      = null;
+let teaInt       = null;
+let playerInt    = null;
+let gentleTimer  = null;
+let currentSugs  = [];
+
+/* ─── SETUP CHIPS ───────────────────────────────── */
 window.addEventListener('load', () => {
+  buildSetupChips('so-decompress', DECOMPRESS_OPTS, 'decompress');
+  buildSetupChips('so-regret',     REGRET_OPTS,     'regret');
   updateClock();
   setInterval(updateClock, 1000);
-  setPhoneState('idle');
 });
 
+function buildSetupChips(id, opts, key) {
+  const wrap = document.getElementById(id);
+  opts.forEach(opt => {
+    const b = document.createElement('button');
+    b.className   = 'so-chip';
+    b.textContent = opt;
+    b.onclick = () => {
+      b.classList.toggle('on');
+      const arr = demoProfile[key];
+      const i   = arr.indexOf(opt);
+      i > -1 ? arr.splice(i,1) : arr.push(opt);
+    };
+    wrap.appendChild(b);
+  });
+}
+
+function startDemo() {
+  const overlay = document.getElementById('setup-overlay');
+  overlay.classList.add('hiding');
+  setTimeout(() => overlay.classList.add('gone'), 500);
+  setPhoneState('idle');
+}
+
+/* ─── CLOCK ─────────────────────────────────────── */
 function updateClock() {
   const t = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  document.getElementById('tb-time').textContent   = t;
-  document.getElementById('idle-clock').textContent = t.replace(' AM','').replace(' PM','');
-  document.getElementById('ps-clock').textContent   = t.replace(' AM','').replace(' PM','');
+  const s = t.replace(/ AM| PM/,'');
+  document.getElementById('tb-time').textContent    = t;
+  document.getElementById('idle-clock').textContent = s;
+  document.getElementById('ps-clock').textContent   = s;
 }
 
 /* ─── CLOSE APP ─────────────────────────────────── */
@@ -906,24 +767,15 @@ function closeApp(name) {
   const win = document.getElementById('win-' + name);
   win.classList.add('closing');
   setTimeout(() => win.classList.add('closed'), 400);
-
   appsOpen = appsOpen.filter(a => a !== name);
   updateCounter();
-
-  if (appsOpen.length === 0) {
-    setTimeout(fireNotification, 700);
-  }
+  if (appsOpen.length === 0) setTimeout(fireNotification, 700);
 }
 
 function updateCounter() {
   const el = document.getElementById('app-counter');
-  if (appsOpen.length === 0) {
-    el.textContent = 'No work apps open';
-    el.classList.add('warn');
-  } else {
-    el.textContent = appsOpen.length + ' work app' + (appsOpen.length > 1 ? 's' : '') + ' open';
-    el.classList.remove('warn');
-  }
+  if (appsOpen.length === 0) { el.textContent = 'No work apps open'; el.classList.add('warn'); }
+  else { el.textContent = appsOpen.length + ' work app' + (appsOpen.length > 1 ? 's' : '') + ' open'; el.classList.remove('warn'); }
 }
 
 /* ─── FIRE NOTIFICATION ─────────────────────────── */
@@ -931,6 +783,12 @@ function fireNotification() {
   const t = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   document.getElementById('dn-time').textContent = t;
   document.getElementById('desktop-notif').style.display = 'block';
+
+  // Personalise notification body
+  const regret = demoProfile.regret[0] || 'scrolling';
+  document.getElementById('notif-body').textContent =
+    `You've been in work mode all day. Before you open ${regret}, let me help you switch.`;
+
   setPhoneState('notif');
 }
 
@@ -939,41 +797,77 @@ function dismissNotif() {
   setPhoneState('idle');
 }
 
+/* ─── SCROLL ANYWAY ─────────────────────────────── */
+function scrollAnyway() {
+  document.getElementById('desktop-notif').style.display = 'none';
+  setPhoneState('idle');
+
+  // Gentle re-engagement after 6 seconds
+  if (gentleTimer) clearTimeout(gentleTimer);
+  gentleTimer = setTimeout(() => {
+    const regret = demoProfile.regret[0] || 'Instagram';
+    const sug    = currentSugs[0]?.activity || 'your rest idea';
+    showGentleNotif(regret, sug);
+  }, 6000);
+}
+
+function showGentleNotif(regret, sug) {
+  setPhoneState('notif');
+
+  // Replace notification card with gentle version
+  const notifState = document.getElementById('ps-notif');
+  const existing   = notifState.querySelector('.notif-card');
+  if (existing) {
+    existing.innerHTML = `
+      <div class="nc-header">
+        <div class="nc-icon">T</div>
+        <span class="nc-app">TRANSITION</span>
+        <span class="nc-time">just now</span>
+      </div>
+      <div class="nc-title">Still scrolling? 💙</div>
+      <div class="nc-body">You told me ${regret} makes you feel worse after.
+        No pressure — but your "${sug}" idea is still here whenever you want it.</div>
+      <div class="nc-actions">
+        <button class="nc-btn nc-primary" onclick="openTransition()">Take me back</button>
+        <button class="nc-btn nc-ghost" onclick="setPhoneState('idle')">I'm okay</button>
+      </div>`;
+  }
+}
+
 /* ─── OPEN TRANSITION ───────────────────────────── */
 function openTransition() {
   document.getElementById('desktop-notif').style.display = 'none';
+  if (gentleTimer) clearTimeout(gentleTimer);
   setPhoneState('thinking');
 
-  // Simulate thinking for 3 seconds then show suggestions
+  currentSugs = buildSuggestions();
   setTimeout(() => {
-    renderSuggestions();
+    renderSuggestions(currentSugs);
     setPhoneState('suggestions');
   }, 3000);
 }
 
 /* ─── RENDER SUGGESTIONS ────────────────────────── */
-function renderSuggestions() {
-  const wrap = document.getElementById('ps-sug-content');
-  // Clear old suggestions but keep header
-  const header = wrap.querySelector('.p-header');
-  wrap.innerHTML = '';
-  wrap.appendChild(header);
+function renderSuggestions(sugs) {
+  const list = document.getElementById('sug-list');
+  list.innerHTML = '';
 
-  SUGGESTIONS.forEach(s => {
+  // Personalise context line
+  const regret = demoProfile.regret[0] || 'scrolling';
+  document.getElementById('p-ctx-text').textContent =
+    `Before you open ${regret} — here's what you said helps.`;
+
+  sugs.forEach(s => {
     const card = document.createElement('div');
     card.className = 'p-sug';
     card.innerHTML = `
-      <div class="p-sug-title">${s.activity}</div>
-      <div class="p-sug-because">${s.because}</div>
-      <div class="p-sug-start">${s.start}</div>`;
+      <span class="hlabel" style="top:-8px;left:0">Transparency</span>
+      <div class="p-sug-title">${esc(s.activity)}</div>
+      <div class="p-sug-because">${esc(s.because || '')}</div>
+      <div class="p-sug-start">${esc(s.start)}</div>`;
     card.onclick = () => startActivity(s);
-    wrap.appendChild(card);
+    list.appendChild(card);
   });
-
-  const esc = document.createElement('div');
-  esc.className = 'p-escape';
-  esc.innerHTML = `<button class="p-escape-btn" onclick="dismissNotif()">I'll scroll anyway</button>`;
-  wrap.appendChild(esc);
 }
 
 /* ─── START ACTIVITY ────────────────────────────── */
@@ -982,12 +876,15 @@ function startActivity(s) {
   const wrap = document.getElementById('activity-content');
   wrap.innerHTML = '';
 
-  if (s.type === 'music') renderMusicPlayer(wrap);
-  else if (s.type === 'walk') renderWalkTimer(wrap);
-  else if (s.type === 'tea')  renderTeaTimer(wrap);
+  clearTimers();
+
+  if (s.type === 'music') renderMusic(wrap);
+  else if (s.type === 'walk')  renderWalk(wrap);
+  else if (s.type === 'tea')   renderTea(wrap);
+  else renderGenericTimer(wrap, s.activity);
 }
 
-function renderMusicPlayer(wrap) {
+function renderMusic(wrap) {
   const card = document.createElement('div');
   card.className = 'activity-card';
   card.innerHTML = `
@@ -995,25 +892,23 @@ function renderMusicPlayer(wrap) {
     <div class="player-info">
       <div class="player-title">Evening Wind-Down</div>
       <div class="player-sub">Your saved playlist · 47 songs</div>
-      <div class="player-bar-wrap"><div class="player-bar-fill" id="pbar"></div></div>
+      <div class="pbar-wrap"><div class="pbar-fill" id="pbar"></div></div>
     </div>
-    <div class="player-controls">
+    <div class="player-ctrls">
       <button class="pc-btn">⏮</button>
       <button class="pc-play">▶</button>
       <button class="pc-btn">⏭</button>
     </div>`;
   wrap.appendChild(card);
-
-  let pct = 0;
-  playerBar = setInterval(() => {
-    pct = Math.min(pct + 0.3, 100);
+  let p = 0;
+  playerInt = setInterval(() => {
+    p = Math.min(p + 0.25, 100);
     const el = document.getElementById('pbar');
-    if (el) el.style.width = pct + '%';
-    else clearInterval(playerBar);
+    if (el) el.style.width = p + '%'; else clearInterval(playerInt);
   }, 100);
 }
 
-function renderWalkTimer(wrap) {
+function renderWalk(wrap) {
   const card = document.createElement('div');
   card.className = 'activity-card';
   card.innerHTML = `
@@ -1022,23 +917,20 @@ function renderWalkTimer(wrap) {
       <div class="walk-title">20-minute walk</div>
       <div class="walk-sub">Phone is staying home. Back by 5:23.</div>
       <div class="walk-timer" id="walk-timer">20:00</div>
-      <div class="walk-timer-label">MINUTES REMAINING</div>
+      <div class="walk-lbl">MINUTES REMAINING</div>
     </div>`;
   wrap.appendChild(card);
-
   let secs = 1200;
-  walkTimer = setInterval(() => {
+  walkInt = setInterval(() => {
     secs--;
-    if (secs <= 0) { clearInterval(walkTimer); return; }
-    const m = Math.floor(secs / 60);
-    const s = secs % 60;
     const el = document.getElementById('walk-timer');
-    if (el) el.textContent = m + ':' + String(s).padStart(2,'0');
-    else clearInterval(walkTimer);
+    if (el) el.textContent = Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
+    else clearInterval(walkInt);
   }, 1000);
 }
 
-function renderTeaTimer(wrap) {
+function renderTea(wrap) {
+  const circ = 2 * Math.PI * 38;
   const card = document.createElement('div');
   card.className = 'activity-card';
   card.innerHTML = `
@@ -1046,34 +938,50 @@ function renderTeaTimer(wrap) {
       <div class="tea-icon">🍵</div>
       <div class="tea-title">Tea time</div>
       <div class="tea-sub">Phone is face-down. Kettle's on.</div>
-      <div class="tea-ring-wrap">
-        <svg class="tea-ring-svg" width="80" height="80" viewBox="0 0 80 80">
-          <circle class="tea-ring-bg"   cx="40" cy="40" r="35"/>
-          <circle class="tea-ring-fill" id="tea-ring" cx="40" cy="40" r="35"/>
+      <div class="ring-wrap">
+        <svg class="ring-svg" width="88" height="88" viewBox="0 0 88 88">
+          <circle class="ring-bg"   cx="44" cy="44" r="38"/>
+          <circle class="ring-fill" id="tea-ring" cx="44" cy="44" r="38" style="stroke-dasharray:${circ};stroke-dashoffset:${circ}"/>
         </svg>
-        <div class="tea-ring-text" id="tea-text">10:00</div>
+        <div class="ring-text" id="tea-text">10:00</div>
       </div>
-      <div class="walk-timer-label">UNTIL KETTLE BOILS</div>
+      <div class="walk-lbl">UNTIL KETTLE BOILS</div>
     </div>`;
   wrap.appendChild(card);
-
   let secs = 600;
-  const circ = 2 * Math.PI * 35;
-  teaTimer = setInterval(() => {
+  teaInt = setInterval(() => {
     secs--;
-    if (secs <= 0) { clearInterval(teaTimer); return; }
-    const pct   = secs / 600;
-    const m     = Math.floor(secs / 60);
-    const s     = secs % 60;
-    const ring  = document.getElementById('tea-ring');
-    const text  = document.getElementById('tea-text');
+    const pct  = secs / 600;
+    const ring = document.getElementById('tea-ring');
+    const txt  = document.getElementById('tea-text');
     if (ring) ring.style.strokeDashoffset = circ * (1 - pct);
-    if (text) text.textContent = m + ':' + String(s).padStart(2,'0');
-    else clearInterval(teaTimer);
+    if (txt)  txt.textContent = Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
+    else clearInterval(teaInt);
   }, 1000);
 }
 
-/* ─── PHONE STATE MANAGER ───────────────────────── */
+function renderGenericTimer(wrap, name) {
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.innerHTML = `
+    <div class="walk-card">
+      <div class="walk-icon">⏱</div>
+      <div class="walk-title">${esc(name)}</div>
+      <div class="walk-sub">10-minute window. You've got this.</div>
+      <div class="walk-timer" id="gen-timer">10:00</div>
+      <div class="walk-lbl">MINUTES</div>
+    </div>`;
+  wrap.appendChild(card);
+  let secs = 600;
+  genTimer = setInterval(() => {
+    secs--;
+    const el = document.getElementById('gen-timer');
+    if (el) el.textContent = Math.floor(secs/60) + ':' + String(secs%60).padStart(2,'0');
+    else clearInterval(genTimer);
+  }, 1000);
+}
+
+/* ─── PHONE STATE ───────────────────────────────── */
 function setPhoneState(name) {
   ['idle','notif','thinking','suggestions','activity'].forEach(s => {
     const el = document.getElementById('ps-' + s);
@@ -1081,20 +989,38 @@ function setPhoneState(name) {
   });
 }
 
+/* ─── HELPERS ───────────────────────────────────── */
+function clearTimers() {
+  [walkInt, teaInt, playerInt, genTimer].forEach(t => t && clearInterval(t));
+  walkInt = teaInt = playerInt = genTimer = null;
+}
+
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 /* ─── RESET ─────────────────────────────────────── */
 function resetDemo() {
-  if (walkTimer)  clearInterval(walkTimer);
-  if (teaTimer)   clearInterval(teaTimer);
-  if (playerBar)  clearInterval(playerBar);
-
+  clearTimers();
+  if (gentleTimer) { clearTimeout(gentleTimer); gentleTimer = null; }
   appsOpen = ['slack','gmail'];
-
   ['slack','gmail'].forEach(a => {
     const w = document.getElementById('win-' + a);
     w.classList.remove('closing','closed');
   });
-
   document.getElementById('desktop-notif').style.display = 'none';
+
+  // Restore notification card to default
+  const card = document.querySelector('#ps-notif .notif-card');
+  if (card) card.innerHTML = `
+    <div class="nc-header"><div class="nc-icon">T</div><span class="nc-app">TRANSITION</span><span class="nc-time">now</span></div>
+    <div class="nc-title">Last work app closed.</div>
+    <div class="nc-body" id="notif-body">You've been in work mode all day. Let me help you switch.</div>
+    <div class="nc-actions">
+      <button class="nc-btn nc-primary" onclick="openTransition()">Let's go →</button>
+      <button class="nc-btn nc-ghost" onclick="scrollAnyway()">Not now</button>
+    </div>`;
+
   updateCounter();
   setPhoneState('idle');
 }

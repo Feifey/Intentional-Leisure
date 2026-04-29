@@ -466,6 +466,7 @@
         <button class="ghost-btn" onclick="showView('memory')">What do you know about me?</button>
       </span>
       <button class="ghost-btn" onclick="showView('setup')">Edit my profile</button>
+      <button class="ghost-btn" onclick="promptNewKey()">Update API key</button>
     </div>
   </div>
 </div>
@@ -737,7 +738,54 @@ function showResults(data, timeStr) {
 function showError(msg) {
   document.getElementById('thinking').style.display = 'none';
   document.getElementById('results').style.display  = 'block';
-  document.getElementById('r-context').textContent  = `Something went wrong: ${msg}`;
+
+  const isKeyError = /invalid api key|401|unauthorized/i.test(msg);
+  document.getElementById('r-context').textContent = '';
+
+  const list = document.getElementById('r-suggestions');
+  list.innerHTML = `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:1.3rem;margin-bottom:10px">${isKeyError ? '🔑' : '⚠️'}</div>
+      <div style="font-size:0.88rem;font-weight:600;margin-bottom:6px">
+        ${isKeyError ? 'API key issue' : 'Something went wrong'}
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:16px;line-height:1.5">
+        ${isKeyError
+          ? 'Your Groq key looks invalid or expired. Get a fresh one at console.groq.com, then update it below.'
+          : msg}
+      </div>
+      ${isKeyError ? `
+        <input type="password" id="inline-key" placeholder="Paste new gsk_ key…"
+          style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+                 font-family:Inter,sans-serif;font-size:0.82rem;outline:none;margin-bottom:10px;
+                 background:#FAFAF8;color:var(--fg)"/>
+        <button onclick="updateKey()" style="width:100%;padding:10px;background:var(--fg);color:#fff;
+          border:none;border-radius:8px;font-family:Inter,sans-serif;font-size:0.84rem;font-weight:500;cursor:pointer">
+          Save & retry
+        </button>` : ''}
+      <button onclick="goHome()" style="width:100%;padding:9px;margin-top:8px;
+        background:transparent;color:var(--muted);border:1px solid var(--border);
+        border-radius:8px;font-family:Inter,sans-serif;font-size:0.82rem;cursor:pointer">
+        Back to home
+      </button>
+    </div>`;
+  document.querySelector('.escape').style.display = 'none';
+}
+
+function updateKey() {
+  const val = document.getElementById('inline-key')?.value.trim();
+  if (!val) return;
+  apiKey = val;
+  localStorage.setItem('il_key', val);
+  startTransition();
+}
+
+function promptNewKey() {
+  const val = prompt('Paste your Groq API key (gsk_…):');
+  if (!val) return;
+  apiKey = val.trim();
+  localStorage.setItem('il_key', apiKey);
+  alert('Key saved. Try again!');
 }
 
 function chooseActivity(name) {
